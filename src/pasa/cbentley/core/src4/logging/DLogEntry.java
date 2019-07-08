@@ -3,8 +3,10 @@ package pasa.cbentley.core.src4.logging;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
- * Timing of the Log
+ * Represents a log statement
  * 
+ * The {@link IStringable} is a reference to the object. As such it cannot be serialized
+ *
  * <li> message
  * <li> {@link IStringable}
  * <li> Class
