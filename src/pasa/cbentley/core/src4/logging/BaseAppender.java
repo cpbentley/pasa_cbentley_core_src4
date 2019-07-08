@@ -5,7 +5,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 public abstract class BaseAppender implements ILogEntryAppender {
 
    //#mdebug
-   private IConfig config;
+   protected IConfig config;
 
    protected UCtx uc;
 
