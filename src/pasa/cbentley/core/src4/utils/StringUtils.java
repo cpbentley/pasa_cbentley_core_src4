@@ -3,7 +3,6 @@ package pasa.cbentley.core.src4.utils;
 import java.awt.Font;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
-
 import pasa.cbentley.core.src4.structs.IntBuffer;
 
 /**
@@ -13,11 +12,6 @@ import pasa.cbentley.core.src4.structs.IntBuffer;
  */
 public class StringUtils {
 
-   /**
-    * 
-    */
-   public static final String UTF8_BOM = "\uFEFF";
-
    public static final int    EN_PAD   = 0;
 
    /**
@@ -25,36 +19,10 @@ public class StringUtils {
     */
    public static final int    RU_PAD   = 4;
 
-   public String getString(int[] ar, String separator) {
-      if (ar == null) {
-         return "null";
-      }
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < ar.length; i++) {
-         if (i != 0) {
-            sb.append(separator);
-         }
-         sb.append(ar[i]);
-      }
-      return sb.toString();
-   }
-   public String getString(String[] ar, char separator) {
-      return getString(ar, String.valueOf(separator));
-   }
-   
-   public String getString(String[] ar, String separator) {
-      if (ar == null) {
-         return "null";
-      }
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < ar.length; i++) {
-         if (i != 0) {
-            sb.append(separator);
-         }
-         sb.append(ar[i]);
-      }
-      return sb.toString();
-   }
+   /**
+    * 
+    */
+   public static final String UTF8_BOM = "\uFEFF";
 
    /**
     * Append the byte values to the string builder
@@ -89,17 +57,6 @@ public class StringUtils {
    public static boolean checkSamePlane(char[][] data) {
       return true;
 
-   }
-
-   /**
-    * -1 when source is smaller
-    * 1 when source is bigger
-    * @param source
-    * @param target
-    * @return
-    */
-   public int compare(String source, String target) {
-      return uc.getCU().compare(source.toCharArray(), target.toCharArray());
    }
 
    /**
@@ -347,22 +304,6 @@ public class StringUtils {
       return getCharByteArrayPlane(str.toCharArray(), 0, str.length(), plane);
    }
 
-   public String getLowerCase(String s, int langid) {
-      char[] chars = s.toCharArray();
-      if (langid == RU_PAD) {
-         int[] newv = new int[chars.length];
-         for (int i = 0; i < chars.length; i++) {
-            newv[i] = CharUtils.byteArrayBEFromChar(chars[i])[1];
-            if (newv[i] < 48) {
-               newv[i] = newv[i] + 32;
-            }
-         }
-         return new String(CharUtils.buildCharsFromLowBytes(newv, StringUtils.RU_PAD, 0, newv.length));
-      } else {
-         return s.toLowerCase();
-      }
-   }
-
    /**
     * Returns the plane value when all characters match the given plane
     * <br>
@@ -553,30 +494,6 @@ public class StringUtils {
    }
 
    /**
-    * Tells if character is the last letter of the alphabet.
-    * <li> z in latin alphabet
-    * <li> я in cyrillic
-    * <br>
-    * Works with uppercase and lowercase
-    * <br>
-    * @param c
-    * @return
-    */
-   public boolean isLastLetter(char c) {
-      int plan = (byte) ((c >>> 8) & 0xFF);
-      int letter = (byte) ((c >>> 0) & 0xFF);
-      switch (plan) {
-         case RU_PAD:
-            // я = 79   Я = 47 
-            return letter == 79 || letter == 47;
-         case EN_PAD:
-            // a = 97  z=122    Z=90
-            return letter == 122 || letter == 90;
-      }
-      return false;
-   }
-
-   /**
     * @param c char to check
     * @return false if BIG letter. false otherwise
     */
@@ -653,33 +570,6 @@ public class StringUtils {
 
    public static int isSamePrefix(String source, int index, String match) {
       return isSamePrefix(source.toCharArray(), index, match.toCharArray());
-   }
-
-   /**
-    * Test whether test can be humanly considered with the same
-    * high level semantic meaning
-    * ie Clothe, clothes
-    * phone, Phones
-    * @param source
-    * @param test
-    * @return
-    * true if 
-    * false if there is a length diff higher than 2
-    */
-   public boolean isSimilar(String source, String test) {
-      int sl = source.length();
-      int tl = test.length();
-      int min = Math.min(sl, tl);
-      //int max = Math.max(sl, tl);
-      if (Math.abs(sl - tl) > 2)
-         return false;
-      for (int i = 0; i < min; i++) {
-         if (toLowerCase(source.charAt(i)) != toLowerCase(test.charAt(i))) {
-            return false;
-         }
-
-      }
-      return true;
    }
 
    public static boolean isWhitespace(char character) {
@@ -796,115 +686,12 @@ public class StringUtils {
       }
    }
 
-   public String prettyDouble(double amountn, int decimals) {
-      String s = Double.toString(amountn);
-      int index = s.indexOf('.') + 1;
-      int numofdeci = s.length() - index;
-      if (index == -1) {
-         index = 0;
-         numofdeci = 0;
-      }
-      int max = Math.min(decimals, numofdeci);
-      if (decimals == 0) {
-         index--;
-      }
-      String m1 = s.substring(0, index);
-      String m2 = s.substring(index, index + max);
-      return m1 + m2;
-   }
-
    public static String prettyFloat(float amountn) {
       if (amountn > 5) {
          return Integer.toString((int) amountn);
       } else {
          return Float.toString(amountn).substring(0, 3);
       }
-   }
-
-   /**
-    * Pretty method:
-    * <br>
-    * Pads 0 in front value
-    * @param value
-    * @param numChars
-    * @return
-    */
-   public String prettyInt0Padd(int value, int numChars) {
-      return prettyIntPaddStr(value, numChars, "0");
-   }
-
-   public String prettyIntPaddStr(int value, int numChars, String str) {
-      String numIt = String.valueOf(value);
-      while (numIt.length() < numChars) {
-         numIt = str + numIt;
-      }
-      return numIt;
-   }
-
-   /**
-    * 
-    * @param value
-    * @param total
-    * @param decimals
-    * @return
-    */
-   public String prettyPercentage(int value, int total, int decimals) {
-      double me = (double) ((double) value / (double) total) * ((double) 100);
-      return prettyDouble(me, decimals);
-   }
-
-   /**
-    * pads String from front to reach size
-    * @param str
-    * @param size
-    * @return
-    */
-   public String prettyStringPad(String str, int size, char padder) {
-      int diff = size - str.length();
-      if (diff > 0) {
-         for (int i = 0; i < diff; i++) {
-            str = padder + str;
-         }
-      }
-      return str;
-   }
-
-   /**
-    * Computes a user readable String
-    * Does m
-    * @param m
-    * @return
-    */
-   public String prettyStringMem(long m) {
-      String s = null;
-      double divisor = 1;
-      double upper = (double) m;
-      if (m < 2000) {
-         s = " bytes";
-      } else if (m < 2000000) {
-         divisor = 1000;
-         s = " kb";
-      } else if (m < 2000000000L) {
-         divisor = 1000000;
-         s = " mb";
-      } else {
-         //giga
-         divisor = 1000000000;
-         s = " gb";
-      }
-      String v = String.valueOf((int) (upper / divisor));
-      return v + s;
-
-   }
-
-   public String prettyStringPadBack(String str, int size, char padder) {
-      int diff = size - str.length();
-      if (diff > 0) {
-         for (int i = 0; i < diff; i++) {
-            str = str + padder;
-         }
-      }
-      return str;
    }
 
    /**
@@ -1050,7 +837,6 @@ public class StringUtils {
       }
    }
 
-
    public static char[] sort(char[] c, boolean asc) {
       char tempstr = ' ';
       if (c.length == 1)
@@ -1170,24 +956,13 @@ public class StringUtils {
       return c;
    }
 
-   public String trimAtChar(String string, char c) {
-      int index = string.indexOf(c);
-      if (index != -1) {
-         return string.substring(0, index);
-      }
-      return string;
-   }
-
-   /**
-    * Returns a String trimmed at the first occurrence of the character 
-    * @param string
-    * @return
-    */
-   public String trimAtNewLine(String string) {
-      return trimAtChar(string, '\n');
-   }
+   public final char[] as = new char[] { 'a', 'â' };
 
    private char[] cyrChar;
+
+   public final char[] es = new char[] { 'e', 'é', 'è', 'ê' };
+
+   public final char[] is = new char[] { 'i', 'î' };
 
    private char[] latinChar;
 
@@ -1197,6 +972,17 @@ public class StringUtils {
 
    public StringUtils(UCtx uc) {
       this.uc = uc;
+   }
+
+   /**
+    * -1 when source is smaller
+    * 1 when source is bigger
+    * @param source
+    * @param target
+    * @return
+    */
+   public int compare(String source, String target) {
+      return uc.getCU().compare(source.toCharArray(), target.toCharArray());
    }
 
    /**
@@ -1327,35 +1113,6 @@ public class StringUtils {
       }
    }
 
-   public final char[] es = new char[] { 'e', 'é', 'è', 'ê' };
-
-   public final char[] as = new char[] { 'a', 'â' };
-
-   public final char[] is = new char[] { 'i', 'î' };
-
-   /**
-    * Return an array of related characters
-    * <li> i return i and î, ì, í, 
-    * 
-    * This depends on the context. A user in French does not need ñ
-    * 
-    * TODO
-    * @param c
-    * @return
-    */
-   public char[] getCharAccentMerge(char c) {
-      switch (c) {
-         case 'e':
-            return es;
-         case 'a':
-            return as;
-         case 'i':
-            return is;
-         default:
-            return null;
-      }
-   }
-
    /**
     * Int array starts .
     * <br>
@@ -1426,12 +1183,66 @@ public class StringUtils {
       return b.getIntsRef();
    }
 
+   /**
+    * Return an array of related characters
+    * <li> i return i and î, ì, í, 
+    * 
+    * This depends on the context. A user in French does not need ñ
+    * 
+    * TODO
+    * @param c
+    * @return
+    */
+   public char[] getCharAccentMerge(char c) {
+      switch (c) {
+         case 'e':
+            return es;
+         case 'a':
+            return as;
+         case 'i':
+            return is;
+         default:
+            return null;
+      }
+   }
+
    public char[] getChars(int plane) {
       char[] fgs = new char[256];
       for (int i = 0; i < 256; i++) {
          fgs[i] = (char) ((plane << 8) + i << 0);
       }
       return fgs;
+   }
+
+   /**
+    * Gets the indexes of c inside str
+    * 
+    * Empty buffer if no occurences;
+    * @param str
+    * @param c
+    * @return
+    * @throws NullPointerException if str or c is null
+    */
+   public IntBuffer getIndexesAsBuffer(String str, String c) {
+      if (str == null) {
+         throw new NullPointerException();
+      }
+      if (c == null) {
+         throw new NullPointerException();
+      }
+      IntBuffer ib = new IntBuffer(uc);
+      int offset = 0;
+      int iLen = c.length();
+      //check if search string is empty ""
+      if (iLen != 0) {
+
+         int next = -1;
+         while ((next = str.indexOf(c, offset)) != -1) {
+            ib.addInt(next);
+            offset = next + iLen;
+         }
+      }
+      return ib;
    }
 
    /**
@@ -1452,6 +1263,22 @@ public class StringUtils {
       return latinChar;
    }
 
+   public String getLowerCase(String s, int langid) {
+      char[] chars = s.toCharArray();
+      if (langid == RU_PAD) {
+         int[] newv = new int[chars.length];
+         for (int i = 0; i < chars.length; i++) {
+            newv[i] = CharUtils.byteArrayBEFromChar(chars[i])[1];
+            if (newv[i] < 48) {
+               newv[i] = newv[i] + 32;
+            }
+         }
+         return new String(CharUtils.buildCharsFromLowBytes(newv, StringUtils.RU_PAD, 0, newv.length));
+      } else {
+         return s.toLowerCase();
+      }
+   }
+
    public char[] getModifiers() {
       if (modChar == null) {
          modChar = new char[6];
@@ -1469,6 +1296,67 @@ public class StringUtils {
          modChar[5] = CharUtils.buildCharFromLowByte(-72, EN_PAD);
       }
       return modChar;
+   }
+
+   /**
+    * Returns an array of String from String str
+    * 
+    * <li> ("range;extends;try", ";") returns ["range","extends","try"]
+    * 
+    * <li> <b>Borderline cases</b>
+    * <li> ("range;extends;try", "") returns ["range;extends;try"]
+    * <li> ("range;extends;try", "range;extends;try") returns ["",""]
+    * <li> (";;", ";") returns ["","",""]
+    * 
+    * @param str
+    * @param splitter
+    * @return
+    * @throws NullPointerException if str or c is null
+    */
+   public String[] getSplitArray(String str, String splitter) {
+      IntBuffer ib = getIndexesAsBuffer(str, splitter); //does the null check for us
+      int num = ib.getSize();
+      String[] array = new String[num + 1];
+      int startOffset = 0;
+      for (int i = 0; i < num; i++) {
+         int endIndex = ib.get(i);
+         array[i] = str.substring(startOffset, endIndex);
+         startOffset = endIndex + splitter.length();
+      }
+      array[num] = str.substring(startOffset);
+      return array;
+   }
+
+   public String getString(int[] ar, String separator) {
+      if (ar == null) {
+         return "null";
+      }
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            sb.append(separator);
+         }
+         sb.append(ar[i]);
+      }
+      return sb.toString();
+   }
+
+   public String getString(String[] ar, char separator) {
+      return getString(ar, String.valueOf(separator));
+   }
+
+   public String getString(String[] ar, String separator) {
+      if (ar == null) {
+         return "null";
+      }
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            sb.append(separator);
+         }
+         sb.append(ar[i]);
+      }
+      return sb.toString();
    }
 
    /**
@@ -1548,5 +1436,176 @@ public class StringUtils {
       //add the last, or the single one if only one
       s[s.length - 1] = value.substring(count, value.length());
       return s;
+   }
+
+   /**
+    * Tells if character is the last letter of the alphabet.
+    * <li> z in latin alphabet
+    * <li> я in cyrillic
+    * <br>
+    * Works with uppercase and lowercase
+    * <br>
+    * @param c
+    * @return
+    */
+   public boolean isLastLetter(char c) {
+      int plan = (byte) ((c >>> 8) & 0xFF);
+      int letter = (byte) ((c >>> 0) & 0xFF);
+      switch (plan) {
+         case RU_PAD:
+            // я = 79   Я = 47 
+            return letter == 79 || letter == 47;
+         case EN_PAD:
+            // a = 97  z=122    Z=90
+            return letter == 122 || letter == 90;
+      }
+      return false;
+   }
+
+   /**
+    * Test whether test can be humanly considered with the same
+    * high level semantic meaning
+    * ie Clothe, clothes
+    * phone, Phones
+    * @param source
+    * @param test
+    * @return
+    * true if 
+    * false if there is a length diff higher than 2
+    */
+   public boolean isSimilar(String source, String test) {
+      int sl = source.length();
+      int tl = test.length();
+      int min = Math.min(sl, tl);
+      //int max = Math.max(sl, tl);
+      if (Math.abs(sl - tl) > 2)
+         return false;
+      for (int i = 0; i < min; i++) {
+         if (toLowerCase(source.charAt(i)) != toLowerCase(test.charAt(i))) {
+            return false;
+         }
+
+      }
+      return true;
+   }
+
+   public String prettyDouble(double amountn, int decimals) {
+      String s = Double.toString(amountn);
+      int index = s.indexOf('.') + 1;
+      int numofdeci = s.length() - index;
+      if (index == -1) {
+         index = 0;
+         numofdeci = 0;
+      }
+      int max = Math.min(decimals, numofdeci);
+      if (decimals == 0) {
+         index--;
+      }
+      String m1 = s.substring(0, index);
+      String m2 = s.substring(index, index + max);
+      return m1 + m2;
+   }
+
+   /**
+    * Pretty method:
+    * <br>
+    * Pads 0 in front value
+    * @param value
+    * @param numChars
+    * @return
+    */
+   public String prettyInt0Padd(int value, int numChars) {
+      return prettyIntPaddStr(value, numChars, "0");
+   }
+
+   public String prettyIntPaddStr(int value, int numChars, String str) {
+      String numIt = String.valueOf(value);
+      while (numIt.length() < numChars) {
+         numIt = str + numIt;
+      }
+      return numIt;
+   }
+
+   /**
+    * 
+    * @param value
+    * @param total
+    * @param decimals
+    * @return
+    */
+   public String prettyPercentage(int value, int total, int decimals) {
+      double me = (double) ((double) value / (double) total) * ((double) 100);
+      return prettyDouble(me, decimals);
+   }
+
+   /**
+    * Computes a user readable String
+    * Does m
+    * @param m
+    * @return
+    */
+   public String prettyStringMem(long m) {
+      String s = null;
+      double divisor = 1;
+      double upper = (double) m;
+      if (m < 2000) {
+         s = " bytes";
+      } else if (m < 2000000) {
+         divisor = 1000;
+         s = " kb";
+      } else if (m < 2000000000L) {
+         divisor = 1000000;
+         s = " mb";
+      } else {
+         //giga
+         divisor = 1000000000;
+         s = " gb";
+      }
+      String v = String.valueOf((int) (upper / divisor));
+      return v + s;
+
+   }
+
+   /**
+    * pads String from front to reach size
+    * @param str
+    * @param size
+    * @return
+    */
+   public String prettyStringPad(String str, int size, char padder) {
+      int diff = size - str.length();
+      if (diff > 0) {
+         for (int i = 0; i < diff; i++) {
+            str = padder + str;
+         }
+      }
+      return str;
+   }
+
+   public String prettyStringPadBack(String str, int size, char padder) {
+      int diff = size - str.length();
+      if (diff > 0) {
+         for (int i = 0; i < diff; i++) {
+            str = str + padder;
+         }
+      }
+      return str;
+   }
+
+   public String trimAtChar(String string, char c) {
+      int index = string.indexOf(c);
+      if (index != -1) {
+         return string.substring(0, index);
+      }
+      return string;
+   }
+
+   /**
+    * Returns a String trimmed at the first occurrence of the character 
+    * @param string
+    * @return
+    */
+   public String trimAtNewLine(String string) {
+      return trimAtChar(string, '\n');
    }
 }
