@@ -42,6 +42,7 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  * </p>
  * <b>Requirements</b> of the <b>Module Context Pattern</b>:
  * <li>Each module of code must define a <code>.ctx</code> package in which a ModuleNameCtx class is defined.
+ * <li>Convention: All methods, fields and static constants are sorted alphabetically with constant at the top then fields the methods.
  * <li>The context module class provides access to all static object/singletons. Those objects become instances of the module context instance.
  * <li>Dependency Injection 1: every class of a module has the module ctx instance in the first parameter of the constructor. It is saved as a <code>protected final</code> as a class field. 
  * <li>Dependency Injection 2: a module ctx class is constructor injected its dependencies of other known module ctxs.
