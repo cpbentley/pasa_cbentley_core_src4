@@ -17,7 +17,7 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.ILogEntryAppender;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.logging.IUserLog;
-import pasa.cbentley.core.src4.logging.SystemOutUserLog;
+import pasa.cbentley.core.src4.logging.UserLogSystemOut;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 import pasa.cbentley.core.src4.memory.IMemory;
 import pasa.cbentley.core.src4.memory.MemorySimpleCreator;
@@ -219,7 +219,7 @@ public class UCtx implements ICtx, IEventsCore {
       iou = new IOUtils(this);
 
       //#debug
-      this.userLog = new SystemOutUserLog(this);
+      this.userLog = new UserLogSystemOut(this);
       //#debug
       dlog = new BaseDLogger(this);
 
