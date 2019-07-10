@@ -29,28 +29,85 @@ public interface IPrefs extends IStringable {
     */
    public String[] getStrings(String key, char separator);
 
+   /**
+    * 
+    * @param key
+    * @param value
+    */
    public void putBoolean(String key, boolean value);
 
+   /**
+    * 
+    * @param key
+    * @param value
+    */
    public void putInt(String key, int value);
 
+   /**
+    * 
+    * @param key
+    * @param value
+    */
    public void put(String key, String value);
 
+   /**
+    * 
+    * @param key
+    * @param def
+    * @return
+    * @throws NullPointerException - if key is null. (A null value for def is permitted.)
+    */
    public String get(String key, String def);
 
+   /**
+    * the boolean value represented by the string associated with key, 
+    * or def if the associated value does not exist or cannot be interpreted as a boolean.
+    * @param key
+    * @param def
+    * @return
+    */
    public boolean getBoolean(String key, boolean def);
 
+   /**
+    * 
+    * @param key
+    * @param def
+    * @return
+    */
    public int getInt(String key, int def);
 
+   /**
+    * 
+    */
    public void clear();
 
+   /**
+    * 
+    * @param os
+    */
    public void export(OutputStream os);
 
-   public double getDouble(String key, double d);
-   
-   public void putDouble(String key, double value);
-   
    /**
-    * Gets all keys. Int is a value for Type
+    * 
+    * @param key
+    * @param def
+    * @return
+    */
+   public double getDouble(String key, double def);
+
+   /**
+    * 
+    * @param key
+    * @param value
+    */
+   public void putDouble(String key, double value);
+
+   /**
+    * Gets all keys. 
+    * 
+    * TODO Int is a value for Type ?
+    * 
+    * 
     * @return
     */
    public IntToStrings getKeys();
