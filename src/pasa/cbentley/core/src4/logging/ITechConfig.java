@@ -27,18 +27,27 @@ public interface ITechConfig extends ITech {
    /**
     * Lever to block all print. Ignores all other flags except {@link IDLog#MASTER_FLAG_02_OPEN_ALL_PRINT}
     * and the {@link IDLog#pAlways(String, IStringable, Class, String)}
+    * 
+    * Second most powerful master flag. Blocks prints
     */
    public static final int MASTER_FLAG_01_BLOCK_ALL_PRINT = 1 << 0;
 
    /**
     * Ignores the {@link Config} and print all.
     * <br>
+    * Most powerful flags. TODO rename at 1
+    * 
     * Override all flags and print all the content when set.
     * <br>
     * This flag will force the ignore of Class Negatives/Positives.
     * 
     */
    public static final int MASTER_FLAG_02_OPEN_ALL_PRINT  = 1 << 1;
+
+   /**
+    * Assume all tags are true, will reject only flags that are explicitly false
+    */
+   public static final int MASTER_FLAG_08_OPEN_ALL_BUT_FALSE  = 1 << 7;
 
    /**
     * By default, all classes are accepted. Print only positive classes.

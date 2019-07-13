@@ -32,6 +32,17 @@ public class Config implements IConfig, ITechTags, ITechConfig {
 
    protected int     cmdflags;
 
+   protected int     flagsFormat;
+
+   protected int     flagsPrint;
+
+   /**
+    * <li> {@link ITechTags#FLAG_07_PRINT_EVENT}
+    */
+   protected int     flagsTag;
+
+   private int       flagsTagNeg;
+
    private Hashtable fullPositives       = new Hashtable();
 
    private int       logLevel            = ITechLvl.LVL_05_FINE;
@@ -44,27 +55,18 @@ public class Config implements IConfig, ITechTags, ITechConfig {
     */
    private Hashtable negatives           = new Hashtable();
 
+   private Hashtable positives1LineClass = new Hashtable();
+
+   private Hashtable positives1LineInt   = new Hashtable();
+
    /**
     * 
     */
    private Hashtable positivesClasses    = new Hashtable();
 
-   private Hashtable positives1LineClass = new Hashtable();
-
-   private Hashtable positives1LineInt   = new Hashtable();
-
    private Hashtable positivesTraceClass = new Hashtable();
 
    private Hashtable positivesTraceInt   = new Hashtable();
-
-   protected int     flagsPrint;
-
-   /**
-    * <li> {@link ITechTags#FLAG_07_PRINT_EVENT}
-    */
-   protected int     flagsTag;
-
-   protected int     flagsFormat;
 
    private String    stackPrefix;
 
@@ -104,8 +106,8 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       return entryOfConf;
    }
 
-   public void setLevelGlobal(int lvl) {
-      this.logLevel = lvl;
+   public int getLogLevel() {
+      return logLevel;
    }
 
    /**
@@ -128,6 +130,10 @@ public class Config implements IConfig, ITechTags, ITechConfig {
     */
    public boolean hasFlagData(int flag) {
       return false;
+   }
+
+   public boolean hasFlagFormat(int flag) {
+      return BitUtils.hasFlag(flagsFormat, flag);
    }
 
    /**
@@ -154,8 +160,8 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       return BitUtils.hasFlag(flagsTag, flag);
    }
 
-   public boolean hasFlagFormat(int flag) {
-      return BitUtils.hasFlag(flagsFormat, flag);
+   public boolean hasFlagTagNeg(int flag) {
+      return BitUtils.hasFlag(flagsTagNeg, flag);
    }
 
    /**
@@ -206,6 +212,15 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       return false;
    }
 
+   public boolean isAccepted(LogEntryType type) {
+      //fail fast
+      if (type.getLevel() < logLevel) {
+         return false;
+      }
+
+      return true;
+   }
+
    public boolean isAcceptedFlags(int flagTag) {
       if (hasFlagPrint(MASTER_FLAG_02_OPEN_ALL_PRINT)) {
          return true;
@@ -216,18 +231,20 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       if (hasFlagPrint(MASTER_FLAG_05_IGNORE_FLAGS)) {
          return true;
       } else {
-         boolean hasFlagTag = hasFlagTag(flagTag);
-         return hasFlagTag;
+         if (hasFlagPrint(MASTER_FLAG_08_OPEN_ALL_BUT_FALSE)) {
+            //accept it unless flag as negative
+            boolean hasFlagTagNeg = hasFlagTagNeg(flagTag);
+            if (hasFlagTagNeg) {
+               return false;
+            } else {
+               return true;
+            }
+         } else {
+            //only accept if tag is set to true
+            boolean hasFlagTag = hasFlagTag(flagTag);
+            return hasFlagTag;
+         }
       }
-   }
-
-   public boolean isAccepted(LogEntryType type) {
-      //fail fast
-      if (type.getLevel() < logLevel) {
-         return false;
-      }
-
-      return true;
    }
 
    /**
@@ -358,6 +375,10 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       }
    }
 
+   public void setFlagFormat(int flag, boolean b) {
+      flagsFormat = BitUtils.setFlag(flagsFormat, flag, b);
+   }
+
    public void setFlagPrint(int flag, boolean v) {
       flagsPrint = BitUtils.setFlag(flagsPrint, flag, v);
    }
@@ -365,30 +386,6 @@ public class Config implements IConfig, ITechTags, ITechConfig {
    public void setFlagPrint(int[] flags, boolean v) {
       for (int i = 0; i < flags.length; i++) {
          setFlagPrint(flags[i], v);
-      }
-   }
-
-   public void setOneLines(int flag, Class c) {
-      // TODO Auto-generated method stub
-
-   }
-
-   public void setStackTraced(int type, Class c, boolean b) {
-      // TODO Auto-generated method stub
-
-   }
-
-   public int getLogLevel() {
-      return logLevel;
-   }
-
-   public void setFlagFormat(int flag, boolean b) {
-      flagsFormat = BitUtils.setFlag(flagsFormat, flag, b);
-   }
-
-   public void setFlagTag(int[] flags, boolean v) {
-      for (int i = 0; i < flags.length; i++) {
-         setFlagTag(flags[i], v);
       }
    }
 
@@ -406,6 +403,30 @@ public class Config implements IConfig, ITechTags, ITechConfig {
     */
    public void setFlagTag(int tagID, boolean b) {
       flagsTag = BitUtils.setFlag(flagsTag, tagID, b);
+   }
+
+   public void setFlagTag(int[] flags, boolean v) {
+      for (int i = 0; i < flags.length; i++) {
+         setFlagTag(flags[i], v);
+      }
+   }
+
+   public void setFlagTagNeg(int tagID, boolean b) {
+      flagsTagNeg = BitUtils.setFlag(flagsTagNeg, tagID, b);
+   }
+
+   public void setLevelGlobal(int lvl) {
+      this.logLevel = lvl;
+   }
+
+   public void setOneLines(int flag, Class c) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void setStackTraced(int type, Class c, boolean b) {
+      // TODO Auto-generated method stub
+
    }
 
    public String toString() {
@@ -449,18 +470,12 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       toStringHashClass(dc, "Trace Classes", positivesTraceClass);
    }
 
-   private void toStringHashClass(Dctx dc, String title, Hashtable ht) {
-      dc.nl();
-      dc.append(title);
-      dc.appendVarWithSpace("#", ht.size());
-      dc.tab();
-      Enumeration e = ht.keys();
-      while (e.hasMoreElements()) {
-         Class c = (Class) e.nextElement();
-         dc.nl();
-         dc.append(c.getSimpleName());
-      }
-      dc.tabRemove();
+   public String toString1Line() {
+      return Dctx.toString1Line(this);
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, "Config");
    }
 
    private void toStringFlag(int flag, String msg, Dctx dc) {
@@ -473,12 +488,18 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       return uc;
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "Config");
+   private void toStringHashClass(Dctx dc, String title, Hashtable ht) {
+      dc.nl();
+      dc.append(title);
+      dc.appendVarWithSpace("#", ht.size());
+      dc.tab();
+      Enumeration e = ht.keys();
+      while (e.hasMoreElements()) {
+         Class c = (Class) e.nextElement();
+         dc.nl();
+         dc.append(c.getSimpleName());
+      }
+      dc.tabRemove();
    }
 
    //#enddebug
