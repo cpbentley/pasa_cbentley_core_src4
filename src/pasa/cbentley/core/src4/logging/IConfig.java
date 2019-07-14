@@ -26,6 +26,10 @@ public interface IConfig extends IStringable, ITechConfig {
     */
    public DLogEntryOfConfig getEntryConfig(DLogEntry type);
 
+   /**
+    * 
+    * @return
+    */
    public String getStackTraceBreak();
 
    /**
@@ -35,8 +39,14 @@ public interface IConfig extends IStringable, ITechConfig {
     */
    public boolean hasFlagFormat(int flag);
 
+   /**
+    * 
+    */
    public void removeAllNegatives();
 
+   /**
+    * 
+    */
    public void removeAllPositives();
 
    /**
@@ -109,6 +119,19 @@ public interface IConfig extends IStringable, ITechConfig {
     */
    public void setFlagTag(int flag, boolean v);
 
+   /**
+    * When true, sets the Tag as a negative. The tag is then ignored if {@link ITechConfig#MASTER_FLAG_08_OPEN_ALL_BUT_FALSE}
+    * is set.
+    * @param flag
+    * @param v
+    */
+   public void setFlagTagNeg(int flag, boolean v);
+
+   /**
+    * 
+    * @param flags
+    * @param v
+    */
    public void setFlagTag(int[] flags, boolean v);
 
    /**
