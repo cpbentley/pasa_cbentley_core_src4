@@ -135,7 +135,7 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  */
 public class UCtx implements ICtx, IEventsCore {
 
-   public static final int CTX_ID = 1;
+   public static final int CTX_ID           = 1;
 
    private ArrayUtils      au;
 
@@ -149,7 +149,7 @@ public class UCtx implements ICtx, IEventsCore {
 
    //Used to be static. not anymore. its a variable of the context
    //so that it can be configured dynamically. to test crashes etc.
-   protected String DEFAULT_ENCODING = "UTF-8";
+   protected String        DEFAULT_ENCODING = "UTF-8";
 
    //#debug
    private IDLog           dlog;
@@ -168,7 +168,7 @@ public class UCtx implements ICtx, IEventsCore {
 
    private int             moduleID;
 
-   private Random          random = null;
+   private Random          random           = null;
 
    private IStrComparator  strc;
 
@@ -261,6 +261,9 @@ public class UCtx implements ICtx, IEventsCore {
 
    public int[] getEventBaseTopology() {
       int[] events = new int[BASE_EVENTS];
+      events[PID_0_ANY] = EID_MEMORY_X_NUM;
+      events[PID_1_FRAMEWORK] = EID_FRAMEWORK_X_NUM;
+      events[PID_2_HOST] = EID_HOST_X_NUM;
       events[PID_3_MEMORY] = EID_MEMORY_X_NUM;
       return events;
    }
@@ -468,7 +471,16 @@ public class UCtx implements ICtx, IEventsCore {
          case PID_0_ANY:
             return "Any";
          case PID_1_FRAMEWORK:
-            return "Framework";
+            switch (eid) {
+               case EID_FRAMEWORK_0_ANY:
+                  return "Any";
+               case EID_FRAMEWORK_1_CTX_CREATED:
+                  return "CtxCreated";
+               case EID_FRAMEWORK_2_LANGUAGE_CHANGED:
+                  return "LanguageChanged";
+               default:
+                  return "UnknownEID"+eid;
+            }
          case PID_2_HOST:
             return "Host";
          case PID_3_MEMORY:
@@ -482,10 +494,10 @@ public class UCtx implements ICtx, IEventsCore {
                case EID_MEMORY_3_OBJECT_DESTROY:
                   return "ObjectDestroy";
                default:
-                  return null;
+                  return "UnknownEID"+eid;
             }
          default:
-            return null;
+            return "UnknownPID"+pid;
       }
    }
 

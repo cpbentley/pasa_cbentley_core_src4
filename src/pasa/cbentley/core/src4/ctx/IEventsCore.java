@@ -40,60 +40,66 @@ public interface IEventsCore {
    /**
     * Number of statically defined events
     */
-   public static final int BASE_EVENTS                    = 4;
+   public static final int BASE_EVENTS                      = 4;
 
-   /**
-    * Any Producer will send the event. This production line 
-    * should be used by rare events.
-    * <br>
-    * Events will of instances must register a dynamic PID
-    * outside the static range.
-    */
-   public static final int PID_0_ANY                      = 0;
-
-   /**
-    * 
-    */
-   public static final int PID_1_FRAMEWORK                = 1;
-
-   /**
-    * Producer ID. Uses it to send event relating to Host events.
-    */
-   public static final int PID_2_HOST                     = 2;
-
-   public static final int SID_EVENTS_2                   = 2;
-
-   /**
-    * When a language has been changed
-    */
-   public static final int EID_FRAMEWORK_2_LANGUAGE_CHANGED    = 2;
+   public static final int EID_FRAMEWORK_0_ANY              = 0;
 
    /**
     * Event generated when 
     */
-   public static final int EID_FRAMEWORK_1_CTX_CREATED         = 1;
+   public static final int EID_FRAMEWORK_1_CTX_CREATED      = 1;
 
    /**
-    * The pid used for memory event on the {@link UCtx#getEventBusRoot()} event bus.
+    * When a language has been changed
     */
-   public static final int PID_3_MEMORY                   = 3;
+   public static final int EID_FRAMEWORK_2_LANGUAGE_CHANGED = 2;
+
+   public static final int EID_FRAMEWORK_X_NUM              = 3;
+
+   public static final int EID_HOST_0_ANY                   = 0;
+
+   public static final int EID_HOST_X_NUM                   = 1;
 
    /**
     * Any event by producer {@link IEventsCore#PID_3_MEMORY}
     */
-   public static final int EID_MEMORY_0_ANY               = 0;
+   public static final int EID_MEMORY_0_ANY                 = 0;
 
-   public static final int EID_MEMORY_1_OUT_OF_MEMORY_GC  = 1;
+   public static final int EID_MEMORY_1_OUT_OF_MEMORY_GC    = 1;
 
-   public static final int EID_MEMORY_2_USER_REQUESTED_GC = 2;
+   public static final int EID_MEMORY_2_USER_REQUESTED_GC   = 2;
 
    /**
     * Event sent with Object as producer when object references have to be removed.
     * Typically, cache and event bus will want to catch to events
     * and de reference those objects 
     */
-   public static final int EID_MEMORY_3_OBJECT_DESTROY    = 3;
+   public static final int EID_MEMORY_3_OBJECT_DESTROY      = 3;
 
-   public static final int EID_MEMORY_X_NUM               = 3;
+   public static final int EID_MEMORY_X_NUM                 = 3;
+
+   /**
+    * Reserved
+    * Events will of instances must register a dynamic PID
+    * outside the static range.
+    */
+   public static final int PID_0_ANY                        = 0;
+
+   /**
+    * 
+    */
+   public static final int PID_1_FRAMEWORK                  = 1;
+
+   /**
+    * Producer ID. Uses it to send event relating to Host events.
+    */
+   public static final int PID_2_HOST                       = 2;
+
+   /**
+    * The pid used for memory event on the {@link UCtx#getEventBusRoot()} event bus.
+    */
+   public static final int PID_3_MEMORY                     = 3;
+
+   public static final int SID_EVENTS_2                     = 2;
 
 }
