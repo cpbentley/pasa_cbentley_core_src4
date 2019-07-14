@@ -51,6 +51,9 @@ public interface IEventsCore {
     */
    public static final int PID_0_ANY                      = 0;
 
+   /**
+    * 
+    */
    public static final int PID_1_FRAMEWORK                = 1;
 
    /**
@@ -63,12 +66,12 @@ public interface IEventsCore {
    /**
     * When a language has been changed
     */
-   public static final int EVENT_ID_2_LANGUAGE_CHANGED    = 2;
+   public static final int EID_FRAMEWORK_2_LANGUAGE_CHANGED    = 2;
 
    /**
     * Event generated when 
     */
-   public static final int EVENT_ID_1_CTX_CREATED         = 1;
+   public static final int EID_FRAMEWORK_1_CTX_CREATED         = 1;
 
    /**
     * The pid used for memory event on the {@link UCtx#getEventBusRoot()} event bus.
