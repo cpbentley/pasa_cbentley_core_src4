@@ -1,6 +1,5 @@
 package pasa.cbentley.core.src4.logging;
 
-import java.awt.Component;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -11,7 +10,6 @@ import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.utils.BitUtils;
-import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
  * Bastard context (lowercase C letter)
@@ -124,13 +122,8 @@ public class Dctx implements IFlagsToString {
       sb.append(str, offset, len);
    }
 
-   public void append(String[] strs, int offset, int len, String sep) {
-      for (int i = offset; i < offset + len; i++) {
-         if (i != offset) {
-            sb.append(sep);
-         }
-         sb.append(strs[i]);
-      }
+   public void append(double v) {
+      sb.append(v);
    }
 
    public void append(int v) {
@@ -139,6 +132,15 @@ public class Dctx implements IFlagsToString {
 
    public void append(String string) {
       sb.append(string);
+   }
+
+   public void append(String[] strs, int offset, int len, String sep) {
+      for (int i = offset; i < offset + len; i++) {
+         if (i != offset) {
+            sb.append(sep);
+         }
+         sb.append(strs[i]);
+      }
    }
 
    public void appendName(Class cs) {
@@ -172,56 +174,6 @@ public class Dctx implements IFlagsToString {
       sb.append(v);
    }
 
-   public void appendVar(String s, String v) {
-      sb.append(s);
-      sb.append('=');
-      sb.append(v);
-   }
-
-   public void appendVarWithSpace(String s, boolean v) {
-      sb.append(' ');
-      sb.append(s);
-      sb.append('=');
-      sb.append(String.valueOf(v));
-   }
-
-   public void appendVarWithSpace(String s, float v) {
-      sb.append(' ');
-      sb.append(s);
-      sb.append('=');
-      sb.append(String.valueOf(v));
-   }
-
-   public void appendVarWithSpace(String s, Double v) {
-      if (v == null) {
-         this.appendVarWithSpace(s, "null");
-      } else {
-         this.appendVarWithSpace(s, v.doubleValue());
-      }
-   }
-
-   public void appendVarWithSpace(String s, Integer v) {
-      if (v == null) {
-         this.appendVarWithSpace(s, "null");
-      } else {
-         this.appendVarWithSpace(s, v.intValue());
-      }
-   }
-
-   public void appendVarWithSpace(String s, int v) {
-      sb.append(' ');
-      sb.append(s);
-      sb.append('=');
-      sb.append(v);
-   }
-
-   public void appendVarWithSpace(String s, double v) {
-      sb.append(' ');
-      sb.append(s);
-      sb.append('=');
-      sb.append(String.valueOf(v));
-   }
-
    public void appendVar(String s, Object v) {
       sb.append(s);
       sb.append('=');
@@ -236,9 +188,61 @@ public class Dctx implements IFlagsToString {
       }
    }
 
-   public void appendVarWithSpace(String s, Object v) {
+   public void appendVar(String s, String v) {
+      sb.append(s);
+      sb.append('=');
+      sb.append(v);
+   }
+
+   public void appendVarWithNewLine(String s, String v) {
+      nl();
+      sb.append(s);
+      sb.append('=');
+      sb.append(v);
+   }
+
+   public void appendVarWithSpace(String s, boolean v) {
       sb.append(' ');
-      appendVar(s, v);
+      sb.append(s);
+      sb.append('=');
+      sb.append(String.valueOf(v));
+   }
+
+   public void appendVarWithSpace(String s, double v) {
+      sb.append(' ');
+      sb.append(s);
+      sb.append('=');
+      sb.append(String.valueOf(v));
+   }
+
+   public void appendVarWithSpace(String s, Double v) {
+      if (v == null) {
+         this.appendVarWithSpace(s, "null");
+      } else {
+         this.appendVarWithSpace(s, v.doubleValue());
+      }
+   }
+
+   public void appendVarWithSpace(String s, float v) {
+      sb.append(' ');
+      sb.append(s);
+      sb.append('=');
+      sb.append(String.valueOf(v));
+   }
+
+   public void appendVarWithSpace(String s, int v) {
+      sb.append(' ');
+      sb.append(s);
+      sb.append('=');
+      sb.append(v);
+   }
+
+   public void appendVarWithSpace(String s, Integer v) {
+      if (v == null) {
+         this.appendVarWithSpace(s, "null");
+      } else {
+         this.appendVarWithSpace(s, v.intValue());
+      }
    }
 
    public void appendVarWithSpace(String s, IStringable v) {
@@ -259,6 +263,11 @@ public class Dctx implements IFlagsToString {
       sb.append(v);
    }
 
+   public void appendVarWithSpace(String s, Object v) {
+      sb.append(' ');
+      appendVar(s, v);
+   }
+
    /**
     * Fronted with space
     * @param s
@@ -266,13 +275,6 @@ public class Dctx implements IFlagsToString {
     */
    public void appendVarWithSpace(String s, String v) {
       sb.append(' ');
-      sb.append(s);
-      sb.append('=');
-      sb.append(v);
-   }
-
-   public void appendVarWithNewLine(String s, String v) {
-      nl();
       sb.append(s);
       sb.append('=');
       sb.append(v);
@@ -451,23 +453,6 @@ public class Dctx implements IFlagsToString {
       nlLvl(t, is, 0, true);
    }
 
-   public void nlLvlArray(Object[] ar, String t) {
-      IStringable[] ars = new IStringable[ar.length];
-      for (int i = 0; i < ar.length; i++) {
-         ars[i] = (IStringable) ar[i];
-      }
-      nlLvlArray(t, ars);
-   }
-
-   /**
-    * Only prints title if {@link IStringable} is null
-    * @param is
-    * @param t
-    */
-   public void nlLvlTitleIfNull(IStringable is, String t) {
-      nlLvl(t, is, 0, true, true, true);
-   }
-
    public void nlLvl(String str, int[] ins, int i) {
       sb.append(nl);
       sb.append(str);
@@ -554,6 +539,14 @@ public class Dctx implements IFlagsToString {
             is.toString(dc);
          }
       }
+   }
+
+   public void nlLvlArray(Object[] ar, String t) {
+      IStringable[] ars = new IStringable[ar.length];
+      for (int i = 0; i < ar.length; i++) {
+         ars[i] = (IStringable) ar[i];
+      }
+      nlLvlArray(t, ars);
    }
 
    /**
@@ -800,6 +793,33 @@ public class Dctx implements IFlagsToString {
       }
    }
 
+   /**
+    * If {@link IStringable}, all is good, otherwise ask {@link ICtx} to debug it
+    * @param o
+    * @param title
+    */
+   public void nlLvlO(Object o, String title) {
+      this.nlLvlO(o, title, uc);
+   }
+
+   /**
+    * If {@link IStringable}, all is good, otherwise ask {@link ICtx} to debug it
+    * @param o
+    * @param title only used if object is null
+    * @param ctx {@link ICtx} provides the ctx for the toString
+    */
+   public void nlLvlO(Object o, String title, ICtx ctx) {
+      if (o == null) {
+         nlLvl(null, title);
+      } else {
+         if (o instanceof IStringable) {
+            nlLvlTitleIfNull((IStringable) o, title);
+         } else {
+            uc.toString(this, o, title);
+         }
+      }
+   }
+
    public void nlLvlObject(String string, Object o) {
       Dctx dc = new Dctx(uc, this);
       if (o == null) {
@@ -840,25 +860,29 @@ public class Dctx implements IFlagsToString {
    }
 
    /**
-    * Print without a new level, Title= {@link IStringable#toString1Line()}.
-    * <br>
-    * The title is there to differentiate identic types and when object is null.
-    * <br>
-    * Otherwise title is probably implicit, user only wants it to be shown when object is null.
-    * <br>
-    * @param t
+    * Only prints title if {@link IStringable} is null
     * @param is
+    * @param t
     */
-   public void sameLine1(String t, IStringable is) {
-      Dctx dc = this;
-      if (is == null) {
-         dc.append(t + " is null");
+   public void nlLvlTitleIfNull(IStringable is, String t) {
+      nlLvl(t, is, 0, true, true, true);
+   }
+
+   public void nlLvlVector(Vector v) {
+      if (v == null) {
+         this.append("Vector is null");
       } else {
-         if (t != null && t.length() != 0) {
-            dc.append(t);
-            dc.append("=");
+         Iterator it = v.iterator();
+         int count = 0;
+         while (it.hasNext()) {
+            Object o = it.next();
+            if (o instanceof IStringable) {
+               count++;
+               this.nlLvl((IStringable) o, "Vector#" + count);
+            } else {
+               this.append(o.getClass().getName());
+            }
          }
-         is.toString1Line(dc);
       }
    }
 
@@ -998,6 +1022,48 @@ public class Dctx implements IFlagsToString {
       tab();
    }
 
+   /**
+    * Print without a new level, Title= {@link IStringable#toString1Line()}.
+    * <br>
+    * The title is there to differentiate identic types and when object is null.
+    * <br>
+    * Otherwise title is probably implicit, user only wants it to be shown when object is null.
+    * <br>
+    * @param t
+    * @param is
+    */
+   public void sameLine1(String t, IStringable is) {
+      Dctx dc = this;
+      if (is == null) {
+         dc.append(t + " is null");
+      } else {
+         if (t != null && t.length() != 0) {
+            dc.append(t);
+            dc.append("=");
+         }
+         is.toString1Line(dc);
+      }
+   }
+
+   /**
+    * Append on the same line, the Debug of Object
+    * @param o
+    * @param title
+    * @param ctx
+    */
+   public void sameLineO1(Object o, String title, ICtx ctx) {
+      if (o == null) {
+         sameLine1(title, null);
+      } else {
+         if (o instanceof IStringable) {
+            sameLine1(title, (IStringable) o);
+         } else {
+            ctx.toString1(this, o, title);
+         }
+      }
+   }
+   //#enddebug
+
    public void setCompact(boolean b) {
       isCompact = b;
    }
@@ -1061,68 +1127,4 @@ public class Dctx implements IFlagsToString {
    public String toString() {
       return sb.toString();
    }
-
-   public void nlLvlVector(Vector v) {
-      if (v == null) {
-         this.append("Vector is null");
-      } else {
-         Iterator it = v.iterator();
-         int count = 0;
-         while (it.hasNext()) {
-            Object o = it.next();
-            if (o instanceof IStringable) {
-               count++;
-               this.nlLvl((IStringable) o, "Vector#" + count);
-            } else {
-               this.append(o.getClass().getName());
-            }
-         }
-      }
-   }
-
-   /**
-    * If {@link IStringable}, all is good, otherwise ask {@link ICtx} to debug it
-    * @param o
-    * @param title
-    */
-   public void nlLvlO(Object o, String title) {
-      this.nlLvlO(o, title, uc);
-   }
-
-   /**
-    * If {@link IStringable}, all is good, otherwise ask {@link ICtx} to debug it
-    * @param o
-    * @param title only used if object is null
-    * @param ctx {@link ICtx} provides the ctx for the toString
-    */
-   public void nlLvlO(Object o, String title, ICtx ctx) {
-      if (o == null) {
-         nlLvl(null, title);
-      } else {
-         if (o instanceof IStringable) {
-            nlLvlTitleIfNull((IStringable) o, title);
-         } else {
-            uc.toString(this, o, title);
-         }
-      }
-   }
-
-   /**
-    * Append on the same line, the Debug of Object
-    * @param o
-    * @param title
-    * @param ctx
-    */
-   public void sameLineO1(Object o, String title, ICtx ctx) {
-      if (o == null) {
-         sameLine1(title, null);
-      } else {
-         if (o instanceof IStringable) {
-            sameLine1(title, (IStringable) o);
-         } else {
-            ctx.toString1(this, o, title);
-         }
-      }
-   }
-   //#enddebug
 }
