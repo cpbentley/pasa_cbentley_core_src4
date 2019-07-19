@@ -126,6 +126,42 @@ public class Dctx implements IFlagsToString {
       sb.append(v);
    }
 
+   public void append(Long v) {
+      if (v == null) {
+         sb.append("null");
+      } else {
+         sb.append(v.longValue());
+      }
+   }
+
+   public void append(Boolean v) {
+      if (v == null) {
+         sb.append("null");
+      } else {
+         this.append(v.booleanValue());
+      }
+   }
+
+   public void append(Double v) {
+      if (v == null) {
+         sb.append("null");
+      } else {
+         sb.append(v.doubleValue());
+      }
+   }
+
+   public void append(Integer v) {
+      if (v == null) {
+         sb.append("null");
+      } else {
+         sb.append(v.intValue());
+      }
+   }
+
+   public void append(boolean v) {
+      sb.append(String.valueOf(v));
+   }
+
    public void append(int v) {
       sb.append(v);
    }
