@@ -66,7 +66,7 @@ public class Config implements IConfig, ITechTags, ITechConfig {
 
    private Hashtable positivesTraceClass = new Hashtable();
 
-   private Hashtable positivesTraceInt   = new Hashtable();
+   private Hashtable positivesTraceTags  = new Hashtable();
 
    private String    stackPrefix;
 
@@ -318,7 +318,7 @@ public class Config implements IConfig, ITechTags, ITechConfig {
    public boolean isStackTraced(int type, Class c) {
       if (c != null) {
          if (positivesTraceClass.contains(c)) {
-            if (positivesTraceInt.containsKey(new Integer(type))) {
+            if (positivesTraceTags.containsKey(new Integer(type))) {
                return true;
             }
          }
@@ -415,18 +415,39 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       flagsTagNeg = BitUtils.setFlag(flagsTagNeg, tagID, b);
    }
 
+   /**
+    * Only prints logs equal or above... globally.
+    * 
+    * But if tag is disable, none will appear
+    */
    public void setLevelGlobal(int lvl) {
       this.logLevel = lvl;
    }
 
-   public void setOneLines(int flag, Class c) {
-      // TODO Auto-generated method stub
-
+   /**
+    * set the level even for disable tags.
+    * 
+    * Usually you want to set it to either Severe or Warning.
+    * @param lvl
+    */
+   public void setLevelGlobalTag(int lvl) {
+      this.logLevel = lvl;
    }
 
-   public void setStackTraced(int type, Class c, boolean b) {
-      // TODO Auto-generated method stub
+   /**
+    * Force one lines one class tag
+    */
+   public void setOneLines(int tag, Class c) {
+      positives1LineInt.put(new Integer(tag), Boolean.TRUE);
+      positives1LineClass.put(c, Boolean.TRUE);
+   }
 
+   /**
+    * Computes the stack trace for a class and a tag
+    */
+   public void setStackTraced(int tag, Class c, boolean b) {
+      positivesTraceTags.put(new Integer(tag), Boolean.TRUE);
+      positivesTraceClass.put(c, Boolean.TRUE);
    }
 
    public String toString() {
