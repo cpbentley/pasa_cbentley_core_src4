@@ -17,7 +17,7 @@ public class StrAcceptorContains extends StrAcceptorAbstract implements IStrAcce
    }
 
    public boolean isStringAccepted(String str) {
-      return stringEtalon.contains(str);
+      return stringEtalon.indexOf(str) != -1;
    }
    
    //#mdebug

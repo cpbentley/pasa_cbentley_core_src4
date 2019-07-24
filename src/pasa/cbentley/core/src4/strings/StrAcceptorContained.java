@@ -18,7 +18,7 @@ public class StrAcceptorContained extends StrAcceptorAbstract implements IStrAcc
    }
 
    public boolean isStringAccepted(String str) {
-      return str.contains(stringEtalon); //contained
+      return str.indexOf(stringEtalon) != -1; //contained
    }
    
    //#mdebug
