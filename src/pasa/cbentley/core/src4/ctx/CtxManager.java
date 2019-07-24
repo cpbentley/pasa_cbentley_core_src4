@@ -132,7 +132,7 @@ public class CtxManager implements IStringable {
       uc.toStrDebugNullCheck(ctx, uc);
 
       if (intos.hasObject(ctx)) {
-         throw new IllegalStateException("Same context reference is already registerd");
+         throw new IllegalArgumentException("Same context reference is already registerd");
       }
       intos.add(ctx);
       return intos.nextempty;

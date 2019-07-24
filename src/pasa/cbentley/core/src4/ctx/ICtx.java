@@ -1,6 +1,5 @@
 package pasa.cbentley.core.src4.ctx;
 
-import java.nio.ByteOrder;
 
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.logging.Dctx;
