@@ -117,7 +117,7 @@ public class BasicPrefs implements IPrefs {
 
    public void put(String key, String[] strs, char separator) {
       nullCheckKey(key);
-      StringBuilder sb = new StringBuilder();
+      StringBBuilder sb = new StringBBuilder();
       for (int i = 0; i < strs.length; i++) {
          if (i != 0) {
             sb.append(separator);
