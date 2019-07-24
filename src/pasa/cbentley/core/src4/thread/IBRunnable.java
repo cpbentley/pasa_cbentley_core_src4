@@ -1,6 +1,5 @@
 package pasa.cbentley.core.src4.thread;
 
-import java.util.concurrent.Future;
 
 import pasa.cbentley.core.src4.logging.IStringable;
 

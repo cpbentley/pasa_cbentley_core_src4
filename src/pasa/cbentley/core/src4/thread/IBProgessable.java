@@ -1,7 +1,5 @@
 package pasa.cbentley.core.src4.thread;
 
-import javax.swing.SwingUtilities;
-
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**

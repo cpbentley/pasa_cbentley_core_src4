@@ -1,6 +1,6 @@
 package pasa.cbentley.core.src4.thread;
 
-import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
@@ -151,11 +151,22 @@ public abstract class AbstractBRunnable implements IBRunnable {
     * @return
     */
    public boolean isContinue() {
+      //first check if another thread interrupted us using the Java classic mechanism.
+      //its how SwingWorker will ask our thread to stop doing its task.
+      //TODO Thread.interrupted() is not supported in src4
+//      if(Thread.interrupted()) {
+//         this.state = ITechRunnable.STATE_2_CANCELED;
+//         //#debug
+//         toDLog().pWork("Thread is interrupted", this, AbstractBRunnable.class, "isContinue", LVL_05_FINE, true);
+//         return false;
+//      }
+      //its because this code above does not work that this class was created in the first place.
+      //for interrupting a you set the state request and call interrupt
       int methodStateRequest = getStateRequest();
       int stateCurrent = getState();
       if (stateCurrent != methodStateRequest) {
          //#debug
-         uc.toDLog().pTest("stateCurrent != stateRequest", this, AbstractBRunnable.class, "isContinue", ITechLvl.LVL_05_FINE, true);
+         uc.toDLog().pWork("stateCurrent != stateRequest", this, AbstractBRunnable.class, "isContinue", ITechLvl.LVL_05_FINE, true);
 
          boolean isContinue = false;
          if (methodStateRequest == ITechRunnable.STATE_1_PAUSED) {
@@ -228,9 +239,9 @@ public abstract class AbstractBRunnable implements IBRunnable {
          listener.runnerNewState(this, newState);
       }
       if (listeners != null) {
-         Iterator it = listeners.iterator();
-         while (it.hasNext()) {
-            IBRunnableListener lisv = (IBRunnableListener) it.next();
+         Enumeration it = listeners.elements();
+         while (it.hasMoreElements()) {
+            IBRunnableListener lisv = (IBRunnableListener) it.nextElement();
             lisv.runnerNewState(this, newState);
          }
       }
@@ -277,9 +288,9 @@ public abstract class AbstractBRunnable implements IBRunnable {
          listener.runnerException(this, e);
       }
       if (listeners != null) {
-         Iterator it = listeners.iterator();
-         while (it.hasNext()) {
-            IBRunnableListener lisv = (IBRunnableListener) it.next();
+         Enumeration it = listeners.elements();
+         while (it.hasMoreElements()) {
+            IBRunnableListener lisv = (IBRunnableListener) it.nextElement();
             lisv.runnerException(this, e);
          }
       }
@@ -296,7 +307,7 @@ public abstract class AbstractBRunnable implements IBRunnable {
       } else {
          if (listeners == null) {
             listeners = new Vector(1);
-            listeners.add(lis);
+            listeners.addElement(lis);
          }
       }
    }
@@ -305,7 +316,7 @@ public abstract class AbstractBRunnable implements IBRunnable {
       if (listener == lis) {
          listener = null;
       } else if (listeners != null) {
-         listeners.remove(lis);
+         listeners.removeElement(lis);
       }
 
    }

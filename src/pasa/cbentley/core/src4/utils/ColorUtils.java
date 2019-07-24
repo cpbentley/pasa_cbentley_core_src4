@@ -1,6 +1,7 @@
 package pasa.cbentley.core.src4.utils;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 
@@ -1386,7 +1387,7 @@ public class ColorUtils implements IStringable {
    }
    //#enddebug
 
-   public void toStringColor(StringBuilder sb, int c) {
+   public void toStringColor(StringBBuilder sb, int c) {
       sb.append("(");
       sb.append(((c >> 24) & 0xFF));
       sb.append(",");

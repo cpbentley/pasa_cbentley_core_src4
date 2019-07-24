@@ -7,6 +7,7 @@ import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.memory.IMemory;
+import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
  * Utility class mapping int literals to Strings and Image IDs (also strings). 
@@ -20,12 +21,13 @@ import pasa.cbentley.core.src4.memory.IMemory;
  * The app has a way to make a user select a record store.<br>
  * 
  * The {@link Serializable} is not port of the Bentley framework. ?
- * Used for compatiblity with J2SE. J2ME driver must define a {@link java.io.Serializable} dummy interface. 
+ * 
+ * Used for compatiblity with J2SE. J2ME driver must define a {@link java.io.Serializable} marker interface. 
+ * 
  * @author Charles Bentley
  *
  */
 public class IntToStrings implements IStringable, Serializable {
-
 
    private String[] imgs;
 
@@ -38,12 +40,14 @@ public class IntToStrings implements IStringable, Serializable {
 
    public String[]  strings;
 
+   protected UCtx   uc;
+
    public IntToStrings(UCtx uc) {
       this(uc, 0);
    }
 
    public IntToStrings(UCtx uc, int size) {
-      if(uc == null) {
+      if (uc == null) {
          throw new NullPointerException();
       }
       this.uc = uc;
@@ -52,10 +56,8 @@ public class IntToStrings implements IStringable, Serializable {
       imgs = new String[size];
    }
 
-   protected UCtx uc;
-
    public IntToStrings(UCtx uc, String[] str) {
-      if(uc == null) {
+      if (uc == null) {
          throw new NullPointerException();
       }
       this.uc = uc;
@@ -81,17 +83,21 @@ public class IntToStrings implements IStringable, Serializable {
       nextempty++;
    }
 
-   private void addNoCheck(int integer, String s) {
-      ints[nextempty] = integer;
-      strings[nextempty] = s;
-      nextempty++;
-   }
-
    public void add(IntToStrings its) {
       growArray(its.nextempty);
       for (int i = 0; i < its.nextempty; i++) {
          add(its.ints[i], its.strings[i]);
       }
+   }
+
+   public void add(String s) {
+      add(0, s);
+   }
+
+   private void addNoCheck(int integer, String s) {
+      ints[nextempty] = integer;
+      strings[nextempty] = s;
+      nextempty++;
    }
 
    /**
@@ -121,10 +127,13 @@ public class IntToStrings implements IStringable, Serializable {
       return its.length;
    }
 
-   public void add(String s) {
-      add(0, s);
+   public void clear() {
+      nextempty = 0;
+      for (int i = 0; i < strings.length; i++) {
+         strings[i] = null;
+         ints[i] = 0;
+      }
    }
-   
 
    /**
     * Makes the size value a valid index.
@@ -211,6 +220,15 @@ public class IntToStrings implements IStringable, Serializable {
       return -1;
    }
 
+   /**
+    * Returns the id at index
+    * @param id
+    * @return
+    */
+   public int getID(int index) {
+      return ints[index];
+   }
+
    public int getMaxStringSize() {
       int max = 0;
       String[] ar = new String[nextempty];
@@ -222,16 +240,12 @@ public class IntToStrings implements IStringable, Serializable {
       return max;
    }
 
-   public int getSize() {
-      return nextempty;
+   public IMemory getMem() {
+      return uc.getMem();
    }
 
-   public void clear() {
-      nextempty = 0;
-      for (int i = 0; i < strings.length; i++) {
-         strings[i] = null;
-         ints[i] = 0;
-      }
+   public int getSize() {
+      return nextempty;
    }
 
    /**
@@ -241,15 +255,6 @@ public class IntToStrings implements IStringable, Serializable {
     */
    public String getString(int index) {
       return strings[index];
-   }
-
-   /**
-    * Returns the id at index
-    * @param id
-    * @return
-    */
-   public int getID(int index) {
-      return ints[index];
    }
 
    /**
@@ -271,15 +276,20 @@ public class IntToStrings implements IStringable, Serializable {
       growArray(1);
    }
 
-   public IMemory getMem() {
-      return uc.getMem();
-   }
-
    public void growArray(int increment) {
       int incr = ints.length + increment;
       ints = getMem().increaseCapacity(ints, incr);
       strings = getMem().increaseCapacity(strings, incr);
       imgs = getMem().increaseCapacity(imgs, incr);
+   }
+
+   public boolean hasStringEquals(String s) {
+      for (int i = 0; i < nextempty; i++) {
+         if (strings[i].equals(s)) {
+            return true;
+         }
+      }
+      return false;
    }
 
    /**
@@ -290,15 +300,6 @@ public class IntToStrings implements IStringable, Serializable {
    public boolean hasStringRef(String s) {
       for (int i = 0; i < nextempty; i++) {
          if (strings[i] == s) {
-            return true;
-         }
-      }
-      return false;
-   }
-
-   public boolean hasStringEquals(String s) {
-      for (int i = 0; i < nextempty; i++) {
-         if (strings[i].equals(s)) {
             return true;
          }
       }
@@ -459,10 +460,6 @@ public class IntToStrings implements IStringable, Serializable {
       return Dctx.toString1Line(this);
    }
 
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "IntToString");
       dc.appendVarWithSpace("size", getSize());
@@ -476,5 +473,9 @@ public class IntToStrings implements IStringable, Serializable {
 
    }
    //#enddebug
+
+   public UCtx toStringGetUCtx() {
+      return uc;
+   }
 
 }

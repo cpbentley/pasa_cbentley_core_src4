@@ -1,8 +1,8 @@
 package pasa.cbentley.core.src4.utils;
 
-import java.awt.Font;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.structs.IntBuffer;
 
 /**
@@ -32,7 +32,7 @@ public class StringUtils {
     * @param sb
     * @param cols
     */
-   public static void appendData(byte[] ar, int offset, int len, StringBuilder sb, int cols) {
+   public static void appendData(byte[] ar, int offset, int len, StringBBuilder sb, int cols) {
       if (offset >= ar.length)
          return;
       int count = 0;
@@ -1331,7 +1331,7 @@ public class StringUtils {
       if (ar == null) {
          return "null";
       }
-      StringBuilder sb = new StringBuilder();
+      StringBBuilder sb = new StringBBuilder();
       for (int i = 0; i < ar.length; i++) {
          if (i != 0) {
             sb.append(separator);
@@ -1349,7 +1349,7 @@ public class StringUtils {
       if (ar == null) {
          return "null";
       }
-      StringBuilder sb = new StringBuilder();
+      StringBBuilder sb = new StringBBuilder();
       for (int i = 0; i < ar.length; i++) {
          if (i != 0) {
             sb.append(separator);

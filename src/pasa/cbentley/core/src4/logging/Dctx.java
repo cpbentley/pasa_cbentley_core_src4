@@ -1,6 +1,6 @@
 package pasa.cbentley.core.src4.logging;
 
-import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import pasa.cbentley.core.src4.ctx.ICtx;
@@ -908,10 +908,10 @@ public class Dctx implements IFlagsToString {
       if (v == null) {
          this.append("Vector is null");
       } else {
-         Iterator it = v.iterator();
+         Enumeration it = v.elements();
          int count = 0;
-         while (it.hasNext()) {
-            Object o = it.next();
+         while (it.hasMoreElements()) {
+            Object o = it.nextElement();
             if (o instanceof IStringable) {
                count++;
                this.nlLvl((IStringable) o, "Vector#" + count);
@@ -929,7 +929,7 @@ public class Dctx implements IFlagsToString {
       } else {
          dc.append(title);
          dc.appendVarWithSpace("Name", t.getName());
-         dc.appendVarWithSpace("State", t.getState().toString());
+         dc.appendVarWithSpace("Priority", t.getPriority());
 
       }
    }
