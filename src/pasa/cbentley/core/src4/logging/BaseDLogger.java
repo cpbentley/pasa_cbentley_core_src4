@@ -222,4 +222,5 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_WORK, ITechTags.FLAG_06_PRINT_WORK, lvl, oneLine);
    }
    //#enddebug
+
 }

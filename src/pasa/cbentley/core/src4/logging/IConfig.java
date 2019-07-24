@@ -78,6 +78,7 @@ public interface IConfig extends IStringable, ITechConfig {
    public void setClassPositives(Class c, boolean v);
 
    /**
+    * Set Config flags
     * <li> {@link ITechConfig#CONFIG_FLAG_04_SHOW_THREAD}
     * @param flag
     * @param b
@@ -85,6 +86,8 @@ public interface IConfig extends IStringable, ITechConfig {
    public void setFlagFormat(int flag, boolean b);
 
    /**
+    * Sets a master flag
+    * 
     * <li> {@link ITechConfig#MASTER_FLAG_01_BLOCK_ALL_PRINT}
     * <li> {@link ITechConfig#MASTER_FLAG_02_OPEN_ALL_PRINT}
     * <li> {@link ITechConfig#MASTER_FLAG_03_ONLY_POSITIVES}
@@ -135,10 +138,33 @@ public interface IConfig extends IStringable, ITechConfig {
    public void setFlagTag(int[] flags, boolean v);
 
    /**
+    * Only prints logs equal or above... globally.
+    * 
+    * But if tag is disable, none will appear.
     * 
     * @param lvl
     */
    public void setLevelGlobal(int lvl);
+
+   /**
+    * Set the level even for disabled tags.
+    * 
+    * Usually you want to set it to either Severe or Warning.
+    * 
+    * 
+    * @param lvl
+    */
+   public void setLevelGlobalTag(int lvl);
+
+   /**
+    * Specific level for tag that overrides the global level setting.
+    * 
+    * Useful when you want to see finer grained logs for a given tag.
+    * 
+    * @param lvl
+    * @param tag
+    */
+   public void setLevelTag(int lvl, int tag);
 
    /**
     * Force one line for all debug entries of that class.

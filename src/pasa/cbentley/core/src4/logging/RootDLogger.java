@@ -84,6 +84,16 @@ public abstract class RootDLogger implements IDLog {
       ptPrint(msg, str, c, method, ITechTags.STRING_ALWAYS, ITechTags.FLAG_01_PRINT_ALWAYS, lvl, oneLine);
    }
 
+   private String methodIndent = null;
+
+   public synchronized void methodStart(Class c, String method, int lvl) {
+      methodIndent = c.getName() + "#" + method;
+   }
+
+   public synchronized void methodEnd(Class c, String method, int lvl) {
+      methodIndent = null;
+   }
+
    /**
     * 
     * @param msg
@@ -101,7 +111,9 @@ public abstract class RootDLogger implements IDLog {
       this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, devFlags);
    }
 
-   protected void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, int flags) {
+   protected synchronized void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, int flags) {
+      //thread separation 
+      Thread t = Thread.currentThread();
       count++;
       ILogEntryAppender[] appenders = getAppenders();
       for (int i = 0; i < appenders.length; i++) {

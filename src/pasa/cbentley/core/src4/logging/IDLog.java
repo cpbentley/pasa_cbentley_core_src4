@@ -41,6 +41,10 @@ public interface IDLog {
     */
    public ILogEntryAppender getDefault();
 
+   public void methodEnd(Class c, String method, int lvl);
+
+   public void methodStart(Class c, String method, int lvl);
+
    public void pAlways(String msg, IStringable str, Class c, String method);
 
    public void pAlways(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);

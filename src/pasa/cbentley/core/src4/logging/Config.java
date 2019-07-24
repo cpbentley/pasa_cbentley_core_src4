@@ -99,10 +99,15 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       if (type.hasDevFlag(DEV_3_STACK)) {
          entryOfConf.setConfigResFlag(CONFIG_FLAG_3_STACK, true);
       }
+      
+      if(hasFlagPrint(MASTER_FLAG_07_THREAD_DATA)) {
+         entryOfConf.setConfigResFlag(CONFIG_FLAG_04_SHOW_THREAD, true);
+      }
+      //Dev override master flag
       if (type.hasDevFlag(DEV_4_THREAD)) {
          entryOfConf.setConfigResFlag(CONFIG_FLAG_04_SHOW_THREAD, true);
       }
-      // MASTER_FLAG_07_MUTE_THREAD
+   
       return entryOfConf;
    }
 
@@ -425,15 +430,29 @@ public class Config implements IConfig, ITechTags, ITechConfig {
    }
 
    /**
-    * set the level even for disable tags.
+    * Set the level even for disabled tags.
     * 
     * Usually you want to set it to either Severe or Warning.
+    * 
+    * 
     * @param lvl
     */
    public void setLevelGlobalTag(int lvl) {
       this.logLevel = lvl;
    }
 
+   /**
+    * Specific level for tag that overrides the global level setting.
+    * 
+    * Useful when you want to see finer grained logs for a given tag.
+    * 
+    * @param lvl
+    * @param tag
+    */
+   public void setLevelTag(int lvl, int tag) {
+      this.logLevel = lvl;
+   }
+   
    /**
     * Force one lines one class tag
     */
@@ -518,7 +537,7 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       while (e.hasMoreElements()) {
          Class c = (Class) e.nextElement();
          dc.nl();
-         dc.append(c.getSimpleName());
+         dc.append(c.getName());
       }
       dc.tabRemove();
    }

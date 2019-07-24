@@ -17,11 +17,16 @@ import pasa.cbentley.core.src4.utils.BitUtils;
 public class DLogEntryOfConfig implements ITechLvl {
    //#mdebug
 
+   private IConfig   config;
+
+   /**
+    * Result of {@link DLogEntry#computeDLogEntryOfConfig(IConfig)}
+    */
+   private int configFlags;
+
    private DLogEntry entry;
 
    private UCtx      uc;
-
-   private IConfig   config;
 
    public DLogEntryOfConfig(UCtx uc, IConfig config, DLogEntry entry) {
       this.uc = uc;
@@ -29,21 +34,12 @@ public class DLogEntryOfConfig implements ITechLvl {
       this.entry = entry;
    }
 
-   public DLogEntry getEntry() {
-      return entry;
-   }
-
    public IConfig getConfig() {
       return config;
    }
 
-   /**
-    * Result of {@link DLogEntry#computeDLogEntryOfConfig(IConfig)}
-    */
-   private int configFlags;
-
-   public void setConfigResFlag(int flag, boolean v) {
-      configFlags = BitUtils.setFlag(configFlags, flag, v);
+   public DLogEntry getEntry() {
+      return entry;
    }
 
    public boolean hasConfigFlag(int flag) {
@@ -60,6 +56,10 @@ public class DLogEntryOfConfig implements ITechLvl {
 
    public boolean isStackConfig() {
       return BitUtils.hasFlag(configFlags, ITechConfig.CONFIG_FLAG_3_STACK);
+   }
+
+   public void setConfigResFlag(int flag, boolean v) {
+      configFlags = BitUtils.setFlag(configFlags, flag, v);
    }
 
    //#enddebug

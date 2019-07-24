@@ -73,6 +73,9 @@ public interface ITechConfig extends ITech {
     */
    public static final int MASTER_FLAG_06_CLASS_INSTANCES = 1 << 5;
 
-   public static final int MASTER_FLAG_07_MUTE_THREAD     = 1 << 6;
+   /**
+    * 
+    */
+   public static final int MASTER_FLAG_07_THREAD_DATA     = 1 << 6;
 
 }
