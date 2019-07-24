@@ -87,6 +87,10 @@ public class MemorySimpleCreator implements IMemory {
    public char[] ensureCapacity(char[] ar, int size, int incr) {
       if (size < ar.length)
          return ar;
+
+      //#debug
+      toDLog().pMemory("chars.length=" + ar.length + " size=" + size + " grow=" + incr, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
+
       char[] oldData = ar;
       ar = new char[size + incr];
       for (int i = 0; i < oldData.length; i++) {
@@ -112,6 +116,10 @@ public class MemorySimpleCreator implements IMemory {
       }
       if (size + grow < ar.length)
          return ar;
+
+      //#debug
+      toDLog().pMemory("ints.length=" + ar.length + " size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
+
       int[] oldData = ar;
       ar = new int[size + grow];
       for (int i = 0; i < oldData.length; i++) {
@@ -122,10 +130,15 @@ public class MemorySimpleCreator implements IMemory {
 
    public Object[] ensureCapacity(Object[] ar, int size, int grow) {
       if (ar == null) {
+         //#debug
+         toDLog().pMemory("Objects is null. size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
          return new Object[size + grow];
       }
-      if (size + grow < ar.length)
+      if (size + grow < ar.length) {
          return ar;
+      }
+      //#debug
+      toDLog().pMemory("Objects.length=" + ar.length + " size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
       Object[] oldData = ar;
       ar = new Object[size + grow];
       for (int i = 0; i < oldData.length; i++) {

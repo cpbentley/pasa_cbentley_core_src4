@@ -18,6 +18,12 @@ public interface IMemory extends IStringable {
     */
    public char[] createCharArray(int len);
 
+   /**
+    * 
+    * @param ar
+    * @param size
+    * @return
+    */
    public int[] resizeTo(int[] ar, int size);
 
    /**
@@ -41,10 +47,23 @@ public interface IMemory extends IStringable {
     */
    public byte[] clone(byte[] ar);
 
+   /**
+    * 
+    * @param size
+    * @return
+    */
    public byte[] createByteArray(int size);
 
+   /**
+    * 
+    * @param size
+    * @return
+    */
    public int[] createIntArray(int size);
 
+   /**
+    * 
+    */
    public void softGC();
 
    /**
@@ -55,8 +74,20 @@ public interface IMemory extends IStringable {
     */
    public byte[] increaseCapacity(byte[] ar, int addition);
 
+   /**
+    * 
+    * @param ar
+    * @param addition
+    * @return
+    */
    public char[] increaseCapacity(char[] ar, int addition);
 
+   /**
+    * 
+    * @param ar
+    * @param addition
+    * @return
+    */
    public byte[][] increaseCapacity(byte[][] ar, int addition);
 
    /**
@@ -67,8 +98,20 @@ public interface IMemory extends IStringable {
     */
    public int[] increaseCapacity(int[] ar, int addition);
 
+   /**
+    * 
+    * @param ar
+    * @param addition
+    * @return
+    */
    public String[] increaseCapacity(String[] ar, int addition);
 
+   /**
+    * 
+    * @param ar
+    * @param addition
+    * @return
+    */
    public Object[] increaseCapacity(Object[] ar, int addition);
 
    /**
@@ -87,6 +130,12 @@ public interface IMemory extends IStringable {
     */
    public void addMemFreeable(IMemFreeable free);
 
+   /**
+    * 
+    * @param ar
+    * @param size
+    * @return
+    */
    public int[] ensureCapacity(int[] ar, int size);
 
    /**
@@ -132,10 +181,39 @@ public interface IMemory extends IStringable {
     */
    public String[] ensureCapacity(String[] ar, int size, int incr);
 
+   /**
+    * 
+    * @param ar
+    * @param size
+    * @param incr
+    * @return
+    */
    public char[] ensureCapacity(char[] ar, int size, int incr);
 
+   /**
+    * Ensures that <code>size</code>  does not throw an {@link ArrayIndexOutOfBoundsException}.
+    * 
+    * Grow array so size + grow is total length
+    * 
+    * @param ar
+    * @param size
+    * @param grow
+    * @return
+    */
    public int[] ensureCapacity(int[] ar, int size, int grow);
 
+   /**
+    * Ensures that <code>size</code>  does not throw an {@link ArrayIndexOutOfBoundsException}.
+    * 
+    * Grow array so size + grow is total length
+    * 
+    * If array is null. returns a array of size (size+grow)
+    * 
+    * @param ar
+    * @param size
+    * @param grow
+    * @return
+    */
    public Object[] ensureCapacity(Object[] ar, int size, int grow);
 
    /**
