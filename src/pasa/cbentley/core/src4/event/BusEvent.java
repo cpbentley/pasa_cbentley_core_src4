@@ -221,7 +221,7 @@ public class BusEvent implements IStringable {
       dc.nlLvlOneLine(contextOwner);
       toStringPrivate(dc);
       if(producer != null) {
-         dc.append("by "+ producer.getClass().getSimpleName());
+         dc.append("by "+ producer.getClass().getName());
       }
    }
 
