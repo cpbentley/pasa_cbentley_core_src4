@@ -246,7 +246,18 @@ public class IntToObjects implements IStringable {
          nextempty = size;
       }
    }
-
+   
+   /**
+    * Ensure the number of slots. Make the nextEmpty at least +1
+    * <br>
+    * <br>
+    * Increment will be half the size.
+    * @param size index that should not throw an {@link ArrayIndexOutOfBoundsException}.
+    */
+   public void ensureRoom(int size) {
+      ensureRoom(size, objects.length >> 1);
+   }
+   
    /**
     * Search for the first line with integer mint
     * <br>
