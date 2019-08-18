@@ -236,6 +236,9 @@ public class Config implements IConfig, ITechTags, ITechConfig {
       if (hasFlagPrint(MASTER_FLAG_05_IGNORE_FLAGS)) {
          return true;
       } else {
+         if(flagTag == FLAG_01_PRINT_ALWAYS) {
+            return true;
+         }
          if (hasFlagPrint(MASTER_FLAG_08_OPEN_ALL_BUT_FALSE)) {
             //accept it unless flag as negative
             boolean hasFlagTagNeg = hasFlagTagNeg(flagTag);
