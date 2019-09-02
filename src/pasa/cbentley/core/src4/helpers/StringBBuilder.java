@@ -7,15 +7,6 @@ package pasa.cbentley.core.src4.helpers;
  */
 public class StringBBuilder {
 
-   private char   charValues[];
-
-   /** 
-    * The count is the number of characters used.
-    */
-   private int    count;
-
-   private String sep;
-
    /**
     * There is a logic.. Big? But what is big? And what is small?
     * So there is a logic and its not just sugar.
@@ -28,29 +19,23 @@ public class StringBBuilder {
       return new StringBBuilder(10000);
    }
 
-   public void decrementCount(int v) {
-      count -= v;
-   }
-
    public static StringBBuilder getThreadSmall() {
       return new StringBBuilder(200);
    }
+
+   private char   charValues[];
+
+   /** 
+    * The count is the number of characters used.
+    */
+   private int    count;
+
+   private String sep;
 
    public StringBBuilder() {
       this(100);
    }
 
-   public void nl() {
-      append('\n');
-   }
-
-   /**
-    * Arbitrarily move the pointer, effectively erase characters after count
-    * @param count
-    */
-   public void setCount(int count) {
-      this.count = count;
-   }
    /** 
     * Creates an AbstractStringBuilder of the specified capacity.
     */
@@ -93,8 +78,6 @@ public class StringBBuilder {
       this.append(String.valueOf(amount));
    }
 
-   //#endif
-
    public void append(int amount) {
       this.append(String.valueOf(amount));
    }
@@ -106,6 +89,8 @@ public class StringBBuilder {
    public void append(long amount) {
       this.append(String.valueOf(amount));
    }
+
+   //#endif
 
    /**
     * 
@@ -126,6 +111,84 @@ public class StringBBuilder {
       return this;
    }
 
+   public void appendPretty(int value, int numChars, char c, boolean isBack) {
+      String valueStr = String.valueOf(value);
+      int diff = numChars - valueStr.length();
+      if (isBack) {
+         this.append(valueStr);
+      }
+      while (diff > 0) {
+         this.append(c);
+         diff -= 1;
+      }
+      if (!isBack) {
+         this.append(valueStr);
+      }
+   }
+
+   public void appendPretty(String str, int numChars, char c, boolean isBack) {
+      int diff = numChars - str.length();
+      if (isBack) {
+         this.append(str);
+      }
+      while (diff > 0) {
+         this.append(c);
+         diff -= 1;
+      }
+      if (!isBack) {
+         this.append(str);
+      }
+   }
+
+   /**
+    * Appends the value and append c for that numChars are append in the builder.
+    * <li>45, 5, '0' appends "45000"
+    * <li>845, 8, '-' appends "845-----"
+    * 
+    * @param value
+    * @param numChars
+    * @param c
+    */
+   public void appendPrettyBack(int value, int numChars, char c) {
+      appendPretty(value, numChars, c, true);
+   }
+
+   /**
+    * <li>"data", 5, '-' appends "data-"
+    * <li>"data", 8, ' ' appends "data    "
+    * 
+    * @param str
+    * @param numChars
+    * @param c
+    */
+   public void appendPrettyBack(String str, int numChars, char c) {
+      appendPretty(str, numChars, c, true);
+   }
+
+   /**
+    * Appends the value and append c for that numChars are append in the builder.
+    * <li>45, 5, '0' appends "00045"
+    * <li>845, 8, '-' appends "-----845"
+    * @param value
+    * @param numChars
+    * @param c
+    */
+   public void appendPrettyFront(int value, int numChars, char c) {
+      appendPretty(value, numChars, c, false);
+   }
+
+   /**
+    * <li>"data", 5, '-' appends "-data"
+    * <li>"data", 8, ' ' appends "    data"
+    * 
+    * @param str
+    * @param numChars
+    * @param c
+    */
+   public void appendPrettyFront(String str, int numChars, char c) {
+      appendPretty(str, numChars, c, false);
+   }
+
    /**
     * Append the string with the class separator
     * @param str
@@ -137,10 +200,6 @@ public class StringBBuilder {
       return this;
    }
 
-   public void tab() {
-      this.append("\t");
-   }
-
    public int capacity() {
       return charValues.length;
    }
@@ -149,6 +208,10 @@ public class StringBBuilder {
       if ((index < 0) || (index >= count))
          throw new StringIndexOutOfBoundsException(index);
       return charValues[index];
+   }
+
+   public void decrementCount(int v) {
+      count -= v;
    }
 
    public void ensureCapacity(int minimumCapacity) {
@@ -173,6 +236,10 @@ public class StringBBuilder {
       char newValue[] = new char[newCapacity];
       System.arraycopy(charValues, 0, newValue, 0, count);
       charValues = newValue;
+   }
+
+   public int getCount() {
+      return count;
    }
 
    /**
@@ -207,6 +274,10 @@ public class StringBBuilder {
       return count;
    }
 
+   public void nl() {
+      append('\n');
+   }
+
    public void reset() {
       count = 0;
    }
@@ -217,8 +288,20 @@ public class StringBBuilder {
       charValues[index] = ch;
    }
 
+   /**
+    * Arbitrarily move the pointer, effectively erase characters after count
+    * @param count
+    */
+   public void setCount(int count) {
+      this.count = count;
+   }
+
    public void setSeparator(String sep) {
       this.sep = sep;
+   }
+
+   public void tab() {
+      this.append("\t");
    }
 
    /**
@@ -235,10 +318,6 @@ public class StringBBuilder {
          System.arraycopy(charValues, 0, newValue, 0, count);
          this.charValues = newValue;
       }
-   }
-
-   public int getCount() {
-      return count;
    }
 
 }
