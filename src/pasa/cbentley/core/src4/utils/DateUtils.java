@@ -23,13 +23,21 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  */
 public class DateUtils {
 
-   public static final long MILLIS_IN_A_DAY    = 86400000;
+   public static final long MILLIS_IN_A_DAY     = 86400000;
 
-   public static final long MILLIS_IN_A_HOUR   = 3600000;
+   public static final long MILLIS_IN_A_HOUR    = 3600000;
 
-   public static final long MILLIS_IN_A_MINUTE = 60000;
+   public static final long MILLIS_IN_A_MINUTE  = 60000;
 
-   public static final int  MINUTES_IN_A_DAY   = 24 * 60;
+   public static final int  MINUTES_IN_A_DAY    = 60 * 24;
+
+   public static final int  MINUTES_IN_A_MONTH  = 60 * 24 * 31;
+
+   public static final int  MINUTES_IN_A_YEAR   = 60 * 24 * 31 * 12;
+
+   public static final int  MINUTES_IN_A_YEAR_2 = 60 * 24 * 31 * 12 * 2;
+
+   public static final int  MINUTES_IN_A_YEAR_3 = 60 * 24 * 31 * 12 * 3;
 
    private final UCtx       uc;
 
