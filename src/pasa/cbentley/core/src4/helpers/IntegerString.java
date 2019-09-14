@@ -236,8 +236,8 @@ public class IntegerString implements IStringable {
    public boolean isPalindrome() {
       int num = numChars / 2;
       for (int i = 0; i < num; i++) {
-         int digitLeft = numericalValuesFromLeft[0];
-         int digitRight = numericalValuesFromRight[0];
+         int digitLeft = numericalValuesFromLeft[i];
+         int digitRight = numericalValuesFromRight[i];
          if (digitLeft != digitRight) {
             return false;
          }
