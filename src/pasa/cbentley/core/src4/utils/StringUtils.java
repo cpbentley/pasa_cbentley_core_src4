@@ -1489,9 +1489,40 @@ public class StringUtils {
       return true;
    }
 
-   public String prettyDouble(double amountn, int decimals) {
-      String s = Double.toString(amountn);
-      int index = s.indexOf('.') + 1;
+   /**
+    * Returns a String with at most the number of decimals. No rounding.
+    * 
+    * 1.025 , 2 -> "1.02" 
+    * 1.025 , 0 -> "1" 
+    * 
+    * @param amountn
+    * @param decimals [0-n]
+    * @return
+    */
+   public String prettyFloat(float amountn, int decimals) {
+      String s = Float.toString(amountn);
+      return prettyDecimalString(s, decimals);
+   }
+   
+   /**
+    * Cuts the string at first '.' and keep at most
+    * @param s if no . returns s
+    * @param decimals [0-n] 
+    * @throws {@link StringIndexOutOfBoundsException}
+    * @throws {@link IllegalArgumentException} in debug mode when decimals < 0
+    * @return
+    */
+   public String prettyDecimalString(String s, int decimals) {
+      //#mdebug
+      if(decimals < 0) {
+         throw new IllegalArgumentException("Decimals must be >=0. It was "+ decimals);
+      }
+      //#enddebug
+      int indexOfDot = s.indexOf('.');
+      if(indexOfDot == -1) {
+         return s;
+      }
+      int index = indexOfDot + 1;
       int numofdeci = s.length() - index;
       if (index == -1) {
          index = 0;
@@ -1504,6 +1535,11 @@ public class StringUtils {
       String m1 = s.substring(0, index);
       String m2 = s.substring(index, index + max);
       return m1 + m2;
+   }
+   
+   public String prettyDouble(double amountn, int decimals) {
+      String s = Double.toString(amountn);
+      return prettyDecimalString(s, decimals);
    }
 
    /**
