@@ -96,7 +96,7 @@ public class CharUtils {
     * <br>
     * Index is absolute. if value is at offset, it returns offset.
     * @param val
-    * @param ar
+    * @param ar cannot be null
     * @param offset
     * @param len
     * @return -1 if not found
@@ -107,6 +107,36 @@ public class CharUtils {
             return j;
       }
       return -1;
+   }
+   
+   public static int getFirstIndex(String str, char[] chars) {
+      return getFirstIndex(str, chars, 0, chars.length);
+   }
+   
+   /**
+    * 
+    * @param str -1 if null or ""
+    * @param chars cannot be null
+    * @param offset
+    * @param len
+    * @return
+    */
+   public static int getFirstIndex(String str, char[] chars, int offset, int len) {
+      if(str == null || str.equals("")) {
+         return -1;
+      }
+      char c0 = str.charAt(0);
+      int indexi = CharUtils.getFirstIndex(c0, chars, offset, len);
+      if(indexi != -1) {
+         for (int i = 1; i < str.length(); i++) {
+            char ci = str.charAt(i);
+            int offseti = offset + indexi + i;
+            if(ci != chars[offseti]) {
+               return -1;
+            }
+         }
+      }
+      return indexi;
    }
 
    public static int getFirstIndex(char c, char[] chars) {
