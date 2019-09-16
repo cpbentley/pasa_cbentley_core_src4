@@ -105,7 +105,7 @@ public class Dctx implements IFlagsToString {
       }
       this.uc = uc;
       this.nl = nl;
-      sb = new StringBBuilder(4000);
+      sb = new StringBBuilder(uc,4000);
       nulls = new IntToStrings(uc);
       processedObjects = new IntToObjects(uc);
    }

@@ -957,7 +957,7 @@ public class BitUtils {
     */
    public String toBinStringRightToLeft(byte[] ar, int offset, int len, int chunkLen) {
       //we need a string builder factory
-      StringBBuilder sb = new StringBBuilder(len * 8 + 1 + len / chunkLen);
+      StringBBuilder sb = new StringBBuilder(uc, len * 8 + 1 + len / chunkLen);
       int count = 0;
       for (int i = offset; i < offset + len; i++) {
          int val = ar[i] & 0xFF;
@@ -987,7 +987,7 @@ public class BitUtils {
     * @return
     */
    public String toStringBytes(byte[] ar, int offset, int len, int cols) {
-      StringBBuilder sb = new StringBBuilder();
+      StringBBuilder sb = new StringBBuilder(uc);
       int count = 0;
       for (int i = offset; i < offset + len; i++) {
          sb.append(ar[i]);
@@ -1051,7 +1051,7 @@ public class BitUtils {
       }
       return fi;
    }
-   
+
    /**
     * 
     * @param word
@@ -1158,7 +1158,7 @@ public class BitUtils {
       if (ar == null) {
          return "null";
       }
-      StringBBuilder sb = StringBBuilder.getThreadSmall();
+      StringBBuilder sb = new StringBBuilder(uc);
       for (int i = offset; i < ar.length; i++) {
          if (i != 0)
             sb.append(sep);
@@ -1166,14 +1166,16 @@ public class BitUtils {
       }
       return sb.toString();
    }
-   public static String debugString(byte[] ar, String sep) {
+
+   public String debugString(byte[] ar, String sep) {
       return debugString(ar, 0, sep);
    }
-   public static String debugString(byte[] ar, int offset, String sep) {
+
+   public String debugString(byte[] ar, int offset, String sep) {
       if (ar == null) {
          return "null";
       }
-      StringBBuilder sb = StringBBuilder.getThreadSmall();
+      StringBBuilder sb = new StringBBuilder(uc);
       for (int i = offset; i < ar.length; i++) {
          if (i != 0)
             sb.append(sep);
@@ -1181,6 +1183,7 @@ public class BitUtils {
       }
       return sb.toString();
    }
+
    public String toStringBytes(byte[] ar, String sep) {
       return toStringBytes(ar, 0, sep);
    }
@@ -1193,7 +1196,7 @@ public class BitUtils {
     * @return
     */
    public String toBiString8(byte[] ar, int offset, int len) {
-      StringBBuilder sb = new StringBBuilder(8 * len + 10);
+      StringBBuilder sb = new StringBBuilder(uc, 8 * len + 10);
       for (int i = offset; i < offset + len; i++) {
          int val = ar[i] & 0xFF;
          sb.append(toBinString8(val));

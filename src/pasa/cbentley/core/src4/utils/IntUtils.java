@@ -216,6 +216,7 @@ public class IntUtils implements IStringable {
          ar[i] = filler;
       }
    }
+
    /**
     * true if array only contains i values
     * @param ar
@@ -233,6 +234,7 @@ public class IntUtils implements IStringable {
    public static boolean isOnly(int[] ar, int i) {
       return isOnly(ar, 0, ar.length, i);
    }
+
    /**
     * 
     * @param ar
@@ -370,14 +372,17 @@ public class IntUtils implements IStringable {
    public static int getFirstIndexASC(int value, int[] ints, int offset, int len) {
       return getSearchInASC(value, ints, offset, len)[TUPLE_SEARCH_0_FIRST_INDEX];
    }
-   
+
    public static int getFirstIndexDESC(int value, int[] ints, int offset, int len) {
       return getSearchInDESC(value, ints, offset, len)[TUPLE_SEARCH_0_FIRST_INDEX];
    }
-   public static final int TUPLE_SEARCH_0_FIRST_INDEX = 0;
+
+   public static final int TUPLE_SEARCH_0_FIRST_INDEX  = 0;
+
    public static final int TUPLE_SEARCH_1_INSERT_INDEX = 1;
+
    public static int[] getSearchInASC(int value, int[] ints, int offset, int len) {
-      int[] tuple = new int[] {-1,-1}; //first index value, insert value
+      int[] tuple = new int[] { -1, -1 }; //first index value, insert value
       if (len == 0) {
          tuple[TUPLE_SEARCH_1_INSERT_INDEX] = 0;
          return tuple;
@@ -416,7 +421,7 @@ public class IntUtils implements IStringable {
       int startValue = ints[startIndex];
       int val = startIndex;
       boolean isContinue = true;
-      while (val - 1 >= offset && isContinue) { 
+      while (val - 1 >= offset && isContinue) {
          int valBelow = ints[val - 1];
          if (valBelow == startValue) {
             val = val - 1;
@@ -426,12 +431,12 @@ public class IntUtils implements IStringable {
       }
       return val;
    }
-   
+
    public static int getIndexSimilarValueUp(int startIndex, int[] ints, int offset, int len) {
       int startValue = ints[startIndex];
       int val = startIndex;
       boolean isContinue = true;
-      while (val + 1 < offset + len && isContinue) { 
+      while (val + 1 < offset + len && isContinue) {
          int valUp = ints[val + 1];
          if (valUp == startValue) {
             val = val + 1;
@@ -441,8 +446,9 @@ public class IntUtils implements IStringable {
       }
       return val;
    }
+
    public static int[] getSearchInDESC(int value, int[] ints, int offset, int len) {
-      int[] tuple = new int[] {-1,-1}; //first index value, insert value
+      int[] tuple = new int[] { -1, -1 }; //first index value, insert value
       if (len == 0) {
          tuple[TUPLE_SEARCH_1_INSERT_INDEX] = 0;
          return tuple;
@@ -469,6 +475,7 @@ public class IntUtils implements IStringable {
       tuple[TUPLE_SEARCH_1_INSERT_INDEX] = mid;
       return tuple;
    }
+
    /**
     * 
     * @param ints
@@ -1379,7 +1386,6 @@ public class IntUtils implements IStringable {
       dc.root1Line(this, "IntUtils");
    }
 
-
    public UCtx toStringGetUCtx() {
       return uc;
    }
@@ -1445,11 +1451,11 @@ public class IntUtils implements IStringable {
     * @param max maximum chars
     * @return
     */
-   public static String debugString(byte[] ar, String sep, int max) {
+   public String debugString(byte[] ar, String sep, int max) {
       if (ar == null) {
          return "null";
       }
-      StringBBuilder sb = StringBBuilder.getThreadSmall();
+      StringBBuilder sb = new StringBBuilder(uc);
       int len = ar.length;
       sb.append("[#" + len + "]");
       if (len < max) {
@@ -1462,18 +1468,20 @@ public class IntUtils implements IStringable {
       }
       return sb.toString();
    }
-   public static void debugAlone(int[] ar, Dctx ps, String sep) {
+
+   public void debugAlone(int[] ar, Dctx ps, String sep) {
       for (int i = 0; i < ar.length; i++) {
          if (i != 0)
             ps.append(sep);
          ps.append(ar[i]);
       }
    }
-   public static String debugString(byte[] ar, int offset, int len, String sep) {
+
+   public String debugString(byte[] ar, int offset, int len, String sep) {
       if (ar == null) {
          return "null";
       }
-      StringBBuilder sb = StringBBuilder.getThreadSmall();
+      StringBBuilder sb = new StringBBuilder(uc);
       for (int i = offset; i < offset + len; i++) {
          if (i != 0)
             sb.append(sep);
@@ -1482,11 +1490,11 @@ public class IntUtils implements IStringable {
       return sb.toString();
    }
 
-   public static String debugString(int[] ar) {
+   public String debugString(int[] ar) {
       if (ar == null) {
          return "null";
       }
-      StringBBuilder sb = StringBBuilder.getThreadSmall();
+      StringBBuilder sb = new StringBBuilder(uc);
       for (int i = 0; i < ar.length; i++) {
          if (i != 0)
             sb.append(",");

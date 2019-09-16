@@ -1,27 +1,14 @@
 package pasa.cbentley.core.src4.helpers;
 
+import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.utils.CharUtils;
+
 /**
  * 
  * @author Charles Bentley
  *
  */
 public class StringBBuilder {
-
-   /**
-    * There is a logic.. Big? But what is big? And what is small?
-    * So there is a logic and its not just sugar.
-    * <br>
-    * In this case, the consequences are few. The array is designed to grow anyways.
-    * <br>
-    * @return
-    */
-   public static StringBBuilder getBig() {
-      return new StringBBuilder(10000);
-   }
-
-   public static StringBBuilder getThreadSmall() {
-      return new StringBBuilder(200);
-   }
 
    private char   charValues[];
 
@@ -32,14 +19,18 @@ public class StringBBuilder {
 
    private String sep;
 
-   public StringBBuilder() {
-      this(100);
-   }
+   protected final UCtx uc;
 
+   
+   public StringBBuilder(UCtx uc) {
+      this(uc, 100);
+   }
+   
    /** 
     * Creates an AbstractStringBuilder of the specified capacity.
     */
-   public StringBBuilder(int capacity) {
+   public StringBBuilder(UCtx uc,int capacity) {
+      this.uc = uc;
       charValues = new char[capacity];
    }
 
@@ -73,7 +64,6 @@ public class StringBBuilder {
       return this;
    }
 
-   //#ifdef polish.hasFloatingPoint
    public void append(double amount) {
       this.append(String.valueOf(amount));
    }
@@ -89,8 +79,6 @@ public class StringBBuilder {
    public void append(long amount) {
       this.append(String.valueOf(amount));
    }
-
-   //#endif
 
    /**
     * 
@@ -242,6 +230,13 @@ public class StringBBuilder {
       return count;
    }
 
+   public void replaceFirst(String strOld, String strNew) {
+      int index = CharUtils.getFirstIndex(strOld, charValues, 0, count);
+      if(index != -1) {
+         
+      }
+   }
+   
    /**
     * 
     * @param str

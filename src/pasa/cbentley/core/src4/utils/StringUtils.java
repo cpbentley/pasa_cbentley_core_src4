@@ -83,7 +83,7 @@ public class StringUtils {
    public static int extractNumber(char[] c) {
       return extractNumber(c, 0, c.length);
    }
-
+   
    /**
     * Return the first number occurence in the char array
     * <li> #45 returns 45
@@ -1331,7 +1331,7 @@ public class StringUtils {
       if (ar == null) {
          return "null";
       }
-      StringBBuilder sb = new StringBBuilder();
+      StringBBuilder sb = new StringBBuilder(uc);
       for (int i = 0; i < ar.length; i++) {
          if (i != 0) {
             sb.append(separator);
@@ -1349,7 +1349,7 @@ public class StringUtils {
       if (ar == null) {
          return "null";
       }
-      StringBBuilder sb = new StringBBuilder();
+      StringBBuilder sb = new StringBBuilder(uc);
       for (int i = 0; i < ar.length; i++) {
          if (i != 0) {
             sb.append(separator);

@@ -39,7 +39,7 @@ public class SystemOutAppender extends BaseAppender {
          return;
       }
       //get DLogEntry appenders for this call
-      StringBBuilder sb = new StringBBuilder(500);
+      StringBBuilder sb = new StringBBuilder(uc,500);
 
       //first enter message. format is hard coded
       String tagString = entry.getTagString();
