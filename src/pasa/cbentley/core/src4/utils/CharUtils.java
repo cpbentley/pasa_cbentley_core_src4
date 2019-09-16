@@ -2,61 +2,70 @@ package pasa.cbentley.core.src4.utils;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 
-
 public class CharUtils {
 
    public static final int PLANE_0_EN = 0;
 
    public static final int PLANE_4_RU = 4;
 
+   public static char buildCharFromLowByte(int bys, int padding) {
+      int ch1 = padding << 8;
+      int ch2 = (bys << 0) & 0xFF;
+      return (char) (ch1 + ch2);
+   }
+
    /**
-    * Read short value in byte array at position index.
-    * <br>
-    * Little Endian : low byte first, high byte last. 
-    * @param ar
-    * @param index
+    * 
+    * @param bys
+    * @param padding 0x04 for russian chars
     * @return
     */
-   public static char readCharLE(byte[] ar, int index) {
-      int value = (ar[index++] & 0xFF) << 0;
-      value |= (ar[index++] & 0xFF) << 8;
-      return (char) value;
+   public static char[] buildCharsFromLowByes(byte[] bys, int padding) {
+      char[] chars = new char[bys.length];
+      for (int i = 0; i < bys.length; i++) {
+         int ch1 = padding << 8;
+         int ch2 = (bys[i] << 0) & 0xFF;
+         chars[i] = (char) (ch1 + ch2);
+      }
+      return chars;
    }
 
    /**
-    * Read short value in byte array at position index.
-    * <br>
-    * Big Endian : high byte first, low byte last.
-    * @param ar
-    * @param index
+    * 
+    * @param bys
+    * @param padding 0x04 for russian chars
     * @return
     */
-   public static char readCharBE(byte[] ar, int index) {
-      int value = (ar[index++] & 0xff) << 8;
-      value |= (ar[index++] & 0xFF) << 0;
-      return (char) value;
+   public static char[] buildCharsFromLowByes(byte[] bys, int padding, int from, int to) {
+      char[] chars = new char[to - from];
+      for (int i = 0; i < chars.length; i++) {
+         int ch1 = padding << 8;
+         int ch2 = (bys[i + from] << 0) & 0xFF;
+         chars[i] = (char) (ch1 + ch2);
+      }
+      return chars;
    }
 
-   /**
-    * Big Endian : high byte first, low byte last.
-    * @param ar
-    * @param index
-    * @param value
-    */
-   public static void writeShortBE(byte[] ar, int index, char c) {
-      ar[index++] = (byte) (c >>> 8);
-      ar[index++] = (byte) (c >>> 0);
+   public static char[] buildCharsFromLowBytes(int[] bys, int padding, int from, int to) {
+      char[] chars = new char[to - from];
+      for (int i = 0; i < chars.length; i++) {
+         int ch1 = padding << 8;
+         int ch2 = (bys[i + from] << 0) & 0xFF;
+         chars[i] = (char) (ch1 + ch2);
+      }
+      return chars;
    }
 
-   /**
-    * Little Endian : low byte first, high byte last.
-    * @param ar
-    * @param index
-    * @param value
-    */
-   public static void writeShortLE(byte[] ar, int index, char c) {
-      ar[index++] = (byte) (c >>> 0);
-      ar[index++] = (byte) (c >>> 8);
+   public static String buildStringFromLowByes(byte[] bys, int padding) {
+      return new String(buildCharsFromLowByes(bys, padding));
+   }
+
+   public static String buildStringFromLowByes(byte[] bys, int padding, int from, int to) {
+      return new String(buildCharsFromLowByes(bys, padding, from, to));
+   }
+
+   public static String buildStringFromLowByes(int i, int pad) {
+      return String.valueOf(buildCharFromLowByte(i, pad));
    }
 
    public static byte[] byteArrayBEFromChar(char c) {
@@ -82,81 +91,114 @@ public class CharUtils {
       return (char) (((plane & 0xff) << 8) + ((id & 0xff) << 0));
    }
 
-   private UCtx   uc;
+   /**
+    * Returns the index of first occurence of char.
+    * <br>
+    * Index is absolute. if value is at offset, it returns offset.
+    * @param val
+    * @param ar
+    * @param offset
+    * @param len
+    * @return -1 if not found
+    */
+   public static int getFirstIndex(char c, char[] chars, int offset, int len) {
+      for (int j = offset; j < offset + len; j++) {
+         if (chars[j] == c)
+            return j;
+      }
+      return -1;
+   }
+
+   public static int getFirstIndex(char c, char[] chars) {
+      return getFirstIndex(c, chars, 0, chars.length);
+   }
+
+   public static int getPlane(char c) {
+      return (c >>> 8) & 0xFF;
+   }
+
+   public static int getV(char c) {
+      return c & 0xFF;
+   }
+
+   /**
+    * Read short value in byte array at position index.
+    * <br>
+    * Big Endian : high byte first, low byte last.
+    * @param ar
+    * @param index
+    * @return
+    */
+   public static char readCharBE(byte[] ar, int index) {
+      int value = (ar[index++] & 0xff) << 8;
+      value |= (ar[index++] & 0xFF) << 0;
+      return (char) value;
+   }
+
+   /**
+    * Read short value in byte array at position index.
+    * <br>
+    * Little Endian : low byte first, high byte last. 
+    * @param ar
+    * @param index
+    * @return
+    */
+   public static char readCharLE(byte[] ar, int index) {
+      int value = (ar[index++] & 0xFF) << 0;
+      value |= (ar[index++] & 0xFF) << 8;
+      return (char) value;
+   }
+
+   /**
+    * Big Endian : high byte first, low byte last.
+    * @param ar
+    * @param index
+    * @param value
+    */
+   public static void writeShortBE(byte[] ar, int index, char c) {
+      ar[index++] = (byte) (c >>> 8);
+      ar[index++] = (byte) (c >>> 0);
+   }
+
+   /**
+    * Little Endian : low byte first, high byte last.
+    * @param ar
+    * @param index
+    * @param value
+    */
+   public static void writeShortLE(byte[] ar, int index, char c) {
+      ar[index++] = (byte) (c >>> 0);
+      ar[index++] = (byte) (c >>> 8);
+   }
 
    private char[] cyrChar;
 
-   public char[] getCyrillicChar() {
-      if (cyrChar == null) {
-         cyrChar = new char[33];
-         int ch1 = PLANE_4_RU << 8;
-         int count = 0;
-         for (int i = 48; i < 80; i++) {
-            int ch2 = (i << 0) & 0xFF;
-            cyrChar[count] = (char) (ch1 + ch2);
-            count++;
-         }
-         int ch2 = (81 << 0) & 0xFF;
-         cyrChar[32] = (char) (ch1 + ch2);
-      }
-      return cyrChar;
+   private UCtx   uc;
+
+   public CharUtils(UCtx uc) {
+      this.uc = uc;
    }
 
    /**
-    * Returns 0-9 values exclusively from plane 0
-    * @param c
-    * @return -1 if it does not have a numerical value
-    */
-   public int getNumericalValue(char c) {
-      switch (c) {
-         case '0':
-            return 0;
-         case '1':
-            return 1;
-         case '2':
-            return 2;
-         case '3':
-            return 3;
-         case '4':
-            return 4;
-         case '5':
-            return 5;
-         case '6':
-            return 6;
-         case '7':
-            return 7;
-         case '8':
-            return 8;
-         case '9':
-            return 9;
-         default:
-            return -1;
-      }
-   }
-   /**
-    * Assume v is 0 based for lowercase letter a
-    * @param v
-    * @param plane
+    * 
+    * @param source
+    * @param target
     * @return
     */
-   public char unMapZero(int v, int plane) {
-      switch (plane) {
-         case PLANE_4_RU:
-            // a = 48 - ya
-            return CharUtils.charFromLowByteInt(v + 48, plane);
-         default:
-            //case EN_PAD:
-            // a = 97  z=122
-            return CharUtils.charFromLowByteInt(v + 97, plane);
+   public int compare(char[] source, char[] target) {
+      for (int i = 0; i < source.length; i++) {
+         if (target.length <= i)
+            return 1;
+         int r = compareChar(source[i], target[i]);
+         if (r != 0) {
+            return r;
+         }
       }
-   }
-
-   private int resultComp(int val) {
-      if (val < 0)
+      if (source.length == target.length) {
+         return 0;
+      } else {
          return -1;
-      if (val > 0)
-         return 1;
-      return 0;
+      }
    }
 
    /**
@@ -220,87 +262,22 @@ public class CharUtils {
       return 0;
    }
 
-   /**
-    * 
-    * @param source
-    * @param target
-    * @return
-    */
-   public int compare(char[] source, char[] target) {
-      for (int i = 0; i < source.length; i++) {
-         if (target.length <= i)
-            return 1;
-         int r = compareChar(source[i], target[i]);
-         if (r != 0) {
-            return r;
+   public char[] getCyrillicChar() {
+      if (cyrChar == null) {
+         cyrChar = new char[33];
+         int ch1 = PLANE_4_RU << 8;
+         int count = 0;
+         for (int i = 48; i < 80; i++) {
+            int ch2 = (i << 0) & 0xFF;
+            cyrChar[count] = (char) (ch1 + ch2);
+            count++;
          }
+         int ch2 = (81 << 0) & 0xFF;
+         cyrChar[32] = (char) (ch1 + ch2);
       }
-      if (source.length == target.length) {
-         return 0;
-      } else {
-         return -1;
-      }
-   }
-   public static char buildCharFromLowByte(int bys, int padding) {
-      int ch1 = padding << 8;
-      int ch2 = (bys << 0) & 0xFF;
-      return (char) (ch1 + ch2);
+      return cyrChar;
    }
 
-   /**
-    * 
-    * @param bys
-    * @param padding 0x04 for russian chars
-    * @return
-    */
-   public static char[] buildCharsFromLowByes(byte[] bys, int padding) {
-      char[] chars = new char[bys.length];
-      for (int i = 0; i < bys.length; i++) {
-         int ch1 = padding << 8;
-         int ch2 = (bys[i] << 0) & 0xFF;
-         chars[i] = (char) (ch1 + ch2);
-      }
-      return chars;
-   }
-
-   /**
-    * 
-    * @param bys
-    * @param padding 0x04 for russian chars
-    * @return
-    */
-   public static char[] buildCharsFromLowByes(byte[] bys, int padding, int from, int to) {
-      char[] chars = new char[to - from];
-      for (int i = 0; i < chars.length; i++) {
-         int ch1 = padding << 8;
-         int ch2 = (bys[i + from] << 0) & 0xFF;
-         chars[i] = (char) (ch1 + ch2);
-      }
-      return chars;
-   }
-
-   public static char[] buildCharsFromLowBytes(int[] bys, int padding, int from, int to) {
-      char[] chars = new char[to - from];
-      for (int i = 0; i < chars.length; i++) {
-         int ch1 = padding << 8;
-         int ch2 = (bys[i + from] << 0) & 0xFF;
-         chars[i] = (char) (ch1 + ch2);
-      }
-      return chars;
-   }
-
-   public static String buildStringFromLowByes(byte[] bys, int padding) {
-      return new String(buildCharsFromLowByes(bys, padding));
-   }
-
-   public static String buildStringFromLowByes(byte[] bys, int padding, int from, int to) {
-      return new String(buildCharsFromLowByes(bys, padding, from, to));
-   }
-
-   public static String buildStringFromLowByes(int i, int pad) {
-      return String.valueOf(buildCharFromLowByte(i, pad));
-   }
-   
    /**
     * Returns a non accentuated char.
     * <li> Latin é,è ê becomes e
@@ -346,33 +323,34 @@ public class CharUtils {
    }
 
    /**
-    * This implementation considers a whitespace
-    * <br>
-    * <li> '\t'
-    * <li> '\n'
-    * <li> ' '
-    * <li> '\u000C'
-    * <li> '\u001C'
-    * <li> '\u001D'
-    * <li> '\u001E'
-    * <li> '\u001F'
-    * Subclasses may change this by setting an implementation in {@link UCtx}
-    * @param character
-    * @return
+    * Returns 0-9 values exclusively from plane 0
+    * @param c
+    * @return -1 if it does not have a numerical value
     */
-   public boolean isWhitespace(char character) {
-      switch (character) {
-         case '\t':
-         case '\n':
-         case ' ':
-         case '\u000C':
-         case '\u001C':
-         case '\u001D':
-         case '\u001E':
-         case '\u001F':
-            return true;
+   public int getNumericalValue(char c) {
+      switch (c) {
+         case '0':
+            return 0;
+         case '1':
+            return 1;
+         case '2':
+            return 2;
+         case '3':
+            return 3;
+         case '4':
+            return 4;
+         case '5':
+            return 5;
+         case '6':
+            return 6;
+         case '7':
+            return 7;
+         case '8':
+            return 8;
+         case '9':
+            return 9;
          default:
-            return false;
+            return -1;
       }
    }
 
@@ -402,12 +380,35 @@ public class CharUtils {
       }
    }
 
-   public static int getPlane(char c) {
-      return (c >>> 8) & 0xFF;
-   }
-
-   public static int getV(char c) {
-      return c & 0xFF;
+   /**
+    * This implementation considers a whitespace
+    * <br>
+    * <li> '\t'
+    * <li> '\n'
+    * <li> ' '
+    * <li> '\u000C'
+    * <li> '\u001C'
+    * <li> '\u001D'
+    * <li> '\u001E'
+    * <li> '\u001F'
+    * Subclasses may change this by setting an implementation in {@link UCtx}
+    * @param character
+    * @return
+    */
+   public boolean isWhitespace(char character) {
+      switch (character) {
+         case '\t':
+         case '\n':
+         case ' ':
+         case '\u000C':
+         case '\u001C':
+         case '\u001D':
+         case '\u001E':
+         case '\u001F':
+            return true;
+         default:
+            return false;
+      }
    }
 
    /**
@@ -443,8 +444,30 @@ public class CharUtils {
       }
    }
 
-   public CharUtils(UCtx uc) {
-      this.uc = uc;
+   private int resultComp(int val) {
+      if (val < 0)
+         return -1;
+      if (val > 0)
+         return 1;
+      return 0;
+   }
+
+   /**
+    * Assume v is 0 based for lowercase letter a
+    * @param v
+    * @param plane
+    * @return
+    */
+   public char unMapZero(int v, int plane) {
+      switch (plane) {
+         case PLANE_4_RU:
+            // a = 48 - ya
+            return CharUtils.charFromLowByteInt(v + 48, plane);
+         default:
+            //case EN_PAD:
+            // a = 97  z=122
+            return CharUtils.charFromLowByteInt(v + 97, plane);
+      }
    }
 
 }
