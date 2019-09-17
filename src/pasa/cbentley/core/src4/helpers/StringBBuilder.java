@@ -10,26 +10,25 @@ import pasa.cbentley.core.src4.utils.CharUtils;
  */
 public class StringBBuilder {
 
-   private char   charValues[];
+   private char         charValues[];
 
    /** 
     * The count is the number of characters used.
     */
-   private int    count;
+   private int          count;
 
-   private String sep;
+   private String       sep;
 
    protected final UCtx uc;
 
-   
    public StringBBuilder(UCtx uc) {
       this(uc, 100);
    }
-   
+
    /** 
     * Creates an AbstractStringBuilder of the specified capacity.
     */
-   public StringBBuilder(UCtx uc,int capacity) {
+   public StringBBuilder(UCtx uc, int capacity) {
       this.uc = uc;
       charValues = new char[capacity];
    }
@@ -92,8 +91,9 @@ public class StringBBuilder {
       if (len == 0)
          return this;
       int newCount = count + len;
-      if (newCount > charValues.length)
-         expandCapacity(newCount);
+
+      ensureCapacity(newCount);
+
       str.getChars(0, len, charValues, count);
       count = newCount;
       return this;
@@ -230,13 +230,53 @@ public class StringBBuilder {
       return count;
    }
 
-   public void replaceFirst(String strOld, String strNew) {
-      int index = CharUtils.getFirstIndex(strOld, charValues, 0, count);
-      if(index != -1) {
-         
+   /**
+    * Replaces all instances of strOld by strNew
+    * @param strOld
+    * @param strNew
+    */
+   public void replaceAll(String strOld, String strNew) {
+      int index = 0;
+      int indexIncrement = Math.max(0, strNew.length());
+      while(index != -1 && index < count) {
+         index = replaceFirst(strOld, strNew, index); 
+         if(index != -1) {
+            //we don't want the strNew to interfere whatsover
+            index += indexIncrement; 
+         }
       }
    }
+
+   /**
+    * Returns the index of the replace
+    * @param strOld
+    * @param strNew
+    * @param offset
+    * @return
+    */
+   public int replaceFirst(String strOld, String strNew, int offset) {
+      int index = CharUtils.getFirstIndex(strOld, charValues, offset, count);
+      int numCharsOld = strOld.length();
+      int numCharsNew = strNew.length();
+      int shiftsize = numCharsNew - numCharsOld;
+      ensureCapacity(count + numCharsNew);
+
+      if (index != -1) {
+         int start = index + numCharsOld;
+         int end = count-1;
+         CharUtils.shiftChar(charValues, shiftsize, start, end);
+         for (int i = 0; i < numCharsNew; i++) {
+            charValues[index + i] = strNew.charAt(i);
+         }
+         count += shiftsize;
+      }
+      return index;
+   }
    
+   public void replaceFirst(String strOld, String strNew) {
+      replaceFirst(strOld, strNew, 0);
+   }
+
    /**
     * 
     * @param str
@@ -254,8 +294,9 @@ public class StringBBuilder {
       if (offset > count)
          offset = count;
       int newCount = count + len;
-      if (newCount >= charValues.length)
+      if (newCount >= charValues.length) {
          expandCapacity(newCount);
+      }
       //shift data up
       for (int i = count - 1; i >= offset; i--) {
          charValues[i + len] = charValues[i];
