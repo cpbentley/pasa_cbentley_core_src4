@@ -108,11 +108,64 @@ public class CharUtils {
       }
       return -1;
    }
-   
+
    public static int getFirstIndex(String str, char[] chars) {
       return getFirstIndex(str, chars, 0, chars.length);
    }
+
+   /**
+    * 
+    * Dumb shifts, erases data in the shift destination.
+    * 
+    * Used by buffers where its known that data above the end point is not relevant
+    * 
+    * @param ar
+    * @param shiftsize number of jummps up in the array
+    * @param start included in the shift
+    * @param end included in the shift
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
+    */
+   public static void shiftCharUp(char[] ar, int shiftsize, int start, int end) {
+      for (int i = end; i >= start; i--) {
+         if (i + shiftsize < ar.length) {
+            ar[i + shiftsize] = ar[i];
+         }
+      }
+   }
    
+   /**
+    * 
+    * Dumb shifts down, erases data in the shift destination.
+    * 
+    * Used by buffers where its known that data above the end point is not relevant
+    * 
+    * @param ar
+    * @param shiftsize number of jummps up in the array
+    * @param start included in the shift
+    * @param end included in the shift
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
+    */
+   public static void shiftCharDown(char[] ar, int shiftsize, int start, int end) {
+      for (int i = start; i <= end; i++) {
+         if (i - shiftsize >= 0) {
+            ar[i - shiftsize] = ar[i];
+         }
+      }
+   }
+
+   /**
+    * Fills array [start,end] with filler
+    * @param ar
+    * @param filler
+    * @param start
+    * @param end
+    */
+   public static void fill(char[] ar, char filler, int start, int end) {
+      for (int i = start; i <= end; i++) {
+         ar[i] = filler;
+      }
+   }
+
    /**
     * 
     * @param str -1 if null or ""
@@ -122,16 +175,16 @@ public class CharUtils {
     * @return
     */
    public static int getFirstIndex(String str, char[] chars, int offset, int len) {
-      if(str == null || str.equals("")) {
+      if (str == null || str.equals("")) {
          return -1;
       }
       char c0 = str.charAt(0);
       int indexi = CharUtils.getFirstIndex(c0, chars, offset, len);
-      if(indexi != -1) {
+      if (indexi != -1) {
          for (int i = 1; i < str.length(); i++) {
             char ci = str.charAt(i);
             int offseti = offset + indexi + i;
-            if(ci != chars[offseti]) {
+            if (ci != chars[offseti]) {
                return -1;
             }
          }
