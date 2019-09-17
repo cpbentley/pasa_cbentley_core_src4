@@ -698,6 +698,9 @@ public class IntUtils implements IStringable {
    }
 
    /**
+    * Dumb shifts, erases data in the shift destination.
+    * 
+    * Used by buffers where its known that data above the end point is not relevant
     * 
     * @param ar
     * @param shiftsize number of jummps up in the array
