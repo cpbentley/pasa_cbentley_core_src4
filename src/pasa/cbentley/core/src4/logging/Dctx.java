@@ -59,7 +59,12 @@ public class Dctx implements IFlagsToString {
 
    private Dctx           parent;
 
+   /**
+    * propagated from parents
+    */
    private IntToObjects   processedObjects;
+
+   private IntToObjects   processingSingleLines;
 
    private String         rootTitle;
 
@@ -97,6 +102,7 @@ public class Dctx implements IFlagsToString {
       sb = parent.sb;
       nulls = new IntToStrings(uc);
       processedObjects = parent.processedObjects;
+      processingSingleLines = parent.processingSingleLines;
    }
 
    public Dctx(UCtx uc, String nl) {
@@ -105,9 +111,10 @@ public class Dctx implements IFlagsToString {
       }
       this.uc = uc;
       this.nl = nl;
-      sb = new StringBBuilder(uc,4000);
+      sb = new StringBBuilder(uc, 4000);
       nulls = new IntToStrings(uc);
       processedObjects = new IntToObjects(uc);
+      processingSingleLines = new IntToObjects(uc);
    }
 
    public void append(boolean v) {
@@ -875,7 +882,12 @@ public class Dctx implements IFlagsToString {
 
    public void nlLvlOneLine(IStringable is) {
       nl();
-      is.toString1Line(this);
+      if (processingSingleLines.hasObject(is)) {
+         append(is.getClass().getName() + " is already printed above");
+      } else {
+         processingSingleLines.add(is);
+         is.toString1Line(this);
+      }
    }
 
    public void nlLvlOneLine(IStringable is, String t) {
@@ -883,15 +895,22 @@ public class Dctx implements IFlagsToString {
    }
 
    public void nlLvlOneLine(String t, IStringable is) {
-      Dctx dc = nLevel();
-      if (is == null) {
-         dc.append(t + " is Null");
+      //break cycle don't print if we are currently printing
+      //this one liner
+      if (processingSingleLines.hasObject(is)) {
+         append(t + " is already printed above");
       } else {
-         if (t.length() != 0) {
-            dc.append(t);
-            dc.append("=");
+         Dctx dc = nLevel();
+         if (is == null) {
+            dc.append(t + " is Null");
+         } else {
+            if (t.length() != 0) {
+               dc.append(t);
+               dc.append("=");
+            }
+            processingSingleLines.add(is);
+            is.toString1Line(dc);
          }
-         is.toString1Line(dc);
       }
    }
 
