@@ -30,4 +30,8 @@ public class StringComparator implements IStrComparator {
    public boolean isSimilar(String source, String test) {
       return uc.getStrU().isSimilar(source, test);
    }
+
+   public boolean isEqual(String source, String test) {
+      return source.equals(test);
+   }
 }

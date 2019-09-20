@@ -1,8 +1,8 @@
 package pasa.cbentley.core.src4.utils;
 
-
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
+import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.structs.IntBuffer;
 
 /**
@@ -83,7 +83,7 @@ public class StringUtils {
    public static int extractNumber(char[] c) {
       return extractNumber(c, 0, c.length);
    }
-   
+
    /**
     * Return the first number occurence in the char array
     * <li> #45 returns 45
@@ -419,20 +419,6 @@ public class StringUtils {
       return StringUtils.getUpperCase(s.charAt(0)) + s.substring(1, s.length());
    }
 
-   public static boolean isEqual(char[] c, char[] b) {
-      return isEqual(c, 0, c.length, b);
-   }
-
-   public static boolean isEqual(char[] src, int srcoffset, int srclen, char[] b) {
-      if (srclen != b.length)
-         return false;
-      for (int i = 0; i < b.length; i++) {
-         if (src[srcoffset + i] != b[i])
-            return false;
-      }
-      return true;
-   }
-
    public static boolean isEqualIgnoreCap(char c, char c2) {
       boolean is = c == c2;
       if (is) {
@@ -491,6 +477,49 @@ public class StringUtils {
          }
       }
       return true;
+   }
+
+   /**
+    * Returns the index of first occurence of val.
+    * <br>
+    * Index is absolute. if value is at offset, it returns offset.
+    * @param val
+    * @param ar
+    * @param offset
+    * @param len
+    * @param strComparator {@link IStrComparator#isEqual(String, String)}
+    * @return -1 if not found
+    */
+   public static int getFirstIndexEqual(String val, String[] ar, int offset, int len, IStrComparator strComparator) {
+      return getFirstIndexEqual(val, ar, offset, len, strComparator, 1);
+   }
+
+   /**
+    * Code is supposed to be inlined. Its here for better structing
+    * @param val
+    * @param ar
+    * @param offset
+    * @param len
+    * @param strComparator
+    * @param skip
+    * @return
+    */
+   public static int getFirstIndexEqual(String val, String[] ar, int offset, int len, IStrComparator strComparator, int skip) {
+      for (int j = offset; j < offset + len; j += skip) {
+         if (strComparator.isEqual(val, ar[j])) {
+            return j;
+         }
+      }
+      return -1;
+   }
+
+   public static int getFirstIndexSimilar(String val, String[] ar, int offset, int len, IStrComparator strComparator) {
+      for (int j = offset; j < offset + len; j++) {
+         if (strComparator.isSimilar(val, ar[j])) {
+            return j;
+         }
+      }
+      return -1;
    }
 
    /**
@@ -631,6 +660,79 @@ public class StringUtils {
          return;
       for (int i = 0; i < c.length; i++) {
          c[i] = toLowerCase(c[i]);
+      }
+   }
+
+   /**
+    * shift only if start < end
+    * @param ar
+    * @param shiftsize <0 for shifting down
+    * @param start index value starts at 0. inclusive
+    * @param end index value inclusive
+    * @param erase pad the hole with 0s
+    */
+   public static void shiftInt(String[] ar, int shiftsize, int start, int end, boolean erase) {
+      if (start > end)
+         return;
+      if (shiftsize < 0)
+         shiftIntDown(ar, 0 - shiftsize, start, end, erase);
+      else
+         shiftIntUp(ar, shiftsize, start, end, erase);
+   }
+
+   /**
+    * 
+    * 
+    * @param ar array to shift down
+    * @param shiftsize number of units to go down
+    * @param start start index will go down shiftsize
+    * @param end end index will be the last to be shifted
+    * @param erase
+    */
+   public static void shiftIntDown(String[] ar, int shiftsize, int start, int end, boolean erase) {
+      for (int i = start; i <= end; i++) {
+         if (i - shiftsize >= 0) {
+            ar[i - shiftsize] = ar[i];
+         }
+      }
+      if (erase) {
+         fill(ar, null, end - shiftsize + 1, end);
+      }
+   }
+
+   /**
+    * Dumb shifts, erases data in the shift destination.
+    * 
+    * Used by buffers where its known that data above the end point is not relevant
+    * 
+    * @param ar
+    * @param shiftsize number of jummps up in the array
+    * @param start included in the shift
+    * @param end included in the shift
+    * @param erase erase data liberated
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
+    */
+   public static void shiftIntUp(String[] ar, int shiftsize, int start, int end, boolean erase) {
+      for (int i = end; i >= start; i--) {
+         if (i + shiftsize < ar.length) {
+            ar[i + shiftsize] = ar[i];
+         }
+      }
+      if (erase) {
+         fill(ar, null, start, start + shiftsize - 1);
+      }
+   }
+
+   /**
+    * Fills array [start,end] with filler
+    * @param ar
+    * @param filler
+    * @param start included 
+    * @param end included
+    */
+   public static void fill(String[] ar, String filler, int start, int end) {
+      for (int i = start; i <= end; i++) {
+         ar[i] = filler;
       }
    }
 
@@ -958,17 +1060,17 @@ public class StringUtils {
 
    public final char[] as = new char[] { 'a', 'â' };
 
-   private char[] cyrChar;
+   private char[]      cyrChar;
 
    public final char[] es = new char[] { 'e', 'é', 'è', 'ê' };
 
    public final char[] is = new char[] { 'i', 'î' };
 
-   private char[] latinChar;
+   private char[]      latinChar;
 
-   private char[] modChar;
+   private char[]      modChar;
 
-   private UCtx   uc;
+   private UCtx        uc;
 
    public StringUtils(UCtx uc) {
       this.uc = uc;
@@ -1467,8 +1569,8 @@ public class StringUtils {
     * high level semantic meaning
     * ie Clothe, clothes
     * phone, Phones
-    * @param source
-    * @param test
+    * @param source no null checks
+    * @param test no null checks
     * @return
     * true if 
     * false if there is a length diff higher than 2
@@ -1503,7 +1605,7 @@ public class StringUtils {
       String s = Float.toString(amountn);
       return prettyDecimalString(s, decimals);
    }
-   
+
    /**
     * Cuts the string at first '.' and keep at most
     * @param s if no . returns s
@@ -1514,12 +1616,12 @@ public class StringUtils {
     */
    public String prettyDecimalString(String s, int decimals) {
       //#mdebug
-      if(decimals < 0) {
-         throw new IllegalArgumentException("Decimals must be >=0. It was "+ decimals);
+      if (decimals < 0) {
+         throw new IllegalArgumentException("Decimals must be >=0. It was " + decimals);
       }
       //#enddebug
       int indexOfDot = s.indexOf('.');
-      if(indexOfDot == -1) {
+      if (indexOfDot == -1) {
          return s;
       }
       int index = indexOfDot + 1;
@@ -1536,7 +1638,7 @@ public class StringUtils {
       String m2 = s.substring(index, index + max);
       return m1 + m2;
    }
-   
+
    public String prettyDouble(double amountn, int decimals) {
       String s = Double.toString(amountn);
       return prettyDecimalString(s, decimals);

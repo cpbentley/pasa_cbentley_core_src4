@@ -184,6 +184,20 @@ public class CharUtils {
          ar[i] = filler;
       }
    }
+   
+   public static boolean isEqual(char[] c, char[] b) {
+      return isEqual(c, 0, c.length, b);
+   }
+
+   public static boolean isEqual(char[] src, int srcoffset, int srclen, char[] b) {
+      if (srclen != b.length)
+         return false;
+      for (int i = 0; i < b.length; i++) {
+         if (src[srcoffset + i] != b[i])
+            return false;
+      }
+      return true;
+   }
 
    public static int getFirstIndex(String str, char[] chars, int offset) {
       return getFirstIndex(str, chars, offset, chars.length);
