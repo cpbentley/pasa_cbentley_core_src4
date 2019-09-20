@@ -137,6 +137,16 @@ public class ColorUtils implements IColors, IStringable {
    }
 
    /**
+    * Returns RGB values from red,green,blue in the array
+    * @see ColorUtils#getRGBInt(int, int, int)
+    * @param rgb
+    * @return
+    */
+   public static int getRGBInt(int[] rgb) {
+      return (255 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2];
+   }
+
+   /**
     * Computes the aRGB.
     * @param alpha
     * @param red
@@ -324,6 +334,17 @@ public class ColorUtils implements IColors, IStringable {
     */
    public static void getRGBFromH360S100L100Unsafe(int h, int s, int l, int[] rgb) {
       getRGBFromH1S1L1Unsafe(h / 360f, s / 100f, l / 100f, rgb);
+   }
+
+   /**
+    * RGB from 360 angle, 255 saturation, 255 light. no checks on parameters validity.
+    * @param h
+    * @param s
+    * @param l
+    * @param rgb
+    */
+   public static void getRGBFromH360S255L255Unsafe(float h, float s, float l, int[] rgb) {
+      getRGBFromH1S1L1Unsafe(h / 360f, s / 255f, l / 255f, rgb);
    }
 
    /**
