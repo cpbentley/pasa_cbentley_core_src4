@@ -496,16 +496,23 @@ public class Dctx implements IFlagsToString {
       nlLvl(t, is, 0, true);
    }
 
-   public void nlLvl(String str, int[] ins, int i) {
+   /**
+    * 
+    * @param str
+    * @param ints
+    * @param numIntPerLine
+    */
+   public void nlLvl(String str, int[] ints, int numIntPerLine) {
       sb.append(nl);
       sb.append(str);
       sb.append(nl + "\t");
       int count = 0;
-      for (int j = 0; j < ins.length; j++) {
-         sb.append(ins[j]);
+      for (int j = 0; j < ints.length; j++) {
+         sb.append(ints[j]);
          sb.append(" ");
          count++;
-         if (count == i) {
+         if (count == numIntPerLine) {
+            count = 0;
             sb.append(nl + "\t");
          }
       }
