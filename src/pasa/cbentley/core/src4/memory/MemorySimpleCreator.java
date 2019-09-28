@@ -29,12 +29,39 @@ public class MemorySimpleCreator implements IMemory {
       System.arraycopy(data, 0, ndata, 0, data.length);
       return ndata;
    }
+   
+   public char[] clone(char[] ar) {
+      if (ar == null) {
+         return null;
+      }
+      char[] clone = new char[ar.length];
+      System.arraycopy(ar, 0, clone, 0, ar.length);
+      return clone;
+   }
 
    public int[] clone(int[] ar) {
       if (ar == null) {
          return null;
       }
       int[] clone = new int[ar.length];
+      System.arraycopy(ar, 0, clone, 0, ar.length);
+      return clone;
+   }
+
+   public String[] clone(String[] ar) {
+      if (ar == null) {
+         return null;
+      }
+      String[] clone = new String[ar.length];
+      System.arraycopy(ar, 0, clone, 0, ar.length);
+      return clone;
+   }
+   
+   public Object[] clone(Object[] ar) {
+      if (ar == null) {
+         return null;
+      }
+      Object[] clone = new Object[ar.length];
       System.arraycopy(ar, 0, clone, 0, ar.length);
       return clone;
    }
@@ -93,9 +120,7 @@ public class MemorySimpleCreator implements IMemory {
 
       char[] oldData = ar;
       ar = new char[size + incr];
-      for (int i = 0; i < oldData.length; i++) {
-         System.arraycopy(oldData, 0, ar, 0, oldData.length);
-      }
+      System.arraycopy(oldData, 0, ar, 0, oldData.length);
       return ar;
    }
 
@@ -122,9 +147,7 @@ public class MemorySimpleCreator implements IMemory {
 
       int[] oldData = ar;
       ar = new int[size + grow];
-      for (int i = 0; i < oldData.length; i++) {
-         System.arraycopy(oldData, 0, ar, 0, oldData.length);
-      }
+      System.arraycopy(oldData, 0, ar, 0, oldData.length);
       return ar;
    }
 
@@ -141,9 +164,7 @@ public class MemorySimpleCreator implements IMemory {
       toDLog().pMemory("Objects.length=" + ar.length + " size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
       Object[] oldData = ar;
       ar = new Object[size + grow];
-      for (int i = 0; i < oldData.length; i++) {
-         System.arraycopy(oldData, 0, ar, 0, oldData.length);
-      }
+      System.arraycopy(oldData, 0, ar, 0, oldData.length);
       return ar;
    }
 
@@ -152,9 +173,7 @@ public class MemorySimpleCreator implements IMemory {
          return ar;
       String[] oldData = ar;
       ar = new String[size + incr];
-      for (int i = 0; i < oldData.length; i++) {
-         System.arraycopy(oldData, 0, ar, 0, oldData.length);
-      }
+      System.arraycopy(oldData, 0, ar, 0, oldData.length);
       return ar;
    }
 
@@ -191,15 +210,78 @@ public class MemorySimpleCreator implements IMemory {
    }
 
    /**
-    * new entries are nulls
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
     */
-   public byte[][] increaseCapacity(byte[][] ar, int addition) {
-      byte[][] oldData = ar;
-      ar = new byte[oldData.length + addition][];
-      for (int i = 0; i < oldData.length; i++) {
-         ar[i] = oldData[i];
-      }
-      return ar;
+   public byte[][] increaseCapacity(byte[][] array, int addition) {
+      byte[][] oldData = array;
+      array = new byte[oldData.length + addition][];
+      System.arraycopy(oldData, 0, array, 0, oldData.length);
+      return array;
+   }
+
+   /**
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
+    */
+   public char[][] increaseCapacity(char[][] array, int addition) {
+      char[][] oldData = array;
+      array = new char[oldData.length + addition][];
+      System.arraycopy(oldData, 0, array, 0, oldData.length);
+      return array;
+   }
+
+   /**
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
+    */
+   public String[][] increaseCapacity(String[][] array, int addition) {
+      String[][] oldData = array;
+      array = new String[oldData.length + addition][];
+      System.arraycopy(oldData, 0, array, 0, oldData.length);
+      return array;
+   }
+
+   /**
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
+    */
+   public Object[][] increaseCapacity(Object[][] array, int addition) {
+      Object[][] oldData = array;
+      array = new Object[oldData.length + addition][];
+      System.arraycopy(oldData, 0, array, 0, oldData.length);
+      return array;
+   }
+
+   /**
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
+    */
+   public int[][] increaseCapacity(int[][] array, int addition) {
+      int[][] oldData = array;
+      array = new int[oldData.length + addition][];
+      System.arraycopy(oldData, 0, array, 0, oldData.length);
+      return array;
    }
 
    public char[] increaseCapacity(char[] ar, int addition) {

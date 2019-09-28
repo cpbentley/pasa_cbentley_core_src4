@@ -99,6 +99,47 @@ public interface IMemory extends IStringable {
    public int[] increaseCapacity(int[] ar, int addition);
 
    /**
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
+    */
+   public int[][] increaseCapacity(int[][] array, int addition);
+   
+   /**
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
+    */
+   public Object[][] increaseCapacity(Object[][] array, int addition);
+   
+   /**
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
+    */
+   public String[][] increaseCapacity(String[][] array, int addition);
+   
+   
+   /**
+    * Increases the capacity of the first array by addition.
+    * New entries are nulls
+    * @param array cannot be null 
+    * @param addition increment size
+    * @return non null array
+    * @throws NullPointerException if array is null
+    */
+   public char[][] increaseCapacity(char[][] array, int addition);
+   
+   /**
     * 
     * @param ar
     * @param addition
