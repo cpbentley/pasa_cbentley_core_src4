@@ -2,6 +2,7 @@ package pasa.cbentley.core.src4.event;
 
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IEventsCore;
+import pasa.cbentley.core.src4.interfaces.ITechThread;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -56,9 +57,17 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * If the generic support offered by the {@link BusEvent} is not enough, one can subclass and provide additional fields and
  * methods.
  * 
+ * Thread modes:
+ * <li>posting
+ * <li>main
+ * <li>main-ordered
+ * <li>worker
+ * 
+ * EvenBus might not support some thread modes. 
+ * 
  * @author Charles-Philip Bentley
  */
-public interface IEventBus extends IStringable {
+public interface IEventBus extends IStringable, ITechThread {
 
    /**
     * Registering with this PID will forward any event from any producer.
@@ -72,6 +81,7 @@ public interface IEventBus extends IStringable {
     * This method allows a Consumer to register to events without having
     * a reference to the producer. Simply use the contextually and statically defined
     * tuple of eventID and producerID
+    *
     * @param con
     * @param prodID
     * @param eventID
@@ -109,5 +119,5 @@ public interface IEventBus extends IStringable {
     * @param consumer
     */
    public void removeConsumer(IEventConsumer consumer);
-      
+
 }

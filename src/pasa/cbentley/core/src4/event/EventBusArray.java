@@ -4,6 +4,7 @@ import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IEventsCore;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.ex.UCtxException;
+import pasa.cbentley.core.src4.interfaces.IExecutor;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.structs.IntToObjects;
@@ -29,6 +30,11 @@ public class EventBusArray implements IEventBus, IEventConsumer {
     * columns are event consumers
     */
    private IntToObjects[] producerIDToConsumerArray;
+
+   /**
+    * Object used for threading calls
+    */
+   private IExecutor      executor;
 
    /**
     * Contains
@@ -153,16 +159,9 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       return e;
    }
 
-   private void doConsumer(Object consumer, BusEvent e) {
+   private void doConsumer2(IEventConsumer eventConsumer, BusEvent e) {
       try {
-         if (consumer instanceof IEventConsumer) { //we only have one consumer
-            ((IEventConsumer) consumer).consumeEvent(e);
-         } else if (consumer instanceof IntToObjects) { //we have several consumers
-            IntToObjects cons = (IntToObjects) consumer;
-            for (int i = 0; i < cons.nextempty; i++) {
-               ((IEventConsumer) cons.objects[i]).consumeEvent(e);
-            }
-         }
+         eventConsumer.consumeEvent(e);
       } catch (UCtxException ex) {
          if (ex.getId() == UCtxException.EVENT_MATCH_EX) {
             //#debug
@@ -177,6 +176,40 @@ public class EventBusArray implements IEventBus, IEventConsumer {
          uc.toDLog().pEventFiner("BusEvent was consumed", e, EventBusArray.class, "doConsumer");
       }
       //#enddebug
+   }
+
+   private void doConsumer(Object consumer, BusEvent e, int threadMode) {
+      if (consumer instanceof IEventConsumer) { //we only have one consumer
+         doConsumer((IEventConsumer) consumer, e, threadMode);
+      } else if (consumer instanceof IntToObjects) { //we have several consumers
+         IntToObjects cons = (IntToObjects) consumer;
+         for (int i = 0; i < cons.nextempty; i++) {
+            IEventConsumer eventConsumer = (IEventConsumer) cons.objects[i];
+            doConsumer(eventConsumer, e, threadMode);
+         }
+      }
+
+   }
+
+   private void doConsumer(final IEventConsumer eventConsumer, final BusEvent e, int threadMode) {
+      if (executor == null || threadMode == THREAD_MODE_0_POST_NOW) {
+         doConsumer2(eventConsumer, e);
+      } else {
+         //
+         Runnable runner = new Runnable() {
+            public void run() {
+               doConsumer2(eventConsumer, e);
+            }
+         };
+         if (threadMode == THREAD_MODE_3_WORKER) {
+            executor.executeWorker(runner);
+         } else if (threadMode == THREAD_MODE_2_MAIN_LATER) {
+            executor.executeMainLater(runner);
+         } else if (threadMode == THREAD_MODE_1_MAIN_NOW) {
+            executor.executeMainNow(runner);
+         }
+      }
+
    }
 
    public void consumeEvent(BusEvent e) {
@@ -208,14 +241,19 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       }
       //
       Object consumersSpecificEvent = allConsumersForPID.getObjectAtIndex(eventID);
-      doConsumer(consumersSpecificEvent, be);
+      int threadMode = allConsumersForPID.getInt(eventID);
+      doConsumer(consumersSpecificEvent, be, threadMode);
       //send to any inside the PID
       Object consumersAnyEvent = allConsumersForPID.getObjectAtIndex(0);
-      doConsumer(consumersAnyEvent, be);
+      if (consumersAnyEvent != null) {
+         threadMode = allConsumersForPID.getInt(eventID);
+         doConsumer(consumersAnyEvent, be, threadMode);
+      }
       //send the event to those listeners that want to recieve all events from all producers
       for (int i = 0; i < listenersToAllEvents.nextempty; i++) {
          Object consumer = listenersToAllEvents.objects[i];
-         doConsumer(consumer, be);
+         int tMode = listenersToAllEvents.ints[i];
+         doConsumer(consumer, be, tMode);
       }
    }
 
@@ -312,6 +350,14 @@ public class EventBusArray implements IEventBus, IEventConsumer {
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "EvChannel");
+   }
+
+   public IExecutor getExecutor() {
+      return executor;
+   }
+
+   public void setExecutor(IExecutor executor) {
+      this.executor = executor;
    }
 
    //#enddebug
