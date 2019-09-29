@@ -25,16 +25,16 @@ public class IntBuffer implements IStringable {
    /**
     * must be 1 or higher
     */
-   private int      increment = 5;
+   private int   increment = 5;
 
    /**
     * index 0 starts at 0 and gives the last used value.
     * Therefore it also gives the number of elements
     * buffer size = ints.length - 1 - int[0]
     */
-   private int[]   ints;
+   private int[] ints;
 
-   private UCtx    uc;
+   private UCtx  uc;
 
    /**
     * 1,1
@@ -72,9 +72,10 @@ public class IntBuffer implements IStringable {
     * @param i
     */
    public void addInt(int i) {
-      setInts(uc.getMem().ensureCapacity(ints, ints[0] + 1, increment));
-      ints[ints[0] + 1] = i;
-      ints[0]++;
+      int num = ints[0];
+      setInts(uc.getMem().ensureCapacity(ints, num + 1, increment));
+      ints[num + 1] = i;
+      ints[0] = num + 1;
    }
 
    public void addInt(int x, int y, int w, int h) {
@@ -84,7 +85,7 @@ public class IntBuffer implements IStringable {
       ints[num + 2] = y;
       ints[num + 3] = w;
       ints[num + 4] = h;
-      ints[0] += 4;
+      ints[0] = num + 4;
 
    }
 
@@ -200,7 +201,7 @@ public class IntBuffer implements IStringable {
    public int getFirstIndexOf(int value) {
       return IntUtils.getFirstIndex(value, ints, 0, getSize());
    }
-   
+
    /**
     * Number of elements.
     * @return
@@ -242,7 +243,7 @@ public class IntBuffer implements IStringable {
          return 0;
       }
    }
-   
+
    public void appendBufferToArrayAt(int[] array, int offset) {
       int size = getSize();
       for (int j = 1; j <= size; j++) {
@@ -276,7 +277,6 @@ public class IntBuffer implements IStringable {
       this.ints = ints;
    }
 
-   
    public void sortWith(IntSorter sorter) {
       sorter.sortArray(ints, 1, ints[0]);
    }
@@ -315,5 +315,4 @@ public class IntBuffer implements IStringable {
    }
    //#enddebug
 
- 
 }

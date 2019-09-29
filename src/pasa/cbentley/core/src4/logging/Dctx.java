@@ -463,6 +463,11 @@ public class Dctx implements IFlagsToString {
       return dc;
    }
 
+   /**
+    * New level with overriding flags
+    * @param flags
+    * @return
+    */
    public Dctx nLevel(int flags) {
       nl();
       Dctx c = new Dctx(uc, this);
@@ -1171,7 +1176,7 @@ public class Dctx implements IFlagsToString {
    public void tabRemove() {
       if (nlNum > 0) {
          nlNum--;
-         nl = "\n";
+         nl = "\n  ";
          for (int i = 0; i < nlNum; i++) {
             nl = nl + "│   ";
          }
