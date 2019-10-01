@@ -25,7 +25,7 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
  *
  */
 public class EventBusArray implements IEventBus, IEventConsumer {
-   
+
    /**
     * cannot be null
     */
@@ -64,10 +64,10 @@ public class EventBusArray implements IEventBus, IEventConsumer {
    public EventBusArray(UCtx uc, ICtx contextOwner, int[] producersNumEvents) {
       this.uc = uc;
       //#mdebug
-      if(contextOwner == null) {
+      if (contextOwner == null) {
          throw new NullPointerException();
       }
-      //#mdebug
+      //#enddebug
       this.contextOwner = contextOwner;
       listenersToAllEvents = new IntToObjects(uc);
 
@@ -105,9 +105,9 @@ public class EventBusArray implements IEventBus, IEventConsumer {
     * @param threadMode
     */
    public void addConsumerSingle(IEventConsumer con, int producerID, int eventID, int threadMode) {
-      
+
    }
-   
+
    public void addConsumer(IEventConsumer con, int producerID, int eventID, int threadMode) {
       //check ids and producerID
       if (producerID == PID_0_ANY) {
@@ -249,6 +249,7 @@ public class EventBusArray implements IEventBus, IEventConsumer {
    public IExecutor getExecutor() {
       return executor;
    }
+
 
    /**
     * Create a new producer line in addition of the module static ones
@@ -411,11 +412,6 @@ public class EventBusArray implements IEventBus, IEventConsumer {
 
    public UCtx toStringGetUCtx() {
       return uc;
-   }
-
-   public IExecutor getExector() {
-      // TODO Auto-generated method stub
-      return null;
    }
 
    //#enddebug

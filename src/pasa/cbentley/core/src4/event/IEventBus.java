@@ -134,7 +134,7 @@ public interface IEventBus extends IStringable, ITechThread {
     * Return the current {@link IExecutor} null if none
     * @return
     */
-   public IExecutor getExector();
+   public IExecutor getExecutor();
 
    /**
     * Sends the {@link BusEvent} to registered {@link IEventConsumer}
