@@ -25,11 +25,11 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
  *
  */
 public class EventBusArray implements IEventBus, IEventConsumer {
+   
    /**
-    * rows are producers id
-    * columns are event consumers
+    * cannot be null
     */
-   private IntToObjects[] producerIDToConsumerArray;
+   private ICtx           contextOwner;
 
    /**
     * Object used for threading calls
@@ -44,18 +44,30 @@ public class EventBusArray implements IEventBus, IEventConsumer {
     */
    private IntToObjects   listenersToAllEvents;
 
-   private UCtx           uc;
+   /**
+    * rows are producers id
+    * columns are event consumers
+    */
+   private IntToObjects[] producerIDToConsumerArray;
 
-   private ICtx           contextOwner;
+   private UCtx           uc;
 
    /**
     * Registers to dipose memory events 
     * @param uc
     * @param contextOwner
     * @param producersNumEvents containes the event topology. number of producers mapped to number of events
+    * 
+    * Length of array - 1 is the number of Producer types 
+    * 
     */
    public EventBusArray(UCtx uc, ICtx contextOwner, int[] producersNumEvents) {
       this.uc = uc;
+      //#mdebug
+      if(contextOwner == null) {
+         throw new NullPointerException();
+      }
+      //#mdebug
       this.contextOwner = contextOwner;
       listenersToAllEvents = new IntToObjects(uc);
 
@@ -76,33 +88,58 @@ public class EventBusArray implements IEventBus, IEventConsumer {
    }
 
    /**
-    * Create a new producer line in addition of the module static ones
-    * <br>
-    * Events produced on a line will only be consumed by {@link IEventConsumer}
-    * for registered for that line number. They must know that line.
-    * <br>
-    * ID used by any Object producer to identify itself.
-    * <br>
-    * <br>
-    * Create the room needed
-    * @paran maxEventID the number of different events
-    * @return
-    */
-   public int getNextProducerID(int maxEventID) {
-      IntToObjects consumersSlots = new IntToObjects(uc, maxEventID, true);
-      int index = producerIDToConsumerArray.length;
-      this.producerIDToConsumerArray = uc.getAU().increaseCapacity(producerIDToConsumerArray, 1);
-      producerIDToConsumerArray[index] = consumersSlots;
-      return index;
-   }
-
-   /**
     * Registers for all events of all producers.
     * <br>
     * @param con
     */
    public void addConsumer(IEventConsumer con) {
       listenersToAllEvents.add(con, 0);
+   }
+
+   /**
+    * The consumer will only consume one event and then will automatically be unregistered
+    * TODO
+    * @param con
+    * @param producerID
+    * @param eventID
+    * @param threadMode
+    */
+   public void addConsumerSingle(IEventConsumer con, int producerID, int eventID, int threadMode) {
+      
+   }
+   
+   public void addConsumer(IEventConsumer con, int producerID, int eventID, int threadMode) {
+      //check ids and producerID
+      if (producerID == PID_0_ANY) {
+         listenersToAllEvents.add(con);
+      } else {
+         //should never happen in production code
+         //#mdebug
+         if (producerID >= producerIDToConsumerArray.length) {
+            throw new IllegalArgumentException("ProducerID " + producerID + " is not valid");
+         }
+         //#enddebug
+         IntToObjects consumersForPID = producerIDToConsumerArray[producerID];
+         consumersForPID.ensureRoom(eventID, 1);
+         Object o = consumersForPID.getObjectAtIndex(eventID);
+         if (o != null) {
+            //check if we have 
+            if (o instanceof IEventConsumer) {
+               //add the existing consumer along the new one into a struct
+               IntToObjects newConsumers = new IntToObjects(uc, 2);
+               int threadModeExistingConsumer = consumersForPID.getInt(eventID);
+               newConsumers.add(o, threadModeExistingConsumer);
+               newConsumers.add(con, threadMode);
+               consumersForPID.setObject(newConsumers, eventID);
+            } else {
+               //already an IntToObjects
+               ((IntToObjects) o).add(con, threadMode);
+            }
+         } else {
+            //put it directly
+            consumersForPID.setObjectAndInt(con, threadMode, eventID);
+         }
+      }
    }
 
    /**
@@ -116,38 +153,18 @@ public class EventBusArray implements IEventBus, IEventConsumer {
     * This implementation is compatible with MIDP 2.0.
     */
    public void addConsumer(IEventConsumer con, int producerID, int eventID) {
-      //check ids and producerID
-      if (producerID == PID_0_ANY) {
-         listenersToAllEvents.add(con);
-      } else {
-         //should never happen in production code
-         //#mdebug
-         if (producerID >= producerIDToConsumerArray.length) {
-            throw new IllegalArgumentException("ProducerID " + producerID + " is not valid");
-         }
-         //#enddebug
-         IntToObjects ito1 = producerIDToConsumerArray[producerID];
-         ito1.ensureRoom(eventID, 1);
-         Object o = ito1.objects[eventID];
-         if (o != null) {
-            //check if we have 
-            if (o instanceof IEventConsumer) {
-               //add the existing consumer along the new one into a struct
-               IntToObjects ito = new IntToObjects(uc, new Object[] { o, con });
-               ito1.objects[eventID] = ito;
-            } else {
-               //already an item
-               ((IntToObjects) o).add(con, 0);
-            }
-         } else {
-            //put it directly
-            ito1.objects[eventID] = con;
-         }
+      this.addConsumer(con, producerID, eventID, THREAD_MODE_0_POST_NOW);
+   }
+
+   public void consumeEvent(BusEvent e) {
+      Object prod = e.getProducer();
+      if (prod instanceof IEventConsumer) {
+         this.removeConsumer((IEventConsumer) prod);
       }
    }
 
    public BusEvent createEvent(int producerID, int eventID, Object producer) {
-      BusEvent e = new BusEvent(uc, contextOwner, producerID, eventID);
+      BusEvent e = new BusEvent(uc, this, producerID, eventID);
       e.setProducer(producer);
       return e;
    }
@@ -157,38 +174,6 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       e.setParam1(param1);
       e.setParam2(param2);
       return e;
-   }
-
-   private void doConsumer2(IEventConsumer eventConsumer, BusEvent e) {
-      try {
-         eventConsumer.consumeEvent(e);
-      } catch (UCtxException ex) {
-         if (ex.getId() == UCtxException.EVENT_MATCH_EX) {
-            //#debug
-            uc.toDLog().pEventSevere(ex.getMessage(), e, EventBusArray.class, "doConsumer");
-         }
-      }
-      //#mdebug
-      if (!e.hasFlag(BusEvent.FLAG_1_ACTED)) {
-         //send warning. event was not acted
-         uc.toDLog().pEventWarn("BusEvent not consumed", e, EventBusArray.class, "doConsumer");
-      } else {
-         uc.toDLog().pEventFiner("BusEvent was consumed", e, EventBusArray.class, "doConsumer");
-      }
-      //#enddebug
-   }
-
-   private void doConsumer(Object consumer, BusEvent e, int threadMode) {
-      if (consumer instanceof IEventConsumer) { //we only have one consumer
-         doConsumer((IEventConsumer) consumer, e, threadMode);
-      } else if (consumer instanceof IntToObjects) { //we have several consumers
-         IntToObjects cons = (IntToObjects) consumer;
-         for (int i = 0; i < cons.nextempty; i++) {
-            IEventConsumer eventConsumer = (IEventConsumer) cons.objects[i];
-            doConsumer(eventConsumer, e, threadMode);
-         }
-      }
-
    }
 
    private void doConsumer(final IEventConsumer eventConsumer, final BusEvent e, int threadMode) {
@@ -212,11 +197,78 @@ public class EventBusArray implements IEventBus, IEventConsumer {
 
    }
 
-   public void consumeEvent(BusEvent e) {
-      Object prod = e.getProducer();
-      if (prod instanceof IEventConsumer) {
-         this.removeConsumer((IEventConsumer) prod);
+   private void doConsumer(Object consumer, BusEvent e, int threadMode) {
+      if (consumer instanceof IEventConsumer) { //we only have one consumer
+         doConsumer((IEventConsumer) consumer, e, threadMode);
+      } else if (consumer instanceof IntToObjects) { //we have several consumers
+         IntToObjects cons = (IntToObjects) consumer;
+         for (int i = 0; i < cons.nextempty; i++) {
+            IEventConsumer eventConsumer = (IEventConsumer) cons.getObjectAtIndex(i);
+            threadMode = cons.getInt(i);
+            doConsumer(eventConsumer, e, threadMode);
+         }
       }
+
+   }
+
+   /**
+    * Forward the event to the consumer and deal with debug messages in debug mode.
+    * 
+    * Execepion
+    * 
+    * @param eventConsumer
+    * @param e
+    */
+   private void doConsumer2(IEventConsumer eventConsumer, BusEvent e) {
+      try {
+         eventConsumer.consumeEvent(e);
+      } catch (UCtxException ex) {
+         ex.printStackTrace();
+         if (ex.getId() == UCtxException.EVENT_MATCH_EX) {
+            //#debug
+            uc.toDLog().pEventSevere(ex.getMessage(), e, EventBusArray.class, "doConsumer");
+         }
+      } catch (Exception exe) {
+         //we cannot throw it here. we might be in a thread. TODO log it in a visual interface
+         exe.printStackTrace();
+      }
+      //#mdebug
+      if (!e.hasFlag(BusEvent.FLAG_1_ACTED)) {
+         //send warning. event was not acted
+         uc.toDLog().pEventWarn("BusEvent not consumed", e, EventBusArray.class, "doConsumer");
+      } else {
+         uc.toDLog().pEventFiner("BusEvent was consumed", e, EventBusArray.class, "doConsumer");
+      }
+      //#enddebug
+   }
+
+   public ICtx getCtxOwner() {
+      return contextOwner;
+   }
+
+   public IExecutor getExecutor() {
+      return executor;
+   }
+
+   /**
+    * Create a new producer line in addition of the module static ones
+    * <br>
+    * Events produced on a line will only be consumed by {@link IEventConsumer}
+    * for registered for that line number. They must know that line.
+    * <br>
+    * ID used by any Object producer to identify itself.
+    * <br>
+    * <br>
+    * Create the room needed
+    * @paran maxEventID the number of different events
+    * @return
+    */
+   public int getNextProducerID(int maxEventID) {
+      IntToObjects consumersSlots = new IntToObjects(uc, maxEventID, true);
+      int index = producerIDToConsumerArray.length;
+      this.producerIDToConsumerArray = uc.getAU().increaseCapacity(producerIDToConsumerArray, 1);
+      producerIDToConsumerArray[index] = consumersSlots;
+      return index;
    }
 
    /**
@@ -257,6 +309,11 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       }
    }
 
+   public void sendNewEvent(int producerID, int eventID, Object producer) {
+      BusEvent be = createEvent(producerID, eventID, producer);
+      this.putOnBus(be);
+   }
+
    /**
     * Removes all instances of {@link IEventConsumer} on the bus.
     * @param consumer
@@ -279,6 +336,10 @@ public class EventBusArray implements IEventBus, IEventConsumer {
             }
          }
       }
+   }
+
+   public void setExecutor(IExecutor executor) {
+      this.executor = executor;
    }
 
    //#mdebug
@@ -344,20 +405,17 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       return Dctx.toString1Line(this);
    }
 
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "EvChannel");
    }
 
-   public IExecutor getExecutor() {
-      return executor;
+   public UCtx toStringGetUCtx() {
+      return uc;
    }
 
-   public void setExecutor(IExecutor executor) {
-      this.executor = executor;
+   public IExecutor getExector() {
+      // TODO Auto-generated method stub
+      return null;
    }
 
    //#enddebug

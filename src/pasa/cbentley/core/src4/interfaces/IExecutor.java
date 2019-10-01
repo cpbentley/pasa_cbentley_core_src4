@@ -1,6 +1,8 @@
 package pasa.cbentley.core.src4.interfaces;
 
-public interface IExecutor {
+import pasa.cbentley.core.src4.logging.IStringable;
+
+public interface IExecutor extends ITechThread, IStringable {
 
    
    public void executeWorker(Runnable run);

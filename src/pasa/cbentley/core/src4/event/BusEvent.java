@@ -67,7 +67,7 @@ public class BusEvent implements IStringable {
     * The Context owner of the Bus. Help detects errors.
     * 
     */
-   private ICtx            contextOwner;
+   private IEventBus       busOwner;
 
    private int             eventID;
 
@@ -89,19 +89,28 @@ public class BusEvent implements IStringable {
 
    private Object          producer;
 
+   private EventParam      param;
+
    private int             producerID;
 
    private UCtx            uc;
 
-   public BusEvent(UCtx uc, ICtx contextOwner, int pid, int eid) {
+   /**
+    * 
+    * @param uc
+    * @param contextOwner
+    * @param pid
+    * @param eid
+    */
+   public BusEvent(UCtx uc, IEventBus busOwner, int pid, int eid) {
       this.uc = uc;
-      this.contextOwner = contextOwner;
+      this.busOwner = busOwner;
       this.producerID = pid;
       this.eventID = eid;
    }
 
-   public void checkSanity(Object ctxOwner, int pid, int eid) {
-      if (ctxOwner != contextOwner && pid != producerID && eid != eventID) {
+   public void checkSanity(ICtx ctxOwner, int pid, int eid) {
+      if (ctxOwner != busOwner.getCtxOwner() || pid != producerID || eid != eventID) {
          String message = ctxOwner.getClass().getName() + " " + pid + " " + eid;
          throw new UCtxException(UCtxException.EVENT_MATCH_EX, message);
       }
@@ -168,6 +177,13 @@ public class BusEvent implements IStringable {
       this.param2 = param2;
    }
 
+   /**
+    * Send this event on its ubs
+    */
+   public void putOnBus() {
+      this.busOwner.putOnBus(this);
+   }
+
    public void setParamO1(Object paramO1) {
       this.paramO1 = paramO1;
    }
@@ -184,6 +200,11 @@ public class BusEvent implements IStringable {
       this.producerID = producerID;
    }
 
+   public EventParam createParam() {
+      param = new EventParam(uc, this);
+      return param;
+   }
+
    public void setUserEvent() {
       setFlag(FLAG_3_USER_EVENT, true);
    }
@@ -195,7 +216,7 @@ public class BusEvent implements IStringable {
 
    public void toString(Dctx dc) {
       dc.root(this, "BusEvent");
-      dc.nlLvlOneLine(contextOwner);
+      dc.nlLvlOneLine(busOwner.getCtxOwner());
       toStringPrivate(dc);
       dc.nl();
       dc.nlLvlObject("ParamObject1", paramO1);
@@ -208,8 +229,8 @@ public class BusEvent implements IStringable {
    }
 
    private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("PID", getProducerID() + ":" + contextOwner.toStringProducerID(producerID));
-      dc.appendVarWithSpace("EID", getEventID() + ":" + contextOwner.toStringEventID(producerID, getEventID()));
+      dc.appendVarWithSpace("PID", getProducerID() + ":" + busOwner.getCtxOwner().toStringProducerID(producerID));
+      dc.appendVarWithSpace("EID", getEventID() + ":" + busOwner.getCtxOwner().toStringEventID(producerID, getEventID()));
       dc.appendVarWithSpace("acted", hasFlag(FLAG_1_ACTED));
       dc.appendVarWithSpace("user", hasFlag(FLAG_3_USER_EVENT));
       dc.appendVarWithSpace("param1", getParam1());
@@ -218,10 +239,10 @@ public class BusEvent implements IStringable {
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "BusEvent");
-      dc.nlLvlOneLine(contextOwner);
+      dc.nlLvlOneLine(busOwner.getCtxOwner());
       toStringPrivate(dc);
-      if(producer != null) {
-         dc.append("by "+ producer.getClass().getName());
+      if (producer != null) {
+         dc.append("by " + producer.getClass().getName());
       }
    }
 
@@ -229,4 +250,5 @@ public class BusEvent implements IStringable {
       return uc;
    }
    //#enddebug
+
 }
