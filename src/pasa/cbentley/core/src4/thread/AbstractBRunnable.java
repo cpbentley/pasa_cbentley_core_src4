@@ -154,12 +154,12 @@ public abstract class AbstractBRunnable implements IBRunnable {
       //first check if another thread interrupted us using the Java classic mechanism.
       //its how SwingWorker will ask our thread to stop doing its task.
       //TODO Thread.interrupted() is not supported in src4
-//      if(Thread.interrupted()) {
-//         this.state = ITechRunnable.STATE_2_CANCELED;
-//         //#debug
-//         toDLog().pWork("Thread is interrupted", this, AbstractBRunnable.class, "isContinue", LVL_05_FINE, true);
-//         return false;
-//      }
+      //      if(Thread.interrupted()) {
+      //         this.state = ITechRunnable.STATE_2_CANCELED;
+      //         //#debug
+      //         toDLog().pWork("Thread is interrupted", this, AbstractBRunnable.class, "isContinue", LVL_05_FINE, true);
+      //         return false;
+      //      }
       //its because this code above does not work that this class was created in the first place.
       //for interrupting a you set the state request and call interrupt
       int methodStateRequest = getStateRequest();
@@ -265,14 +265,40 @@ public abstract class AbstractBRunnable implements IBRunnable {
          }
          notifyNewState(state);
       } catch (Exception e) {
-         
-         //#debug
-         toDLog().pEx("Error during task execution", this, AbstractBRunnable.class, "run", e);
-         
-         //an exception occured during the task.. what do we do about it?
-         exception(e);
+
+         //this exception might be OK.. some libraries may throw some kind of exceptions when interrupted.
+         //ask implementation if this exception has the meaning of thread interrupted=true
+         //We have to do this because in src4 we don't have access to isInterrupted() on Thread object
+         if (isExceptionThreadInterrupted(e)) {
+            //this will occur when task is stuck in a low level IO task and UI user interrupts it.
+            //Most of the time, this case should not happen anyways, implementation must check isContinue
+            //when running this class in a SwingWorker thread for example, you should
+            //in src4 we don't have access to isInterrupted on Thread object
+            //set state to interrupted manually
+            state = STATE_5_INTERRUPTED;
+            //tell implementation to cleanly go away. This should n
+            interruptedPleaseExit();
+         } else {
+            //#debug
+            toDLog().pEx("Error during task execution", this, AbstractBRunnable.class, "run", e);
+
+            //an exception occured during the task.. what do we do about it?
+            exception(e);
+         }
       }
 
+   }
+
+   protected void interruptedPleaseExit() {
+   }
+
+   /**
+    * By default returns false
+    * @param e
+    * @return
+    */
+   protected boolean isExceptionThreadInterrupted(Exception e) {
+      return false;
    }
 
    /**
@@ -344,6 +370,8 @@ public abstract class AbstractBRunnable implements IBRunnable {
     */
    public void requestNewState(int state) {
 
+      //#debug
+      toDLog().pFlow("newstate=" + toStringState(state), this, AbstractBRunnable.class, "requestNewState", LVL_05_FINE, true);
       /*
        * Declaring a volatile Java variable means: 
        * The value of this variable will never be cached thread-locally:
