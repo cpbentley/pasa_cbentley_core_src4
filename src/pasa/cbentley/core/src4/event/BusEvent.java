@@ -3,6 +3,7 @@ package pasa.cbentley.core.src4.event;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.ex.UCtxException;
+import pasa.cbentley.core.src4.interfaces.ITechThread;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.BitUtils;
@@ -41,7 +42,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class BusEvent implements IStringable {
+public class BusEvent implements IStringable, ITechThread {
 
    /**
     * An event can be parsed by several {@link IEventConsumer} but not acted upon.
@@ -182,6 +183,22 @@ public class BusEvent implements IStringable {
     */
    public void putOnBus() {
       this.busOwner.putOnBus(this);
+   }
+
+   public void putOnBusMainNow(BusEvent be) {
+      this.busOwner.putOnBus(be, THREAD_MODE_1_MAIN_NOW);
+   }
+
+   public void putOnBusMainLater(BusEvent be) {
+      this.busOwner.putOnBus(be, THREAD_MODE_2_MAIN_LATER);
+   }
+
+   public void putOnBusWorker(BusEvent be) {
+      this.busOwner.putOnBus(be, THREAD_MODE_3_WORKER);
+   }
+
+   public void putOnBus(BusEvent be, int threadType) {
+      this.busOwner.putOnBus(be, threadType);
    }
 
    public void setParamO1(Object paramO1) {

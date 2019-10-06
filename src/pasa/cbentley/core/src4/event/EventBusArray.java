@@ -186,15 +186,8 @@ public class EventBusArray implements IEventBus, IEventConsumer {
                doConsumer2(eventConsumer, e);
             }
          };
-         if (threadMode == THREAD_MODE_3_WORKER) {
-            executor.executeWorker(runner);
-         } else if (threadMode == THREAD_MODE_2_MAIN_LATER) {
-            executor.executeMainLater(runner);
-         } else if (threadMode == THREAD_MODE_1_MAIN_NOW) {
-            executor.executeMainNow(runner);
-         }
+         run(runner, threadMode);
       }
-
    }
 
    private void doConsumer(Object consumer, BusEvent e, int threadMode) {
@@ -250,7 +243,6 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       return executor;
    }
 
-
    /**
     * Create a new producer line in addition of the module static ones
     * <br>
@@ -270,6 +262,30 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       this.producerIDToConsumerArray = uc.getAU().increaseCapacity(producerIDToConsumerArray, 1);
       producerIDToConsumerArray[index] = consumersSlots;
       return index;
+   }
+
+   
+   public void putOnBus(final BusEvent be, int threadMode) {
+      if (executor == null || threadMode == THREAD_MODE_0_POST_NOW) {
+         putOnBus(be);
+      } else {
+         Runnable runner = new Runnable() {
+            public void run() {
+               putOnBus(be);
+            }
+         };
+         run(runner, threadMode);
+      }
+   }
+   
+   private void run(Runnable runner, int threadMode) {
+      if (threadMode == THREAD_MODE_3_WORKER) {
+         executor.executeWorker(runner);
+      } else if (threadMode == THREAD_MODE_2_MAIN_LATER) {
+         executor.executeMainLater(runner);
+      } else if (threadMode == THREAD_MODE_1_MAIN_NOW) {
+         executor.executeMainNow(runner);
+      }
    }
 
    /**

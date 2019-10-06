@@ -7,8 +7,14 @@ public interface ITechThread extends ITech {
     */
    public static final int THREAD_MODE_0_POST_NOW   = 0;
 
+   /**
+    * If we are in main, run synchronously, otherwise post to main queue
+    */
    public static final int THREAD_MODE_1_MAIN_NOW   = 1;
 
+   /**
+    * post to main queue
+    */
    public static final int THREAD_MODE_2_MAIN_LATER = 2;
 
    /**

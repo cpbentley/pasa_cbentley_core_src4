@@ -148,6 +148,16 @@ public interface IEventBus extends IStringable, ITechThread {
    public void putOnBus(BusEvent be);
 
    /**
+    * Sends the {@link BusEvent} to registered {@link IEventConsumer}
+    * 
+    * The whole call will be made inside the thread type provided of the {@link IExecutor}
+    * 
+    * @param be
+    * @param threadType
+    */
+   public void putOnBus(BusEvent be, int threadType);
+
+   /**
     * Remove all instances of the event consumer.
     * 
     * If implementation is not thread safe, all remove calls are
