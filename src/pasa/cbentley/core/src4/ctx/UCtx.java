@@ -18,8 +18,8 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.ILogEntryAppender;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.logging.IUserLog;
-import pasa.cbentley.core.src4.logging.UserLogSystemOut;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
+import pasa.cbentley.core.src4.logging.UserLogSystemOut;
 import pasa.cbentley.core.src4.memory.IMemory;
 import pasa.cbentley.core.src4.memory.MemorySimpleCreator;
 import pasa.cbentley.core.src4.strings.StringComparator;
@@ -351,6 +351,10 @@ public class UCtx implements ICtx, IEventsCore {
       return urlu;
    }
 
+   /**
+    * It will never be null
+    * @return
+    */
    public IUserLog getUserLog() {
       if(userLog == null) {
          userLog = new UserLogJournal(this);
@@ -403,8 +407,15 @@ public class UCtx implements ICtx, IEventsCore {
       }
    }
 
-   public void setUserLog(IUserLog userLog) {
-      this.userLog = userLog;
+   /**
+    * When null, reset the log to an empty {@link UserLogJournal}
+    * @param userLogNew
+    */
+   public void setUserLog(IUserLog userLogNew) {
+      if(userLogNew != null && this.userLog != null) {
+         userLogNew.processOld(this.userLog);
+      }
+      this.userLog = userLogNew;
    }
 
    //#mdebug
