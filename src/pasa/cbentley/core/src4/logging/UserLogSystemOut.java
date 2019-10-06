@@ -34,6 +34,10 @@ public class UserLogSystemOut implements IUserLog {
       System.out.println(str);
    }
 
+   public void processOld(IUserLog log) {
+
+   }
+
    //#mdebug
    public String toString() {
       return Dctx.toString(this);

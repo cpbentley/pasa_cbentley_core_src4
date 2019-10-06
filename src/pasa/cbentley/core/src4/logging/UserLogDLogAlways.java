@@ -39,6 +39,10 @@ public class UserLogDLogAlways implements IUserLog {
       //#debug
       uc.toDLog().pAlways(str, null, UserLogDLogAlways.class, "consoleLogGreen", ITechLvl.LVL_05_FINE, true);
    }
+   
+   public void processOld(IUserLog log) {
+      
+   }
 
    //#mdebug
    public String toString() {
@@ -60,6 +64,8 @@ public class UserLogDLogAlways implements IUserLog {
    public UCtx toStringGetUCtx() {
       return uc;
    }
+
+ 
 
    //#enddebug
 

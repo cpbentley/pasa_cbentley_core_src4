@@ -6,6 +6,7 @@ import java.util.Random;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
+import pasa.cbentley.core.src4.helpers.UserLogJournal;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.interfaces.ITech;
@@ -351,6 +352,9 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public IUserLog getUserLog() {
+      if(userLog == null) {
+         userLog = new UserLogJournal(this);
+      }
       return userLog;
    }
 

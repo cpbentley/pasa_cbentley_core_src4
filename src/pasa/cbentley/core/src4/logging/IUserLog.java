@@ -41,4 +41,10 @@ public interface IUserLog extends IStringable {
    public void consoleLogDateGreen(String str);
 
    public void consoleLogDateRed(String str);
+   
+   /**
+    * Called when replacing another log. Implementation is free to do what it wants
+    * @param log
+    */
+   public void processOld(IUserLog log);
 }
