@@ -50,7 +50,9 @@ public interface ITechConfig extends ITech {
    public static final int MASTER_FLAG_08_OPEN_ALL_BUT_FALSE  = 1 << 7;
 
    /**
-    * By default, all classes are accepted. Print only positive classes.
+    * Print only positive classes.
+    * 
+    * Setting this flag overrides the default which is that all classes are accepted. 
     */
    public static final int MASTER_FLAG_03_ONLY_POSITIVES  = 1 << 2;
 

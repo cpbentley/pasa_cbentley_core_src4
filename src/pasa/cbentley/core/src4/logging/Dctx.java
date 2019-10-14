@@ -1064,7 +1064,7 @@ public class Dctx implements IFlagsToString {
     * Displays a root. 
     * <br>
     * Link Str to IStringable
-    * @param o
+    * @param o when null, print that
     * @param str
     */
    public void root(Object o, String str) {

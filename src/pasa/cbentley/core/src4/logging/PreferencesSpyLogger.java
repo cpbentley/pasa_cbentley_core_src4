@@ -24,13 +24,20 @@ public class PreferencesSpyLogger implements IPrefs {
       this.uc = uc;
       this.prefs = prefs;
 
+      //#debug
+      toDLog().pFlow("", this, PreferencesSpyLogger.class, "constructor", LVL_05_FINE, true);
    }
 
    public void clear() {
+      //#debug
+      toDLog().pFlow("", this, PreferencesSpyLogger.class, "clear", LVL_05_FINE, true);
+   
       prefs.clear();
    }
 
    public void export(OutputStream os) {
+      //#debug
+      toDLog().pFlow("", this, PreferencesSpyLogger.class, "export", LVL_05_FINE, true);
       prefs.export(os);
    }
 
