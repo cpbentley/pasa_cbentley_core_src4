@@ -20,6 +20,10 @@ public class CounterInt implements IStringable {
       value++;
    }
 
+   public void increment(int value) {
+      this.value += value;
+   }
+
    public int getCount() {
       return value;
    }

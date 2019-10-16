@@ -139,7 +139,7 @@ public class ColorData implements IStringable {
    }
 
    public float getSaturation100() {
-      return light100;
+      return saturation100;
    }
 
    public float getGreenishFloat() {

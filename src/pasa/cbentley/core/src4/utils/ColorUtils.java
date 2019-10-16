@@ -74,6 +74,10 @@ public class ColorUtils implements IColors, IStringable {
       return (0xFF000000 & color) | ((255 - ((0x00FF0000 & color) >> 16)) << 16) | ((255 - ((0x0000FF00 & color) >> 8)) << 8) | (255 - (0x000000FF & color));
    }
 
+   public static int getComplementaryColor(int[] rgb) {
+      return (0xFF000000) | ((255 - rgb[0]) << 16) | ((255 - (rgb[1]) << 8) | (255 - rgb[2]));
+   }
+   
    public static int getDarker(int rgb, int percent) {
       int r = ((rgb >> 16) & 0xFF);
       int g = ((rgb >> 8) & 0xFF);
