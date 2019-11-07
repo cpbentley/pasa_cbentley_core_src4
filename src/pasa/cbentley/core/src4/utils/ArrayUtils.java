@@ -11,48 +11,26 @@ import pasa.cbentley.core.src4.structs.IntToStrings;
  */
 public class ArrayUtils {
 
-   private final UCtx uc;
-
-   public ArrayUtils(UCtx uc) {
-      this.uc = uc;
-   }
-
    /**
-    * Copy src into destination starting at offset 0.
-    * @param src
-    * @param dest
-    * @throws ArrayIndexOutOfBoundsException
-    * @throws {@link NullPointerException} if any array is null
-    */
-   public void copy1stTo2nd(Object[] src, Object[] dest) {
-      copyTo(src, 0, dest, 0, src.length);
-   }
-
-   /**
-    * 
-    * @param strings
-    * @param val
+    * Reference equality
+    * @param ar
+    * @param i
     * @return
     */
-   public IntToStrings[] ensureCapacity(IntToStrings[] strings, int val) {
-      if (val >= strings.length) {
-         IntToStrings[] news = new IntToStrings[val + 1];
-         for (int i = 0; i < strings.length; i++) {
-            news[i] = strings[i];
-         }
-         return news;
+   public static boolean contains(Object[] ar, Object i) {
+      for (int j = 0; j < ar.length; j++) {
+         if (ar[j] == i)
+            return true;
       }
-      return strings;
+      return false;
    }
 
-   public IntToObjects[] increaseCapacity(IntToObjects[] ar, int increment) {
-      //else increase array
-      IntToObjects[] old = ar;
-      IntToObjects[] news = new IntToObjects[old.length + increment];
-      for (int i = 0; i < old.length; i++) {
-         news[i] = old[i];
+   public static int containsInt(Object[] ar, Object i) {
+      for (int j = 0; j < ar.length; j++) {
+         if (ar[j] == i)
+            return j;
       }
-      return news;
+      return -1;
    }
 
    public static int countNulls(Object[] ar) {
@@ -62,6 +40,19 @@ public class ArrayUtils {
             count++;
       }
       return count;
+   }
+
+   /**
+    * Fills array [start,end] with filler
+    * @param ar
+    * @param filler
+    * @param start included 
+    * @param end included
+    */
+   public static void fill(Object[] ar, Object filler, int start, int end) {
+      for (int i = start; i <= end; i++) {
+         ar[i] = filler;
+      }
    }
 
    /**
@@ -97,18 +88,80 @@ public class ArrayUtils {
    }
 
    /**
-    * Shift up and stops at.
-    * No shift if start is higher and not compatible
+    * shift only if start < end
     * @param ar
-    * @param start must be
-    * @param index
+    * @param shiftsize <0 for shifting down
+    * @param start index value starts at 0. inclusive
+    * @param end index value inclusive
+    * @param erase pad the hole with 0s
     */
-   public void shiftUp(Object[] ar, int start, int index) {
-      if (start < ar.length - 2) {
-         for (int i = start; i >= index; i--) {
-            ar[i + 1] = ar[i];
+   public static void shiftInt(Object[] ar, int shiftsize, int start, int end, boolean erase) {
+      if (start > end)
+         return;
+      if (shiftsize < 0)
+         shiftIntDown(ar, 0 - shiftsize, start, end, erase);
+      else
+         shiftIntUp(ar, shiftsize, start, end, erase);
+   }
+
+   /**
+    * 
+    * 
+    * @param ar array to shift down
+    * @param shiftsize number of units to go down
+    * @param start start index will go down shiftsize
+    * @param end end index will be the last to be shifted
+    * @param erase
+    */
+   public static void shiftIntDown(Object[] ar, int shiftsize, int start, int end, boolean erase) {
+      for (int i = start; i <= end; i++) {
+         if (i - shiftsize >= 0) {
+            ar[i - shiftsize] = ar[i];
          }
       }
+      if (erase) {
+         fill(ar, null, end - shiftsize + 1, end);
+      }
+   }
+
+   /**
+    * Dumb shifts, erases data in the shift destination.
+    * 
+    * Used by buffers where its known that data above the end point is not relevant
+    * 
+    * @param ar
+    * @param shiftsize number of jummps up in the array
+    * @param start included in the shift
+    * @param end included in the shift
+    * @param erase erase data liberated
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
+    */
+   public static void shiftIntUp(Object[] ar, int shiftsize, int start, int end, boolean erase) {
+      for (int i = end; i >= start; i--) {
+         if (i + shiftsize < ar.length) {
+            ar[i + shiftsize] = ar[i];
+         }
+      }
+      if (erase) {
+         fill(ar, null, start, start + shiftsize - 1);
+      }
+   }
+
+   private final UCtx uc;
+
+   public ArrayUtils(UCtx uc) {
+      this.uc = uc;
+   }
+
+   /**
+    * Copy src into destination starting at offset 0.
+    * @param src
+    * @param dest
+    * @throws ArrayIndexOutOfBoundsException
+    * @throws {@link NullPointerException} if any array is null
+    */
+   public void copy1stTo2nd(Object[] src, Object[] dest) {
+      copyTo(src, 0, dest, 0, src.length);
    }
 
    /**
@@ -124,38 +177,20 @@ public class ArrayUtils {
    }
 
    /**
-    * Index of first null value. 
-    * @return -1 if none
-    */
-   public int getFirstNullIndex(Object[] array) {
-      for (int i = 0; i < array.length; i++) {
-         if (array[i] == null) {
-            return i;
-         }
-      }
-      return -1;
-   }
-
-   /**
-    * Reference equality
-    * @param ar
-    * @param i
+    * 
+    * @param strings
+    * @param val
     * @return
     */
-   public static boolean contains(Object[] ar, Object i) {
-      for (int j = 0; j < ar.length; j++) {
-         if (ar[j] == i)
-            return true;
+   public IntToStrings[] ensureCapacity(IntToStrings[] strings, int val) {
+      if (val >= strings.length) {
+         IntToStrings[] news = new IntToStrings[val + 1];
+         for (int i = 0; i < strings.length; i++) {
+            news[i] = strings[i];
+         }
+         return news;
       }
-      return false;
-   }
-
-   public static int containsInt(Object[] ar, Object i) {
-      for (int j = 0; j < ar.length; j++) {
-         if (ar[j] == i)
-            return j;
-      }
-      return -1;
+      return strings;
    }
 
    /**
@@ -172,8 +207,12 @@ public class ArrayUtils {
       return -1;
    }
 
-   public int getLastNullIndex(Object[] array) {
-      for (int i = array.length - 1; i >= 0; i--) {
+   /**
+    * Index of first null value. 
+    * @return -1 if none
+    */
+   public int getFirstNullIndex(Object[] array) {
+      for (int i = 0; i < array.length; i++) {
          if (array[i] == null) {
             return i;
          }
@@ -188,5 +227,39 @@ public class ArrayUtils {
          }
       }
       return -1;
+   }
+
+   public int getLastNullIndex(Object[] array) {
+      for (int i = array.length - 1; i >= 0; i--) {
+         if (array[i] == null) {
+            return i;
+         }
+      }
+      return -1;
+   }
+
+   public IntToObjects[] increaseCapacity(IntToObjects[] ar, int increment) {
+      //else increase array
+      IntToObjects[] old = ar;
+      IntToObjects[] news = new IntToObjects[old.length + increment];
+      for (int i = 0; i < old.length; i++) {
+         news[i] = old[i];
+      }
+      return news;
+   }
+
+   /**
+    * Shift up and stops at.
+    * No shift if start is higher and not compatible
+    * @param ar
+    * @param start must be
+    * @param index
+    */
+   public void shiftUp(Object[] ar, int start, int index) {
+      if (start < ar.length - 2) {
+         for (int i = start; i >= index; i--) {
+            ar[i + 1] = ar[i];
+         }
+      }
    }
 }
