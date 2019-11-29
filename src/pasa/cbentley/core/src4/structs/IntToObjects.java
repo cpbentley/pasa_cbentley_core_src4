@@ -229,7 +229,10 @@ public class IntToObjects implements IStringable {
       }
       nextempty -= nums;
    }
-
+   
+   public void delete(int index) {
+      this.delete(index, 1);
+   }
    /**
     * Ensure the number of slots. Make the nextEmpty at least +1
     * <br>
