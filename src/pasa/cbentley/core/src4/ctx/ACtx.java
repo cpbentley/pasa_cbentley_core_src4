@@ -31,10 +31,17 @@ public abstract class ACtx implements ICtx {
     */
    protected final UCtx uc;
 
+   /**
+    * 
+    * @param uc
+    */
    public ACtx(UCtx uc) {
       this.uc = uc;
    }
 
+   /**
+    * 
+    */
    public int getCtxID() {
       return 0;
    }
@@ -54,15 +61,25 @@ public abstract class ACtx implements ICtx {
       return data;
    }
 
+   /**
+    * 
+    */
    public int getStaticKeyRegistrationID(int type, int key) {
       // TODO Auto-generated method stub
       return 0;
    }
 
+   /**
+    * 
+    * @return
+    */
    public UCtx getUCtx() {
       return uc;
    }
 
+   /**
+    * 
+    */
    public void register() {
       id = uc.getCtxManager().registerCtx(this);
    }
@@ -133,7 +150,6 @@ public abstract class ACtx implements ICtx {
       return null;
    }
 
-
    /**
     * @param flag
     * @param v
@@ -141,5 +157,6 @@ public abstract class ACtx implements ICtx {
    public void toStringSetToStringFlag(int flag, boolean v) {
       toStringFlags = BitUtils.setFlag(toStringFlags, flag, v);
    }
+
    //#enddebug
 }
