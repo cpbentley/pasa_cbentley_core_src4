@@ -351,6 +351,15 @@ public class Dctx implements IFlagsToString {
       sb.append(string);
    }
 
+   public void appendWithSpaceIfNotNull(char c, String name, char d) {
+      if (name != null) {
+         this.append(' ');
+         this.append(c);
+         this.append(name);
+         this.append(d);
+      }
+   }
+
    public void debug(int[] ar, String sep) {
       if (ar == null) {
          this.append("null");
@@ -463,6 +472,12 @@ public class Dctx implements IFlagsToString {
       return dc;
    }
 
+   public Dctx nLevel1Line() {
+      append(' ');
+      Dctx dc = new Dctx(uc, this);
+      return dc;
+   }
+
    /**
     * New level with overriding flags
     * @param flags
@@ -479,6 +494,20 @@ public class Dctx implements IFlagsToString {
       nl();
       Dctx dc = new Dctx(uc, this);
       dc.tab();
+      return dc;
+   }
+
+   /**
+    * 
+    * @return
+    */
+   public Dctx nlLvl() {
+      Dctx dc = nLevel(0);
+      return dc;
+   }
+
+   public Dctx nlLvl(int flags) {
+      Dctx dc = nLevel(flags);
       return dc;
    }
 
