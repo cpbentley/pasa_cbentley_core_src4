@@ -5,6 +5,15 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
+ * 
+ * The class creates elements without object. Why? To save a reference. You create a class that
+ * extends {@link ListElement}. Not very orthodox! IsA inheritance relationship is shaky.
+ * <br>
+ * If you want to create a doubly linked list for objects without this inheritance, {@link LinkedListDouble#getFreeHolder()}
+ * and use casting to {@link ListElementHolder} when you want to extract the element. 
+ * <br>
+ * <br>
+ * 
  * <li>Head (oldest) -> next -> next -> Tail (newest) -> null
  * <li>Tail (newest -> previous -> previous -> Head -> null
  * 
@@ -31,24 +40,28 @@ import pasa.cbentley.core.src4.logging.IStringable;
  */
 public class LinkedListDouble implements IStringable {
 
-   ListElementHolder empties;
+   ListElementHolder    empties;
 
    /**
     * Next element is null
     * Previous element is newer
     */
-   ListElement       head;
+   ListElement          head;
 
-   int               size;
+   int                  size;
 
    /**
     * Next is older
     * Previous is null. Newest element
     */
-   ListElement       tail;
+   ListElement          tail;
 
-   private UCtx      uc;
+   protected final UCtx uc;
 
+   /**
+    * 
+    * @param uc
+    */
    public LinkedListDouble(UCtx uc) {
       this.uc = uc;
    }
@@ -154,6 +167,27 @@ public class LinkedListDouble implements IStringable {
 
          tail = newTail;
          head = newHead;
+      }
+   }
+
+   /**
+    * Removes objects whose reference == object
+    * @param le
+    */
+   public void removeObjectRef(Object le) {
+      ListElement e = this.getTail();
+      while (e != null) {
+         ListElement prev = e.getPrev();
+
+         //do stuff even remove e
+         if (e instanceof ListElementHolder) {
+            ListElementHolder holder = (ListElementHolder) e;
+            if (holder.o == le) {
+               removeFromList(e);
+            }
+         }
+
+         e = prev;
       }
    }
 
