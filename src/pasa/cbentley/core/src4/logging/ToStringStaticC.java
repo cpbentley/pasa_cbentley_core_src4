@@ -27,6 +27,66 @@ public class ToStringStaticC extends ToStringStaticBase implements C {
       }
    }
 
+   public static String toStringLogicAlignY(int dir) {
+      switch (dir) {
+         case LOGIC_0_UNDEFINED:
+            return "Undefined";
+         case LOGIC_1_TOP_LEFT:
+            return "Top";
+         case LOGIC_2_CENTER:
+            return "Center";
+         case LOGIC_3_BOTTOM_RIGHT:
+            return "Bottom";
+         default:
+            return "Unknown " + dir;
+      }
+   }
+
+   public static String toStringLogicAlignX(int dir) {
+      switch (dir) {
+         case LOGIC_0_UNDEFINED:
+            return "Undefined";
+         case LOGIC_1_TOP_LEFT:
+            return "Left";
+         case LOGIC_2_CENTER:
+            return "Center";
+         case LOGIC_3_BOTTOM_RIGHT:
+            return "Right";
+         default:
+            return "Unknown " + dir;
+      }
+   }
+   
+   public static String toStringLogicAlignXStartEnd(int dir) {
+      switch (dir) {
+         case LOGIC_0_UNDEFINED:
+            return "Undefined";
+         case LOGIC_1_TOP_LEFT:
+            return "Start";
+         case LOGIC_2_CENTER:
+            return "Center";
+         case LOGIC_3_BOTTOM_RIGHT:
+            return "End";
+         default:
+            return "Unknown " + dir;
+      }
+   }
+
+   public static String toStringLogicAlign(int dir) {
+      switch (dir) {
+         case LOGIC_0_UNDEFINED:
+            return "Undefined";
+         case LOGIC_1_TOP_LEFT:
+            return "Top-Left";
+         case LOGIC_2_CENTER:
+            return "Center";
+         case LOGIC_3_BOTTOM_RIGHT:
+            return "Bot-Right";
+         default:
+            return "Unknown " + dir;
+      }
+   }
+
    public static String toStringAnc(int ac) {
       switch (ac) {
          case ANC_0_TOP_LEFT:
