@@ -145,6 +145,10 @@ public class BusEvent implements IStringable, ITechThread {
       return producer;
    }
 
+   public int getPID() {
+      return producerID;
+   }
+
    public int getProducerID() {
       return producerID;
    }
@@ -185,20 +189,33 @@ public class BusEvent implements IStringable, ITechThread {
       this.busOwner.putOnBus(this);
    }
 
-   public void putOnBusMainNow(BusEvent be) {
-      this.busOwner.putOnBus(be, THREAD_MODE_1_MAIN_NOW);
+   /**
+    * Sends this event on its busowner with thread {@link ITechThread#THREAD_MODE_1_MAIN_NOW} 
+    */
+   public void putOnBusMainNow() {
+      this.busOwner.putOnBus(this, THREAD_MODE_1_MAIN_NOW);
    }
-
-   public void putOnBusMainLater(BusEvent be) {
-      this.busOwner.putOnBus(be, THREAD_MODE_2_MAIN_LATER);
+   /**
+    * Sends this event on its busowner with thread {@link ITechThread#THREAD_MODE_2_MAIN_LATER} 
+    */
+   public void putOnBusMainLater() {
+      this.busOwner.putOnBus(this, THREAD_MODE_2_MAIN_LATER);
    }
-
-   public void putOnBusWorker(BusEvent be) {
-      this.busOwner.putOnBus(be, THREAD_MODE_3_WORKER);
+   /**
+    * Sends this event on its busowner with thread {@link ITechThread#THREAD_MODE_3_WORKER} 
+    */
+   public void putOnBusWorker() {
+      this.busOwner.putOnBus(this, THREAD_MODE_3_WORKER);
    }
-
-   public void putOnBus(BusEvent be, int threadType) {
-      this.busOwner.putOnBus(be, threadType);
+   /**
+    * Sends this event on its busowner with a dynamic thread type
+    * <li> {@link ITechThread#THREAD_MODE_0_POST_NOW} 
+    * <li> {@link ITechThread#THREAD_MODE_1_MAIN_NOW} 
+    * <li> {@link ITechThread#THREAD_MODE_2_MAIN_LATER} 
+    * <li> {@link ITechThread#THREAD_MODE_3_WORKER} 
+    */
+   public void putOnBus( int threadType) {
+      this.busOwner.putOnBus(this, threadType);
    }
 
    public void setParamO1(Object paramO1) {
