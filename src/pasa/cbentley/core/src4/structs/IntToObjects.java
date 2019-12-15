@@ -23,15 +23,15 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  */
 public class IntToObjects implements IStringable {
 
-   public int[]    ints;
+   public int[]       ints;
 
-   public int      nextempty = 0;
+   public int         nextempty = 0;
 
    /**
     */
-   public Object[] objects;
+   public Object[]    objects;
 
-   private final UCtx    uc;
+   private final UCtx uc;
 
    public IntToObjects(UCtx uc) {
       this.uc = uc;
@@ -185,11 +185,13 @@ public class IntToObjects implements IStringable {
          ints[i] = 0;
       }
    }
+
    public void clearNewTo(int newSize) {
       nextempty = 0;
       objects = new Object[newSize];
       ints = new int[newSize];
    }
+
    /**
     * Copy all objects in array at offset i, starting at i
     * @param ar
@@ -229,10 +231,11 @@ public class IntToObjects implements IStringable {
       }
       nextempty -= nums;
    }
-   
+
    public void delete(int index) {
       this.delete(index, 1);
    }
+
    /**
     * Ensure the number of slots. Make the nextEmpty at least +1
     * <br>
@@ -249,7 +252,7 @@ public class IntToObjects implements IStringable {
          nextempty = size;
       }
    }
-   
+
    /**
     * Ensure the number of slots. Make the nextEmpty at least +1
     * <br>
@@ -260,7 +263,7 @@ public class IntToObjects implements IStringable {
    public void ensureRoom(int size) {
       ensureRoom(size, objects.length >> 1);
    }
-   
+
    /**
     * Search for the first line with integer mint
     * <br>
@@ -379,6 +382,15 @@ public class IntToObjects implements IStringable {
     * @return
     */
    public int getLength() {
+      return nextempty;
+   }
+   /**
+    * Returns the number of elements.
+    * <br>
+    * 0 based length. So returns 0 when no items.
+    * @return
+    */
+   public int getSize() {
       return nextempty;
    }
 
