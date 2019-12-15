@@ -237,6 +237,13 @@ public class Dctx implements IFlagsToString {
       sb.append(v);
    }
 
+   public void appendVarWithNewLine(String s, int v) {
+      nl();
+      sb.append(s);
+      sb.append('=');
+      sb.append(v);
+   }
+
    public void appendVarWithNewLine(String s, String v) {
       nl();
       sb.append(s);
@@ -472,12 +479,6 @@ public class Dctx implements IFlagsToString {
       return dc;
    }
 
-   public Dctx nLevel1Line() {
-      append(' ');
-      Dctx dc = new Dctx(uc, this);
-      return dc;
-   }
-
    /**
     * New level with overriding flags
     * @param flags
@@ -488,6 +489,12 @@ public class Dctx implements IFlagsToString {
       Dctx c = new Dctx(uc, this);
       c.flags = flags;
       return c;
+   }
+
+   public Dctx nLevel1Line() {
+      append(' ');
+      Dctx dc = new Dctx(uc, this);
+      return dc;
    }
 
    public Dctx nLevelTab() {
@@ -519,6 +526,10 @@ public class Dctx implements IFlagsToString {
     */
    public void nlLvl(IStringable is) {
       nlLvl("", is);
+   }
+
+   public void nlLvl(IStringable str, Class class1) {
+      nlLvl(str, class1.getName());
    }
 
    /**
