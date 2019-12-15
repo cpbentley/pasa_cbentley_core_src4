@@ -4,14 +4,24 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 
+/**
+ * 
+ * @author Charles Bentley
+ *
+ */
 public abstract class StringProdBase implements IStringProducer, IStringable {
 
    protected LocaleID[] lids;
 
    protected LocaleID   current;
 
-   protected UCtx       uc;
+   protected final UCtx uc;
 
+   /**
+    * 
+    * @param uc
+    * @param ar
+    */
    public StringProdBase(UCtx uc, LocaleID[] ar) {
       this.uc = uc;
       lids = ar;
@@ -51,7 +61,6 @@ public abstract class StringProdBase implements IStringProducer, IStringable {
    }
 
    //#mdebug
-
    public String toString() {
       return Dctx.toString(this);
    }
