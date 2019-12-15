@@ -1,6 +1,5 @@
 package pasa.cbentley.core.src4.memory;
 
-import pasa.cbentley.core.src4.ctx.IEventsCore;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -62,7 +61,8 @@ public interface IMemory extends IStringable {
    public int[] createIntArray(int size);
 
    /**
-    * 
+    * Calls {@link IMemFreeable#freeMemory()} on registered {@link IMemFreeable} and
+    * call gc on the system
     */
    public void softGC();
 
@@ -107,7 +107,7 @@ public interface IMemory extends IStringable {
     * @throws NullPointerException if array is null
     */
    public int[][] increaseCapacity(int[][] array, int addition);
-   
+
    /**
     * Increases the capacity of the first array by addition.
     * New entries are nulls
@@ -117,7 +117,7 @@ public interface IMemory extends IStringable {
     * @throws NullPointerException if array is null
     */
    public Object[][] increaseCapacity(Object[][] array, int addition);
-   
+
    /**
     * Increases the capacity of the first array by addition.
     * New entries are nulls
@@ -127,8 +127,7 @@ public interface IMemory extends IStringable {
     * @throws NullPointerException if array is null
     */
    public String[][] increaseCapacity(String[][] array, int addition);
-   
-   
+
    /**
     * Increases the capacity of the first array by addition.
     * New entries are nulls
@@ -138,7 +137,7 @@ public interface IMemory extends IStringable {
     * @throws NullPointerException if array is null
     */
    public char[][] increaseCapacity(char[][] array, int addition);
-   
+
    /**
     * 
     * @param ar
@@ -166,10 +165,16 @@ public interface IMemory extends IStringable {
    /**
     * Adds a {@link IMemFreeable}.
     * 
-    * TODO how to unregister a module.. save state and reload?
+    * Remove with {@link IMemory#removeMemFreeable(IMemFreeable)}
     * @param free
     */
    public void addMemFreeable(IMemFreeable free);
+   
+   /**
+    * Remove an {@link IMemFreeable} that was added with {@link IMemory#addMemFreeable(IMemFreeable)}
+    * @param free
+    */
+   public void removeMemFreeable(IMemFreeable free);
 
    /**
     * 
@@ -244,6 +249,26 @@ public interface IMemory extends IStringable {
    public int[] ensureCapacity(int[] ar, int size, int grow);
 
    /**
+    * If array is null, one is created, of size + grow
+    * new entries are null
+    * @param ar
+    * @param size
+    * @param grow
+    * @return
+    */
+   public int[][] ensureCapacity(int[][] ar, int size, int grow);
+   
+   /**
+    * new entries are created with a size of startSize
+    * @param ar
+    * @param size
+    * @param grow
+    * @param startSize
+    * @return
+    */
+   public int[][] ensureCapacity(int[][] ar, int size, int grow, int startSize);
+
+   /**
     * Ensures that <code>size</code>  does not throw an {@link ArrayIndexOutOfBoundsException}.
     * 
     * Grow array so size + grow is total length
@@ -263,6 +288,17 @@ public interface IMemory extends IStringable {
     * @param addition
     * @param position
     * @return
+    * @throws NullPointerException if null
     */
    public int[] increaseCapacity(int[] ar, int addition, int position);
+
+   /**
+    * Increases the array capacity are the index position in the array
+    * @param ar
+    * @param addition
+    * @param position
+    * @return
+    * @throws NullPointerException if null
+    */
+   public int[][] increaseCapacity(int[][] ar, int addition, int position);
 }

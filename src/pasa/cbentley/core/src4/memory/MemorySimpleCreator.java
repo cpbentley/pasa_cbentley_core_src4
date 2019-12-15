@@ -3,6 +3,7 @@ package pasa.cbentley.core.src4.memory;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.structs.IntToObjects;
 
 /**
  * Does not provide any services
@@ -13,12 +14,17 @@ public class MemorySimpleCreator implements IMemory {
 
    private UCtx uc;
 
+   private IntToObjects freeables;
+   
    public MemorySimpleCreator(UCtx uc) {
       this.uc = uc;
    }
 
    public void addMemFreeable(IMemFreeable free) {
-
+      if(freeables == null) {
+         freeables = new IntToObjects(uc);
+      }
+      freeables.add(free);
    }
 
    public byte[] clone(byte[] data) {
@@ -128,6 +134,39 @@ public class MemorySimpleCreator implements IMemory {
       return ensureCapacity(ar, size, 1);
    }
 
+   public int[][] ensureCapacity(int[][] ar, int size, int grow) {
+      if (ar == null) {
+         return new int[size + grow][];
+      }
+      if (size + grow < ar.length)
+         return ar;
+
+      //#debug
+      toDLog().pMemory("ints.length=" + ar.length + " size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
+
+      int[][] oldData = ar;
+      ar = new int[size + grow][];
+      System.arraycopy(oldData, 0, ar, 0, oldData.length);
+      return ar;
+   }
+   
+   public int[][] ensureCapacity(int[][] ar, int size, int grow, int startSize) {
+      if (ar == null) {
+         return new int[size + grow][startSize];
+      }
+      if (size + grow < ar.length)
+         return ar;
+
+      //#debug
+      toDLog().pMemory("ints.length=" + ar.length + " size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
+
+      int[][] oldData = ar;
+      ar = new int[size + grow][startSize];
+      System.arraycopy(oldData, 0, ar, 0, oldData.length);
+      return ar;
+   }
+   
+   
    /**
     * 
     * @param ar
@@ -283,6 +322,10 @@ public class MemorySimpleCreator implements IMemory {
       System.arraycopy(oldData, 0, array, 0, oldData.length);
       return array;
    }
+   
+   public int[][] increaseCapacity(int[][] ar, int addition, int position) {
+      throw new RuntimeException();
+   }
 
    public char[] increaseCapacity(char[] ar, int addition) {
       char[] oldData = ar;
@@ -361,9 +404,14 @@ public class MemorySimpleCreator implements IMemory {
    }
 
    public void softGC() {
+      for (int index = 0; index < freeables.getLength(); index++) {
+         IMemFreeable free = (IMemFreeable) freeables.getObjectAtIndex(index);
+         free.freeMemory();
+      }
       System.gc();
    }
 
+   
    //#mdebug
    public IDLog toDLog() {
       return uc.toDLog();
@@ -389,4 +437,10 @@ public class MemorySimpleCreator implements IMemory {
       return uc;
    }
    //#enddebug
+
+   public void removeMemFreeable(IMemFreeable free) {
+      freeables.removeRef(free);
+   }
+
+ 
 }
