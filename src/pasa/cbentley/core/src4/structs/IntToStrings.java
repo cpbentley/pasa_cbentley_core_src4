@@ -29,18 +29,23 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  */
 public class IntToStrings implements IStringable, Serializable {
 
-   private String[] imgs;
+   /**
+    * 
+    */
+   private static final long serialVersionUID = -8080875409242843475L;
 
-   public int[]     ints;
+   private String[]          imgs;
+
+   public int[]              ints;
 
    /**
     * The size of IntToStrings
     */
-   public int       nextempty = 0;
+   public int                nextempty        = 0;
 
-   public String[]  strings;
+   public String[]           strings;
 
-   protected UCtx   uc;
+   protected UCtx            uc;
 
    public IntToStrings(UCtx uc) {
       this(uc, 0);
@@ -221,17 +226,20 @@ public class IntToStrings implements IStringable, Serializable {
    }
 
    /**
-    * Returns the id at index
+    * Returns the integer at index
     * @param id
     * @return
     */
-   public int getID(int index) {
+   public int getInt(int index) {
       return ints[index];
    }
 
+   /**
+    * Iterates over all strings and returns the maximum length
+    * @return
+    */
    public int getMaxStringSize() {
       int max = 0;
-      String[] ar = new String[nextempty];
       for (int i = 0; i < nextempty; i++) {
          if (strings[i].length() > max) {
             max = strings[i].length();
@@ -244,6 +252,12 @@ public class IntToStrings implements IStringable, Serializable {
       return uc.getMem();
    }
 
+   /**
+    * Returns the number of elements.
+    * <br>
+    * 0 based length. So returns 0 when no items.
+    * @return
+    */
    public int getSize() {
       return nextempty;
    }
@@ -272,6 +286,9 @@ public class IntToStrings implements IStringable, Serializable {
       return ar;
    }
 
+   /**
+    * Grow array by 1
+    */
    public void growArray() {
       growArray(1);
    }
