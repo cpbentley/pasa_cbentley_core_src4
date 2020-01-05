@@ -13,7 +13,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  * @author Charles Bentley
  *
  */
-public interface IConfig extends IStringable, ITechConfig {
+public interface IDLogConfig extends IStringable, ITechConfig {
 
    //#mdebug
 

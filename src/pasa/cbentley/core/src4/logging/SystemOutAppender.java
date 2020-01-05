@@ -30,7 +30,7 @@ public class SystemOutAppender extends BaseAppender {
 
       //get the config of this appender
       ILogEntryAppender logEntryAppender = this;
-      IConfig config = logEntryAppender.getConfig();
+      IDLogConfig config = logEntryAppender.getConfig();
 
       //apply the config to the entry
       DLogEntryOfConfig ec = entry.computeDLogEntryOfConfig(config);
@@ -121,7 +121,7 @@ public class SystemOutAppender extends BaseAppender {
     * @param sb
     * @param nl
     */
-   private void stackTrace(DLogEntryOfConfig ec, DLogEntry entry, StringBBuilder sb, String nl, IConfig config) {
+   private void stackTrace(DLogEntryOfConfig ec, DLogEntry entry, StringBBuilder sb, String nl, IDLogConfig config) {
       if (ec.isStackConfig()) {
          String[] stack = getStackTrace();
          if (stack != null) {

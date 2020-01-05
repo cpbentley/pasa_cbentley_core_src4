@@ -4,7 +4,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
- * Log Entry applied to a {@link IConfig}.
+ * Log Entry applied to a {@link IDLogConfig}.
  * 
  * Answer the questions
  * <li>should the log entry be displayed for this config
@@ -17,10 +17,10 @@ import pasa.cbentley.core.src4.utils.BitUtils;
 public class DLogEntryOfConfig implements ITechLvl {
    //#mdebug
 
-   private IConfig   config;
+   private IDLogConfig   config;
 
    /**
-    * Result of {@link DLogEntry#computeDLogEntryOfConfig(IConfig)}
+    * Result of {@link DLogEntry#computeDLogEntryOfConfig(IDLogConfig)}
     */
    private int configFlags;
 
@@ -28,13 +28,13 @@ public class DLogEntryOfConfig implements ITechLvl {
 
    private UCtx      uc;
 
-   public DLogEntryOfConfig(UCtx uc, IConfig config, DLogEntry entry) {
+   public DLogEntryOfConfig(UCtx uc, IDLogConfig config, DLogEntry entry) {
       this.uc = uc;
       this.config = config;
       this.entry = entry;
    }
 
-   public IConfig getConfig() {
+   public IDLogConfig getConfig() {
       return config;
    }
 

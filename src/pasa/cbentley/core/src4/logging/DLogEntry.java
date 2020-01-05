@@ -194,7 +194,7 @@ public class DLogEntry implements ITechLvl {
     * Compute data for the config.
     * @param config
     */
-   public DLogEntryOfConfig computeDLogEntryOfConfig(IConfig config) {
+   public DLogEntryOfConfig computeDLogEntryOfConfig(IDLogConfig config) {
       DLogEntryOfConfig ec = config.getEntryConfig(this);
       //check if this log entry should record the thread name
       if (threadName == null && ec.hasConfigFlag(ITechConfig.CONFIG_FLAG_04_SHOW_THREAD)) {

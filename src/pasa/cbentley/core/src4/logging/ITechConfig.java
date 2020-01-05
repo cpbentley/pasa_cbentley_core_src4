@@ -33,7 +33,7 @@ public interface ITechConfig extends ITech {
    public static final int MASTER_FLAG_01_BLOCK_ALL_PRINT = 1 << 0;
 
    /**
-    * Ignores the {@link Config} and print all.
+    * Ignores the {@link DLogConfig} and print all.
     * <br>
     * Most powerful flags. TODO rename at 1
     * 

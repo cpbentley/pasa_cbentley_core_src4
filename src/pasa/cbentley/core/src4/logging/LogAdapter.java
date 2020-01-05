@@ -4,7 +4,7 @@ public class LogAdapter implements IDLog {
 
    //#mdebug
 
-   public Config getConfig() {
+   public DLogConfig getConfig() {
       throw new RuntimeException("not implemented yet");
    }
 

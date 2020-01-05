@@ -24,7 +24,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class Config implements IConfig, ITechTags, ITechConfig {
+public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
 
    //#mdebug
 
@@ -74,7 +74,7 @@ public class Config implements IConfig, ITechTags, ITechConfig {
 
    private UCtx      uc;
 
-   public Config(UCtx uc) {
+   public DLogConfig(UCtx uc) {
       this.uc = uc;
 
    }

@@ -5,20 +5,20 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 public abstract class BaseAppender implements ILogEntryAppender {
 
    //#mdebug
-   protected IConfig config;
+   protected IDLogConfig config;
 
    protected UCtx uc;
 
    public BaseAppender(UCtx uc) {
       this.uc = uc;
-      config = new Config(uc); //defautl config
+      config = new DLogConfig(uc); //defautl config
    }
 
-   public IConfig getConfig() {
+   public IDLogConfig getConfig() {
       return config;
    }
 
-   public void setConfig(IConfig c) {
+   public void setConfig(IDLogConfig c) {
       if (c != null) {
          config = c;
       }
