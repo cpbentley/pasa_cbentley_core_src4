@@ -120,17 +120,17 @@ public class BADataOS implements DataOutput {
    /**
     * bytearr is initialized on demand by writeUTF
     */
-   private byte[]    bytearr       = null;
+   private byte[]   bytearr       = null;
 
    private BAByteOS out;
 
-   private byte      writeBuffer[] = new byte[8];
+   private byte     writeBuffer[] = new byte[8];
 
    /**
     * The number of bytes written to the data output stream so far. 
     * If this counter overflows, it will be wrapped to Integer.MAX_VALUE.
     */
-   protected int     written;
+   protected int    written;
 
    /**
     * Creates a new data output stream to write data to the specified 
@@ -155,6 +155,14 @@ public class BADataOS implements DataOutput {
 
    public BAByteOS getOut() {
       return out;
+   }
+
+   /**
+    * Returns a copy of the underlying array
+    * @return
+    */
+   public byte[] getByteCopy() {
+      return out.toByteArray();
    }
 
    /**
@@ -354,7 +362,6 @@ public class BADataOS implements DataOutput {
    public final void writeDouble(double v) {
       writeLong(Double.doubleToLongBits(v));
    }
-
 
    /**
     * Converts the float argument to an <code>int</code> using the 
