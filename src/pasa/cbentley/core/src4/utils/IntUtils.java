@@ -918,6 +918,36 @@ public class IntUtils implements IStringable {
    }
 
    /**
+    * Insert int value from head as soon as it is smaller or equal, shifting all other values. last value is lost
+    * 
+    * The array should be ordered for good results.
+    * @param ints
+    * @param value
+    * @return
+    */
+   public static int[] addOrderedIntDouble(int[] ints, int value) {
+      int[] newi = new int[ints.length + 1];
+      int count = 0;
+      boolean added = false;
+      for (int i = 0; i < ints.length; i++) {
+         int val = ints[i];
+         if (!added && val >= value) {
+            newi[count] = value;
+            count++;
+            newi[count] = val;
+            added = true;
+         } else {
+            newi[count] = val;
+         }
+         count++;
+      }
+      if (!added) {
+         newi[newi.length - 1] = value;
+      }
+      return newi;
+   }
+
+   /**
     * Add the value to array according to type
     * If using
     * When array is null, create a new array
@@ -1141,6 +1171,29 @@ public class IntUtils implements IStringable {
    }
 
    /**
+    * 0 are ignored
+    * @param a1
+    * @param a2
+    * @return unique ints in the array, there is no 2* the same
+    */
+   public int[] getIntersection(int[] a1, int[] a2) {
+      int[] ma = new int[Math.min(a1.length, a2.length) / 2];
+      int count = 0;
+      for (int i = 0; i < a1.length; i++) {
+         for (int j = 0; j < a2.length; j++) {
+            if (a1[i] == a2[j] && !contains(ma, a1[i])) {
+               if (count >= ma.length) {
+                  ma = uc.getMem().increaseCapacity(ma, 5);
+               }
+               ma[count] = a1[i];
+               count++;
+            }
+         }
+      }
+      return uc.getMem().resizeTo(ma, count);
+   }
+
+   /**
     * Increase
     * @param ints
     * @param value
@@ -1275,11 +1328,17 @@ public class IntUtils implements IStringable {
 
    /**
     * Make the array smaller
+    * 
+    * if index invalid, returns array without modifications
+    * 
     * @param ar
     * @param index
     * @return
     */
    public int[] removeIndex(int[] ar, int index) {
+      if(index < 0 || index >= ar.length) {
+         return ar;
+      }
       int[] newi = uc.getMem().createIntArray(ar.length - 1);
       int count = 0;
       for (int i = 0; i < ar.length; i++) {
@@ -1289,6 +1348,21 @@ public class IntUtils implements IStringable {
          }
       }
       return newi;
+   }
+
+   /**
+    * Remove integer remove inside array
+    * @param ar
+    * @param remove
+    * @return the modified array wihout the first occurence of the integer
+    */
+   public int[] remove(int[] ar, int remove) {
+      int index = -1;
+      for (int i = 0; i < ar.length; i++) {
+         if (ar[i] == remove)
+            index = i;
+      }
+      return removeIndex(ar, index);
    }
 
    /**
