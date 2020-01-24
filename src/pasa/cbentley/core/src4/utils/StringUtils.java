@@ -1443,6 +1443,27 @@ public class StringUtils {
       return sb.toString();
    }
 
+   /**
+    * Builds a String at offset with a header of 4 bytes
+    * 
+    * @return
+    */
+   public String getStringIntLong(byte[] data, int offset) {
+      char[] cs = uc.getCU().getCharsIntLong(data, offset);
+      return new String(cs);
+   }
+
+   public void writeStringIntLong(String str, byte[] data, int offset) {
+      int length = str.length();
+      IntUtils.writeIntBE(data, offset, length);
+      int index = offset + 4;
+      for (int i = 0; i < length; i++) {
+         char c = str.charAt(i);
+         CharUtils.writeShortBE(data, index, c);
+         index += 2;
+      }
+   }
+
    public String getString(String[] ar, char separator) {
       return getString(ar, String.valueOf(separator));
    }

@@ -198,9 +198,18 @@ public class ArrayUtils {
     * @param array
     * @return -1 if all null
     */
-   public int getFirstNotNullIndex(Object[] array) {
+   public static int getFirstNotNullIndex(Object[] array) {
       for (int i = 0; i < array.length; i++) {
          if (array[i] != null) {
+            return i;
+         }
+      }
+      return -1;
+   }
+
+   public static int getFirstIndex(Object[] array, Object o) {
+      for (int i = 0; i < array.length; i++) {
+         if (array[i] != o) {
             return i;
          }
       }
@@ -211,7 +220,7 @@ public class ArrayUtils {
     * Index of first null value. 
     * @return -1 if none
     */
-   public int getFirstNullIndex(Object[] array) {
+   public static int getFirstNullIndex(Object[] array) {
       for (int i = 0; i < array.length; i++) {
          if (array[i] == null) {
             return i;
@@ -220,7 +229,7 @@ public class ArrayUtils {
       return -1;
    }
 
-   public int getLastNotNullIndex(Object[] array) {
+   public static int getLastNotNullIndex(Object[] array) {
       for (int i = array.length - 1; i >= 0; i--) {
          if (array[i] != null) {
             return i;
@@ -229,7 +238,7 @@ public class ArrayUtils {
       return -1;
    }
 
-   public int getLastNullIndex(Object[] array) {
+   public static int getLastNullIndex(Object[] array) {
       for (int i = array.length - 1; i >= 0; i--) {
          if (array[i] == null) {
             return i;

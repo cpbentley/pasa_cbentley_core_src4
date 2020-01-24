@@ -36,6 +36,24 @@ public class CharUtils {
     * @param padding 0x04 for russian chars
     * @return
     */
+   public char[] getCharsIntLong(byte[] data, int offset) {
+      int numChars = IntUtils.readIntBE(data, offset);
+      char[] chars = uc.getMem().createCharArray(numChars);
+      int index = offset + 4;
+      for (int i = 0; i < numChars; i++) {
+         int ch1 = data[index++] << 8;
+         int ch2 = data[index++] & 0xFF;
+         chars[i] = (char) (ch1 + ch2);
+      }
+      return chars;
+   }
+
+   /**
+    * 
+    * @param bys
+    * @param padding 0x04 for russian chars
+    * @return
+    */
    public static char[] buildCharsFromLowByes(byte[] bys, int padding, int from, int to) {
       char[] chars = new char[to - from];
       for (int i = 0; i < chars.length; i++) {
@@ -184,7 +202,7 @@ public class CharUtils {
          ar[i] = filler;
       }
    }
-   
+
    public static boolean isEqual(char[] c, char[] b) {
       return isEqual(c, 0, c.length, b);
    }
@@ -291,7 +309,41 @@ public class CharUtils {
     */
    public static void writeShortBE(byte[] ar, int index, char c) {
       ar[index++] = (byte) (c >>> 8);
-      ar[index++] = (byte) (c >>> 0);
+      ar[index] = (byte) (c >>> 0);
+   }
+
+   public static void writeShortBE(byte[] ar, int index, char[] cs) {
+      for (int i = 0; i < cs.length; i++) {
+         char c = cs[i];
+         ar[index++] = (byte) (c >>> 8);
+         ar[index++] = (byte) (c >>> 0);
+      }
+   }
+
+   public static void writeShortLE(byte[] ar, int index, char[] cs) {
+      for (int i = 0; i < cs.length; i++) {
+         char c = cs[i];
+         ar[index++] = (byte) (c >>> 0);
+         ar[index++] = (byte) (c >>> 8);
+      }
+   }
+
+   /**
+    * Read by {@link CharUtils#getCharsIntLong(byte[], int)}
+    * @param cs
+    * @param coffset
+    * @param clen
+    * @param data
+    * @param offset
+    */
+   public void writeCharsIntLong(byte[] data, int offset, char[] cs, int coffset, int clen) {
+      IntUtils.writeIntBE(data, offset, clen);
+      int index = offset + 4;
+      for (int i = 0; i < clen; i++) {
+         char c = cs[coffset + i];
+         CharUtils.writeShortBE(data, index, c);
+         index += 2;
+      }
    }
 
    /**

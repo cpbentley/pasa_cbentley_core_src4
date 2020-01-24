@@ -903,6 +903,34 @@ public class IntUtils implements IStringable {
       arr[index] = (byte) ((val >>> 24) & 0xFF);
    }
 
+   /**
+    * Read by {@link CharUtils#getCharsIntLong(byte[], int)}
+    * @param cs
+    * @param coffset
+    * @param clen
+    * @param data
+    * @param offset
+    */
+   public static void writeIntsIntLong(byte[] data, int offset, int[] cs, int coffset, int clen) {
+      IntUtils.writeIntBE(data, offset, clen);
+      int index = offset + 4;
+      for (int i = 0; i < clen; i++) {
+         int integer = cs[coffset + i];
+         IntUtils.writeIntBE(data, index, integer);
+         index += 4;
+      }
+   }
+
+   public static void writeIntsByteLong(byte[] data, int offset, int[] cs, int coffset, int clen) {
+      data[offset] = (byte)clen;
+      int index = offset + 1;
+      for (int i = 0; i < clen; i++) {
+         int integer = cs[coffset + i];
+         IntUtils.writeIntBE(data, index, integer);
+         index += 4;
+      }
+   }
+
    public static void writeIntXXLE(byte[] arr, int index, int v, int byteSize) {
       int base = 0;
       for (int i = 0; i < byteSize; i++) {
@@ -1150,6 +1178,34 @@ public class IntUtils implements IStringable {
    }
 
    /**
+    * 
+    * @return
+    */
+   public int[] getIntsBEByteLong(byte[] data, int offset) {
+      int num = data[offset] & 0xFF;
+      return getIntsBE(data, offset + 1, num);
+   }
+
+   public int[] getIntsBEIntLong(byte[] data, int offset) {
+      int num = IntUtils.readIntBE(data, offset);
+      return getIntsBE(data, offset + 4, num);
+   }
+
+   public int[] getIntsBE(byte[] data, int offset, int num) {
+      int[] ints = uc.getMem().createIntArray(num);
+      int index = offset;
+      int value = 0;
+      for (int i = 0; i < num; i++) {
+         value = (data[index++] & 0xFF) << 24;
+         value |= (data[index++] & 0xFF) << 16;
+         value |= (data[index++] & 0xFF) << 8;
+         value |= (data[index++] & 0xFF) << 0;
+         ints[i] = value;
+      }
+      return ints;
+   }
+
+   /**
     * Returns an array with integers of a1 and those from a2 that are not in a1.
     * <br>
     * <br>
@@ -1336,7 +1392,7 @@ public class IntUtils implements IStringable {
     * @return
     */
    public int[] removeIndex(int[] ar, int index) {
-      if(index < 0 || index >= ar.length) {
+      if (index < 0 || index >= ar.length) {
          return ar;
       }
       int[] newi = uc.getMem().createIntArray(ar.length - 1);
@@ -1502,6 +1558,12 @@ public class IntUtils implements IStringable {
             ps.append(i + "=" + ar[i] + sep);
          }
       }
+   }
+
+   public String toStringIntArray1Line(String title, int[] ar, String sep) {
+      Dctx dc = new Dctx(uc);
+      toStringIntArray1Line(dc, title, ar, sep);
+      return dc.toString();
    }
 
    public void toStringIntArray1Line(Dctx dc, String title, int[] ar, String sep) {
