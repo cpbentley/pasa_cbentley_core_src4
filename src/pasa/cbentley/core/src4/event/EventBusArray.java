@@ -8,6 +8,7 @@ import pasa.cbentley.core.src4.interfaces.IExecutor;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.structs.IntToObjects;
+import pasa.cbentley.core.src4.utils.ArrayUtils;
 
 /**
  * Bus with knowledge of the statically defined producers of events.
@@ -49,8 +50,14 @@ public class EventBusArray implements IEventBus, IEventConsumer {
     * columns are event consumers
     */
    private IntToObjects[] producerIDToConsumerArray;
+   
 
    private UCtx           uc;
+
+   /**
+    * Static topology is events
+    */
+   private int[]          topologyStatic;
 
    /**
     * Registers to dipose memory events 
@@ -71,6 +78,8 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       this.contextOwner = contextOwner;
       listenersToAllEvents = new IntToObjects(uc);
 
+      this.topologyStatic = producersNumEvents;
+      
       //construct the structure to host the regular mapping
       IntToObjects[] producerIDToConsumerArray = new IntToObjects[producersNumEvents.length];
       for (int i = 0; i < producerIDToConsumerArray.length; i++) {
@@ -85,6 +94,28 @@ public class EventBusArray implements IEventBus, IEventConsumer {
          eventBus = uc.getEventBusRoot();
       }
       eventBus.addConsumer(this, IEventsCore.PID_3_MEMORY, IEventsCore.EID_MEMORY_3_OBJECT_DESTROY);
+   }
+
+   public int getNumStaticProducers() {
+      return topologyStatic.length;
+   }
+   
+   public int createNewProducerID(int topoloyNumEvents) {
+      int producerID = producerIDToConsumerArray.length;
+      int offsetNull = ArrayUtils.getFirstNullIndex(producerIDToConsumerArray);
+      if(offsetNull == -1) {
+         IntToObjects[] arrayNew = uc.getAU().increaseCapacity(producerIDToConsumerArray, 1);
+         producerIDToConsumerArray = arrayNew;
+      } else {
+         producerID = offsetNull;
+      }
+      IntToObjects producer = new IntToObjects(uc, topoloyNumEvents);
+      producerIDToConsumerArray[producerID] = producer;
+      return producerID;
+   }
+
+   public void unregisterDynamicProducerID(int pid) {
+      producerIDToConsumerArray[pid] = null;
    }
 
    /**
@@ -264,7 +295,6 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       return index;
    }
 
-   
    public void putOnBus(final BusEvent be, int threadMode) {
       if (executor == null || threadMode == THREAD_MODE_0_POST_NOW) {
          putOnBus(be);
@@ -277,7 +307,7 @@ public class EventBusArray implements IEventBus, IEventConsumer {
          run(runner, threadMode);
       }
    }
-   
+
    private void run(Runnable runner, int threadMode) {
       if (threadMode == THREAD_MODE_3_WORKER) {
          executor.executeWorker(runner);

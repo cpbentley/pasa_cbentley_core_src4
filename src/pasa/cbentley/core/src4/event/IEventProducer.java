@@ -7,4 +7,5 @@ package pasa.cbentley.core.src4.event;
  */
 public interface IEventProducer {
 
+   public int getProducerID();
 }

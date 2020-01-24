@@ -137,6 +137,10 @@ public class BusEvent implements IStringable, ITechThread {
       return paramO1;
    }
 
+   public void clearForReUse() {
+      
+   }
+   
    public Object getParamO2() {
       return paramO2;
    }

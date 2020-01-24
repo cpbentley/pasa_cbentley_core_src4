@@ -2,6 +2,7 @@ package pasa.cbentley.core.src4.event;
 
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IEventsCore;
+import pasa.cbentley.core.src4.interfaces.IEvents;
 import pasa.cbentley.core.src4.interfaces.IExecutor;
 import pasa.cbentley.core.src4.interfaces.ITechThread;
 import pasa.cbentley.core.src4.logging.IStringable;
@@ -32,8 +33,16 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * <li> Threading issue. The implementation may or may not have access to an {@link IExecutor} for {@link ITechThread} types
  * <li> Event Filtering for dynamic producers
  * </ol>
- *  
+ * 
+ * <p>
+ * <b>Code Context {@link ICtx}</b>
+ *  <br>
+ * Each code context has its own bus with a defined static event topology {@link IEvents}
  * <br>
+ * Dynamic producers are created and unregistered.
+ * </p>
+ * 
+ * <p>
  * <b>Event Filtering</b>
  * <br>
  * When producers are dynamically created and registered to the same PID, all consumers will receive events from 
@@ -43,20 +52,25 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * <li>upstream on the {@link IEventBus} instance 
  * <li>downstream on the reference of the producer
  * <br>
+ * </p>
+ * 
+ * <p>
  * <b>Dynamic Producers : Case of the Table Model</b>
  * <br>
  * Any number of table models may have any number of views.
  * On the requirement that a table view holds a reference on the table model,
  * the view registers for the statically and filter on {@link BusEvent#getProducer()}
  * 
- * 
- * <br>
+ * </p>
+ * <p>
  * <b>Memory leak</b>
+ * <br>
  * {@link IEventBus} pins Producer and Consumer in memory.
  * Code must remove {@link IEventConsumer} and Producers. when no longer needed.
  * <br>
- * <br>
+ * </p>
  * <b>Multi Threading</b>
+ * <br>
  * Some event bus may run exclusively on the so called GUI-thread.
  * <br>
  * 
@@ -82,6 +96,8 @@ public interface IEventBus extends IStringable, ITechThread {
     */
    public static final int PID_0_ANY = 0;
 
+   
+   
    /**
     * Registers 
     * This method allows a Consumer to register to events without having
@@ -93,7 +109,15 @@ public interface IEventBus extends IStringable, ITechThread {
     * @param eventID
     */
    public void addConsumer(IEventConsumer con, int prodID, int eventID);
-
+   
+   /**
+    * 
+    * @param pid
+    * @throws IllegalArgumentException if pid is not a registered
+    */
+   public void unregisterDynamicProducerID(int pid);
+   
+   public int createNewProducerID(int topoloyNumEvents);
    /**
     * 
     * Thread modes available if {@link IExecutor} is available
