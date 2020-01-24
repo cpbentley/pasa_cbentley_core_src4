@@ -260,5 +260,17 @@ public class LogAdapter implements IDLog {
 
    }
 
+   public void pData(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");      
+   }
+
+   public void pModel1(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");      
+   }
+
+   public void pCmd1(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");      
+   }
+
    //#enddebug
 }

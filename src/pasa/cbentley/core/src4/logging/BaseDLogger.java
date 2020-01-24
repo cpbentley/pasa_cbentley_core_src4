@@ -45,6 +45,14 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_CMD, ITechTags.FLAG_11_PRINT_COMMANDS, lvl, oneLine);
    }
 
+   public void pCmd1(String msg, IStringable str, Class c, String method) {
+      pCmd(msg, str, c, method, getLevelDefault(), true);
+   }
+
+   public void pData(String msg, IStringable str, Class c, String method) {
+      pData(msg, str, c, method, getLevelDefault(), false);
+   }
+
    public void pData(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_DATA, ITechTags.FLAG_15_PRINT_DATA, lvl, oneLine);
    }
@@ -73,16 +81,11 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    public void pEvent(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_EVENT, ITechTags.FLAG_07_PRINT_EVENT, lvl, oneLine);
    }
-   public void pNull(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
-      super.ptPrint(msg, str, c, method, ITechTags.STRING_NULL, ITechTags.FLAG_25_PRINT_NULL, lvl, oneLine);
-   }
+
    public void pEvent(String msg, IStringable str, Class c, String method, int lvl, int flags) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_EVENT, ITechTags.FLAG_07_PRINT_EVENT, lvl, flags);
    }
 
-   public void pFlow(String msg, IStringable str, Class c, String method, int lvl, int flags) {
-      super.ptPrint(msg, str, c, method, ITechTags.STRING_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, flags);
-   }
    /**
     * Express cue to only print 1 line by default level defined by the {@RootDLogger} .
     * @param msg
@@ -132,13 +135,16 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       this.ptPrint(msg, str, c, method, "FLAG", tagID, lvl, oneLine);
    }
 
-
    public void pFlow(String msg, IStringable str, Class c, String method) {
       pFlow(msg, str, c, method, getLevelDefault(), false);
    }
 
    public void pFlow(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, oneLine);
+   }
+
+   public void pFlow(String msg, IStringable str, Class c, String method, int lvl, int flags) {
+      super.ptPrint(msg, str, c, method, ITechTags.STRING_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, flags);
    }
 
    public void pInit(String msg, IStringable str, Class c, String method) {
@@ -172,6 +178,14 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
 
    public void pModel(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_MODEL, ITechTags.FLAG_10_PRINT_MODEL, lvl, oneLine);
+   }
+
+   public void pModel1(String msg, IStringable str, Class c, String method) {
+      pModel(msg, str, c, method, getLevelDefault(), true);
+   }
+
+   public void pNull(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, str, c, method, ITechTags.STRING_NULL, ITechTags.FLAG_25_PRINT_NULL, lvl, oneLine);
    }
 
    public void pSound(String msg, IStringable str, Class c, String method) {
@@ -221,6 +235,7 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    public void pWork(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_WORK, ITechTags.FLAG_06_PRINT_WORK, lvl, oneLine);
    }
+
    //#enddebug
 
 }

@@ -61,6 +61,8 @@ public interface IDLog {
 
    public void pCmd(String msg, IStringable str, Class c, String method);
 
+   public void pData(String msg, IStringable str, Class c, String method);
+
    public void pCmd(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
 
    public void pData(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
@@ -129,6 +131,8 @@ public interface IDLog {
 
    public void pMemoryWarn(String msg, IStringable str, Class c, String method);
 
+   public void pModel1(String msg, IStringable str, Class c, String method);
+
    public void pModel(String msg, IStringable str, Class c, String method);
 
    public void pModel(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
@@ -158,6 +162,8 @@ public interface IDLog {
    public void pWork(String msg, IStringable str, Class c, String method);
 
    public void pWork(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pCmd1(String msg, IStringable str, Class c, String method);
 
    //#enddebug
 }

@@ -396,6 +396,12 @@ public class Dctx implements IFlagsToString {
       }
    }
 
+   /**
+    * 
+    * @param str
+    * @param dd
+    * @return
+    */
    public Dctx exclusive(String str, IStringable dd) {
       Dctx dc = new Dctx(uc, nl + "\t");
       dc.append(str);
@@ -888,6 +894,25 @@ public class Dctx implements IFlagsToString {
       }
    }
 
+   public void debugAlone(String title, int[] ar, String sep) {
+      sb.append(title);
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            append(sep);
+         }
+         append(ar[i]);
+      }
+   }
+
+   public void debugAlone(int[] ar, String sep) {
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            append(sep);
+         }
+         append(ar[i]);
+      }
+   }
+
    /**
     * If {@link IStringable}, all is good, otherwise ask {@link ICtx} to debug it
     * @param o
@@ -905,7 +930,7 @@ public class Dctx implements IFlagsToString {
     */
    public void nlLvlO(Object o, String title, ICtx ctx) {
       if (o == null) {
-         nlLvl(null, title);
+         nlLvl((IStringable) null, title);
       } else {
          if (o instanceof IStringable) {
             nlLvlTitleIfNull((IStringable) o, title);
@@ -1232,6 +1257,16 @@ public class Dctx implements IFlagsToString {
 
    public String toString() {
       return sb.toString();
+   }
+
+   public void nlLvl(int[] data, String title) {
+      this.nl();
+      String str = uc.getIU().debugString(data);
+      this.append(str);
+   }
+
+   public void appendColorRGB(int colorRGB) {
+      sb.append(uc.getColorU().toStringColorRGB(colorRGB));
    }
 
    //#enddebug
