@@ -384,6 +384,7 @@ public class IntToObjects implements IStringable {
    public int getLength() {
       return nextempty;
    }
+
    /**
     * Returns the number of elements.
     * <br>
@@ -407,6 +408,21 @@ public class IntToObjects implements IStringable {
 
    public void copyToArray(Object[] ar) {
       copy(ar, 0);
+   }
+
+   /**
+    * Clone this by incrementing backing array size
+    * @param num
+    * @return
+    */
+   public IntToObjects cloneIncrement(int num) {
+      IntToObjects cloneAr = new IntToObjects(uc, objects.length + num);
+      for (int i = 0; i < objects.length; i++) {
+         cloneAr.ints[i] = this.ints[i];
+         cloneAr.objects[i] = this.objects[i];
+      }
+      cloneAr.nextempty = this.nextempty;
+      return cloneAr;
    }
 
    /**
