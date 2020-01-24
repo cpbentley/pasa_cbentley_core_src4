@@ -2,6 +2,7 @@ package pasa.cbentley.core.src4.i8n;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -28,6 +29,9 @@ public abstract class StringProdBase implements IStringProducer, IStringable {
       setLocalID(ar[0]);
    }
 
+   /**
+    * The current Locale
+    */
    public LocaleID getLocaleID() {
       return current;
    }
@@ -67,6 +71,10 @@ public abstract class StringProdBase implements IStringProducer, IStringable {
 
    public UCtx toStringGetUCtx() {
       return uc;
+   }
+   
+   public IDLog toDLog() {
+      return uc.toDLog();
    }
 
    public String toString1Line() {

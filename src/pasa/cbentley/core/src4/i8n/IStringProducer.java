@@ -8,6 +8,8 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * <br>
  * In order to modify the Language, it will depends on the implementation.
  * <br>
+ * The application sees this interface.
+ * 
  * @author Charles Bentley
  *
  */
@@ -62,6 +64,11 @@ public interface IStringProducer extends IStringable {
     */
    public IString getIStringKey(int key, String def);
 
+   /**
+    * 
+    * @param suf
+    * @return
+    */
    public LocaleID getLocale(String suf);
 
    /**
@@ -112,7 +119,7 @@ public interface IStringProducer extends IStringable {
     * @param cl
     * @param pathid
     */
-   public void loads(ICtx cl,String pathid);
+   public void loads(ICtx cl, String pathid);
 
    /**
     * Dynamically sets a translation.

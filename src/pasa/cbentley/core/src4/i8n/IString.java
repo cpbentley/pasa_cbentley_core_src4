@@ -7,7 +7,7 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * A String function that computes a String based on its {@link LocaleID} and the semantical
  * components to provide the a final semantics
  * <br>
- * <li> Move up will have 2 keys. One for move, for Up.
+ * <li> English 'Move up' will have 2 keys. One key for move, one key for Up.
  * <li> But in russian or french, it is one word, monter/descendre
  * <li> But you can also say Naviguer vers le haut/vers le bas
  * <li>
@@ -41,6 +41,9 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * A language that use only one word for Navigate Up?
  * <br>
  * LocalID several local used
+ * 
+ * A string can be a sentence with param values from the user (numbers, names)
+ * "Welcome {name}"
  * 
  * @author Charles Bentley
  *

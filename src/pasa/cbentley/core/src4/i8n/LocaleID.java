@@ -4,20 +4,25 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 
+/**
+ * Encapsulates a Local, simple name "English" and its suffix id "en"
+ * 
+ * @author Charles Bentley
+ *
+ */
 public class LocaleID implements IStringable {
 
    private String name;
 
    private String suffix;
 
-   private UCtx uc;
+   private UCtx   uc;
 
    public LocaleID(UCtx uc, String name, String suffix) {
       this.uc = uc;
       this.name = name;
       this.suffix = suffix;
    }
-
 
    public String getName() {
       return name;
@@ -27,7 +32,6 @@ public class LocaleID implements IStringable {
       return suffix;
    }
 
-   
    //#mdebug
    public String toString() {
       return Dctx.toString(this);
@@ -50,6 +54,5 @@ public class LocaleID implements IStringable {
       return uc;
    }
    //#enddebug
-   
 
 }

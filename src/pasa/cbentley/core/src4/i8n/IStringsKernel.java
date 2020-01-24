@@ -2,9 +2,12 @@ package pasa.cbentley.core.src4.i8n;
 
 
 /**
+ * Root interface for all IString code contexts.
+ * 
  * Equivalent of R.strings in android.
- * Except user must compile ids and IDs are static in definition but
- * will be computed by the 
+ * 
+ * However user compiles ids. 
+ * IDs are static in definition but will be computed by the 
  * @author Charles Bentley
  *
  */
