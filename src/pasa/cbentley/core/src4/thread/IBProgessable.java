@@ -18,7 +18,7 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * @author Charles Bentley
  *
  */
-public interface IBProgessable extends IStringable {
+public interface IBProgessable extends IStringable,ITechRunnable {
 
    /**
     * Most Generic.
