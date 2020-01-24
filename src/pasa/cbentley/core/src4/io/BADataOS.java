@@ -346,6 +346,22 @@ public class BADataOS implements DataOutput {
       }
    }
 
+   public void writeChars(char[] cs) {
+      writeInt(cs.length);
+      int len = cs.length;
+      for (int i = 0; i < len; i++) {
+         writeChar(cs[i]);
+      }
+   }
+
+   public void writeString(String s) {
+      writeInt(s.length());
+      int len = s.length();
+      for (int i = 0; i < len; i++) {
+         writeChar(s.charAt(i));
+      }
+   }
+
    /**
     * Converts the double argument to a <code>long</code> using the 
     * <code>doubleToLongBits</code> method in class <code>Double</code>, 
@@ -441,5 +457,21 @@ public class BADataOS implements DataOutput {
     */
    public final void writeUTF(String str) {
       writeUTF(str, this);
+   }
+
+   public void writeIntArrayByteLong(int[] array) {
+      int length = array.length;
+      out.write(length);
+      for (int i = 0; i < length; i++) {
+         writeInt(array[i]);
+      }
+   }
+
+   public void writeIntArrayIntLong(int[] array) {
+      int length = array.length;
+      writeInt(length);
+      for (int i = 0; i < length; i++) {
+         writeInt(array[i]);
+      }
    }
 }

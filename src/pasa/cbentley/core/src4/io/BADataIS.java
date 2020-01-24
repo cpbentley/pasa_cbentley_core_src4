@@ -147,6 +147,17 @@ public class BADataIS implements DataInput, IStringable {
    protected final UCtx uc;
 
    /**
+    * Creates a DataInputStream that uses the specified
+    * underlying InputStream.
+    * @param uc 
+    * @param  in   the specified input stream
+    */
+   public BADataIS(UCtx uc, BAByteIS in) {
+      this.uc = uc;
+      this.in = in;
+   }
+
+   /**
     * Create a {@link BAByteIS} from {@link BADataOS}
     * @param uc 
     * @param out
@@ -157,14 +168,19 @@ public class BADataIS implements DataInput, IStringable {
    }
 
    /**
-    * Creates a DataInputStream that uses the specified
-    * underlying InputStream.
-    * @param uc 
-    * @param  in   the specified input stream
+    * A reference to the array in the {@link BAByteIS}
+    * @return
     */
-   public BADataIS(UCtx uc, BAByteIS in) {
-      this.uc = uc;
-      this.in = in;
+   public byte[] getArray() {
+      return in.buf;
+   }
+
+   public int getPosition() {
+      return in.pos;
+   }
+
+   public int read() {
+      return in.read();
    }
 
    /**
@@ -242,6 +258,8 @@ public class BADataIS implements DataInput, IStringable {
       }
    }
 
+   //remove this stupid method. not part of the light embedded DataInput interface
+
    /**
     */
    public int readInt() {
@@ -258,8 +276,6 @@ public class BADataIS implements DataInput, IStringable {
       int ch3 = in.read();
       return ((ch1 << 16) + (ch2 << 8)) + (ch3 << 0);
    }
-
-   //remove this stupid method. not part of the light embedded DataInput interface
 
    public String readLine() {
       throw new RuntimeException("Not supported. This method is not supposed to be in DataInput");
@@ -293,14 +309,7 @@ public class BADataIS implements DataInput, IStringable {
       return (short) ((ch1 << 8) + (ch2 << 0));
    }
 
-   /**
-    * Read the string written by {@link BADataOS#writeChars(String)}
-    * <br>
-    * <br>
-    * 
-    * @return
-    */
-   public String readString() {
+   public char[] readChars() {
       int num = readInt();
       //before creating, check if num is not too big for our array
       if (num > in.available()) {
@@ -310,7 +319,37 @@ public class BADataIS implements DataInput, IStringable {
       for (int i = 0; i < num; i++) {
          ar[i] = readChar();
       }
+      return ar;
+   }
+
+   /**
+    * Read the string written by {@link BADataOS#writeChars(String)}
+    * <br>
+    * <br>
+    * 
+    * @return
+    */
+   public String readString() {
+      char[] ar = readChars();
       return new String(ar);
+   }
+
+   public int[] readIntArrayByteLong() {
+      int num = in.read();
+      return readArrayInt(num);
+   }
+
+   private int[] readArrayInt(int num) {
+      int[] ar = uc.getMem().createIntArray(num);
+      for (int i = 0; i < num; i++) {
+         ar[i] = readInt();
+      }
+      return ar;
+   }
+
+   public int[] readIntArrayIntLong() {
+      int num = readInt();
+      return readArrayInt(num);
    }
 
    /**
@@ -363,10 +402,6 @@ public class BADataIS implements DataInput, IStringable {
       return Dctx.toString1Line(this);
    }
 
-   private void toStringPrivate(Dctx dc) {
-
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "BADataIS");
       toStringPrivate(dc);
@@ -374,6 +409,10 @@ public class BADataIS implements DataInput, IStringable {
 
    public UCtx toStringGetUCtx() {
       return uc;
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
    }
 
    //#enddebug

@@ -18,9 +18,11 @@ public class XString implements IStringable {
 
    private char[]       chars;
 
-   private int          offset;
+   private IntBuffer    ib;
 
    private int          len;
+
+   private int          offset;
 
    protected final UCtx uc;
 
@@ -39,23 +41,39 @@ public class XString implements IStringable {
       ib = new IntBuffer(uc, 10);
    }
 
-   public void set(char[] ar, int offset, int len) {
-      this.chars = ar;
-      this.offset = offset;
-      this.len = len;
+   public char getChar(int offset) {
+      return chars[this.offset + offset];
+   }
+
+   public char[] getChars() {
+      return chars;
+   }
+
+   public int getLen() {
+      return len;
+   }
+
+   public int getOffset() {
+      return offset;
+   }
+
+   public String getString() {
+      return new String(chars, offset, len);
+   }
+
+   public String getStringAbsolute(int offset, int len) {
+      return new String(chars, offset, len);
    }
 
    /**
-    * The relative to offset
-    * @param c
-    * @return -1 if not found
-    * @see XString#indexOf(char, int)
+    * 
+    * @param offset
+    * @param len
+    * @return
     */
-   public int indexOf(char c) {
-      return indexOf(c, 0);
+   public String getStringRelative(int offset, int len) {
+      return new String(chars, this.offset + offset, len);
    }
-
-   private IntBuffer ib;
 
    /**
     * Computes the token with starting offset and length of token.
@@ -92,10 +110,6 @@ public class XString implements IStringable {
          ib.addInt(getLen() - startToken);
       }
       return ib.getIntsClonedTrimmed();
-   }
-
-   public char getChar(int offset) {
-      return chars[this.offset + offset];
    }
 
    public int[] getTokensDuplicates(char del) {
@@ -135,6 +149,20 @@ public class XString implements IStringable {
       return d;
    }
 
+   public XString getXStringRelative(int offset, int len) {
+      return new XString(uc, chars, this.offset + offset, len);
+   }
+
+   /**
+    * The relative to offset
+    * @param c
+    * @return -1 if not found
+    * @see XString#indexOf(char, int)
+    */
+   public int indexOf(char c) {
+      return indexOf(c, 0);
+   }
+
    /**
     * The relative to offset index of char c.
     * <br>
@@ -159,30 +187,14 @@ public class XString implements IStringable {
       return -1;
    }
 
-   public String getStringAbsolute(int offset, int len) {
-      return new String(chars, offset, len);
-   }
-
-   public String getString() {
-      return new String(chars, offset, len);
-   }
-
-   /**
-    * 
-    * @param offset
-    * @param len
-    * @return
-    */
-   public String getStringRelative(int offset, int len) {
-      return new String(chars, this.offset + offset, len);
-   }
-
-   public XString getXStringRelative(int offset, int len) {
-      return new XString(uc, chars, this.offset + offset, len);
-   }
-
    public void reset() {
       len = 0;
+   }
+
+   public void set(char[] ar, int offset, int len) {
+      this.chars = ar;
+      this.offset = offset;
+      this.len = len;
    }
 
    /**
@@ -218,9 +230,5 @@ public class XString implements IStringable {
       return uc;
    }
    //#enddebug
-
-   public int getLen() {
-      return len;
-   }
 
 }
