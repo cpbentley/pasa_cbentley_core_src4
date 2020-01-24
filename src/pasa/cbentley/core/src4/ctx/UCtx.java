@@ -12,6 +12,8 @@ import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.core.src4.io.BAByteIS;
 import pasa.cbentley.core.src4.io.BAByteOS;
+import pasa.cbentley.core.src4.io.BADataIS;
+import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.BaseDLogger;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -32,6 +34,7 @@ import pasa.cbentley.core.src4.utils.Geo2dUtils;
 import pasa.cbentley.core.src4.utils.IOUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.core.src4.utils.LongUtils;
+import pasa.cbentley.core.src4.utils.MathUtils;
 import pasa.cbentley.core.src4.utils.ShortUtils;
 import pasa.cbentley.core.src4.utils.StringUtils;
 import pasa.cbentley.core.src4.utils.URLUtils;
@@ -194,6 +197,15 @@ public class UCtx implements ICtx, IEventsCore {
       aInit();
    }
 
+   private MathUtils mathUtils;
+
+   public MathUtils getMathUtils() {
+      if (mathUtils == null) {
+         mathUtils = new MathUtils(this);
+      }
+      return mathUtils;
+   }
+
    /**
     * Register new {@link UCtx} with Manager
     * @param cm
@@ -254,6 +266,24 @@ public class UCtx implements ICtx, IEventsCore {
 
    public CharUtils getCU() {
       return cu;
+   }
+
+   public BADataIS createNewBADataIS(byte[] data, int offset) {
+      BAByteIS bis = new BAByteIS(this, data, offset, data.length);
+      BADataIS dis = new BADataIS(this, bis);
+      return dis;
+   }
+
+   public BADataIS createNewBADataIS(byte[] data) {
+      BAByteIS bis = new BAByteIS(this, data);
+      BADataIS dis = new BADataIS(this, bis);
+      return dis;
+   }
+
+   public BADataOS createNewBADataOS() {
+      BAByteOS bos = new BAByteOS(this);
+      BADataOS bada = new BADataOS(this, bos);
+      return bada;
    }
 
    public String getDefaultEncoding() {
@@ -356,7 +386,7 @@ public class UCtx implements ICtx, IEventsCore {
     * @return
     */
    public IUserLog getUserLog() {
-      if(userLog == null) {
+      if (userLog == null) {
          userLog = new UserLogJournal(this);
       }
       return userLog;
@@ -412,7 +442,7 @@ public class UCtx implements ICtx, IEventsCore {
     * @param userLogNew
     */
    public void setUserLog(IUserLog userLogNew) {
-      if(userLogNew != null && this.userLog != null) {
+      if (userLogNew != null && this.userLog != null) {
          userLogNew.processOld(this.userLog);
       }
       this.userLog = userLogNew;
@@ -494,7 +524,7 @@ public class UCtx implements ICtx, IEventsCore {
                case EID_FRAMEWORK_2_LANGUAGE_CHANGED:
                   return "LanguageChanged";
                default:
-                  return "UnknownEID"+eid;
+                  return "UnknownEID" + eid;
             }
          case PID_2_HOST:
             return "Host";
@@ -509,10 +539,10 @@ public class UCtx implements ICtx, IEventsCore {
                case EID_MEMORY_3_OBJECT_DESTROY:
                   return "ObjectDestroy";
                default:
-                  return "UnknownEID"+eid;
+                  return "UnknownEID" + eid;
             }
          default:
-            return "UnknownPID"+pid;
+            return "UnknownPID" + pid;
       }
    }
 

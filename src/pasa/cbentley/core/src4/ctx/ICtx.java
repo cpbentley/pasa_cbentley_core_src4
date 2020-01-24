@@ -6,7 +6,8 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
- * Implement "static" context of a module.
+ * Implement "static" code context.
+ * <br>
  * The reference can be stored in classes. It will never changes.
  * However contents of the ICtx might change and should always be accessed through a getter.
  * <br>
@@ -68,7 +69,12 @@ public interface ICtx extends IStringable {
    /**
     * Loads the module settings. The byte array is not secured.
     * <br>
-    * There might be several objects
+    * There might be several objects.
+    * 
+    * When state is set, the module must check data and update itself.
+    * 
+    * Security issue if data is malicious.
+    * 
     * @param data
     */
    public void setSettings(byte[] data);

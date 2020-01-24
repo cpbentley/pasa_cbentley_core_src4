@@ -8,13 +8,13 @@ import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 
 /**
- * Manages several {@link ICtx}.
+ * Manages several code contexts {@link ICtx}.
  * <br>
  * A {@link UCtx} always have a non null {@link CtxManager}. 
  * <br>
  * But a {@link CtxManager} may control 1,2 or more {@link UCtx}.
  * <br> 
- * A {@link CtxManager} control the save/load of a module context preference data.
+ * A {@link CtxManager} control the save/load of a code context preference data.
  * <li> {@link CtxManager}
  * 
  * Usually it will be alone, but you could imagine several CtxManager, one for each applications
@@ -30,13 +30,44 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
  */
 public class CtxManager implements IStringable {
 
-   private UCtx         uc;
-
    private IntToObjects intos;
+
+   private UCtx         uc;
 
    public CtxManager(UCtx uc) {
       this.uc = uc;
       intos = new IntToObjects(uc);
+   }
+
+   /**
+    * Called by constructor of a {@link ICtx}
+    * 
+    * @param ctx
+    * @return
+    */
+   public int registerCtx(ICtx ctx) {
+      //#debug
+      uc.toStrDebugNullCheck(ctx, uc);
+
+      if (intos.hasObject(ctx)) {
+         throw new IllegalArgumentException("Same context reference is already registered");
+      }
+      intos.add(ctx);
+      return intos.nextempty;
+   }
+
+   /**
+    * Registers a framework known StaticID slot
+    * <br>
+    * Its the key that is used to register those objects of the given type
+    * <br>
+    * Examples, key for CMDs, key for DIDs, key for Strings
+    * 
+    * @param staticID
+    */
+   public void registerStaticID(ICtx ctx, int keyID) {
+      // TODO Auto-generated method stub
+
    }
 
    /**
@@ -65,9 +96,10 @@ public class CtxManager implements IStringable {
    /**
     * We keep the.
     * What if a module is already loaded? Can we call this method?
+    * 
     * @param dis
     */
-   public void settingsRead(BADataIS dis) {
+   public void stateRead(BADataIS dis) {
       int num = dis.readInt();
       for (int i = 0; i < num; i++) {
          int val = dis.readInt();
@@ -85,14 +117,15 @@ public class CtxManager implements IStringable {
          }
       }
       //#debug
-      //kernel.getUI().dLog().ptInit("Count=" + num, this, ModuleCtrl.class, "settingsRead");
+      uc.toDLog().pInit("Count=" + num, this, CtxManager.class, "settingsRead");
    }
 
+   
    /**
-    * Write Module Settings
+    * Write state of Module Settings
     * @param dos
     */
-   public void settingsWrite(BADataOS dos) {
+   public void stateWrite(BADataOS dos) {
       //write the number
       int size = intos.nextempty;
       dos.writeInt(size);
@@ -127,24 +160,13 @@ public class CtxManager implements IStringable {
       toDLog().pInit("Count=" + size, this, CtxManager.class, "settingsWrite");
    }
 
-   public int registerCtx(ICtx ctx) {
-      //#debug
-      uc.toStrDebugNullCheck(ctx, uc);
-
-      if (intos.hasObject(ctx)) {
-         throw new IllegalArgumentException("Same context reference is already registerd");
-      }
-      intos.add(ctx);
-      return intos.nextempty;
+   public IDLog toDLog() {
+      return uc.toDLog();
    }
 
    //#mdebug
    public String toString() {
       return Dctx.toString(this);
-   }
-
-   public IDLog toDLog() {
-      return uc.toDLog();
    }
 
    public void toString(Dctx dc) {
@@ -163,19 +185,5 @@ public class CtxManager implements IStringable {
       return uc;
    }
    //#enddebug
-
-   /**
-    * Registers a framework known StaticID slot
-    * <br>
-    * Its the key that is used to register those objects of the given type
-    * <br>
-    * Examples, key for CMDs, key for DIDs, key for Strings
-    * 
-    * @param staticID
-    */
-   public void registerStaticID(ICtx ctx, int keyID) {
-      // TODO Auto-generated method stub
-      
-   }
 
 }

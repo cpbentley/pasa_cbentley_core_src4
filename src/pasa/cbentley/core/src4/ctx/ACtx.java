@@ -19,6 +19,10 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  */
 public abstract class ACtx implements ICtx {
 
+   /**
+    * Data of the context. If it exists, it was set
+    * during registering in the constructor.
+    */
    private byte[]       data;
 
    private int          id;
@@ -37,8 +41,16 @@ public abstract class ACtx implements ICtx {
     */
    public ACtx(UCtx uc) {
       this.uc = uc;
+      this.uc.getCtxManager().registerCtx(this);
    }
 
+   /**
+    * true when ctx has saved data from a previous run saved by {@link CtxManager}
+    * @return
+    */
+   public boolean hasCtxData() {
+      return data != null;
+   }
    /**
     * 
     */
@@ -57,7 +69,6 @@ public abstract class ACtx implements ICtx {
     * Context manager
     */
    public byte[] getSettings() {
-
       return data;
    }
 

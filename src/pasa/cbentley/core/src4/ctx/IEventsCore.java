@@ -3,6 +3,7 @@ package pasa.cbentley.core.src4.ctx;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.event.IEventConsumer;
 import pasa.cbentley.core.src4.event.IEventProducer;
+import pasa.cbentley.core.src4.interfaces.IEvents;
 
 /**
  * Centralizes all the events for the {@link UCtx#getEventBusRoot()}
@@ -29,13 +30,15 @@ import pasa.cbentley.core.src4.event.IEventProducer;
  * <li> Event identity is a integer ID. Originally designed for low memory environment.
  * <li> IDs are unique integers enforced by the {@link CtxManager} at runtime.
  * 
+ * Tagged by {@link IEvents}
+ * 
  * @see IEventBus
  * @see IEventConsumer
  * @see IEventProducer
  * 
  * @author Charles Bentley
  */
-public interface IEventsCore {
+public interface IEventsCore extends IEvents {
 
    /**
     * Number of statically defined events
