@@ -5,6 +5,64 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 public class MathUtils {
 
    /**
+    * Derivative Formulas: 
+    * 
+    * <li>acos(x) = atan(sqrt((1 - x * x)/(x * x)))
+    * <li>acos(x) = atan2(sqrt(1 - x * x), x)
+    * <br>
+    * acos(-1.0) = 3.1415927
+    * @param a
+    * @return
+    */
+   public static double acos(double a) {
+      return acos(a, 1.0E-7);
+   }
+
+   public static double acos(double a, double epsilon) {
+      double x = asin(a, epsilon);
+      return -1 * (x - Math.PI / 2);
+   }
+
+   public static double asin(double a) {
+      return asin(a, 1.0E-7);
+   }
+
+   public static double asin(double a, double epsilon) {
+      if (a < -1 || a > 1) {
+         return Double.NaN;
+      }
+      // -1 < a < 1
+      double x = a;
+      // Newton's iterative method
+      do {
+         x -= (Math.sin(x) - a) / Math.cos(x);
+      } while (Math.abs(Math.sin(x) - a) > epsilon);
+
+      return x;// returned angle is in radians
+   }
+
+   /**
+    * Faster but less precision
+    * @param a
+    * @return
+    */
+   public static double asin3(double a) {
+      return asin(a, 0.001);
+   }
+
+   public static double asin5(double a) {
+      return asin(a, 0.00001);
+   }
+
+   public static double asin6(double a) {
+      return asin(a, 0.000001);
+   }
+
+   public static double asin7(double a) {
+      return asin(a, 0.0000001);
+   }
+
+   /**
     * In the case x >= 0d in the posted code, think of z = y/x.
     * <br>
     * <br>
@@ -43,6 +101,37 @@ public class MathUtils {
       return y < 0d ? -angle : angle;
    }
 
+   /**
+    * https://stackoverflow.com/questions/3380628/fast-arc-cos-algorithm
+    * @param x
+    * @return
+    */
+   // Absolute error <= 6.7e-5
+   public static float acosNVidia(float x) {
+      float negate = (x < 0) ? 1f : 0f;
+      x = Math.abs(x);
+      float ret = -0.0187293f;
+      ret = ret * x;
+      ret = ret + 0.0742610f;
+      ret = ret * x;
+      ret = ret - 0.2121144f;
+      ret = ret * x;
+      ret = ret + 1.5707288f;
+      ret = ret * (float) Math.sqrt(1.0 - x);
+      ret = ret - 2 * negate * ret;
+      return negate * 3.14159265358979f + ret;
+   }
+
+   public static double acosApproxDesmos(double x) {
+      double a = 1.43 + 0.59 * x;
+      a = (a + (2 + 2 * x) / a) / 2;
+      double b = 1.65 - 1.41 * x;
+      b = (b + (2 - 2 * x) / b) / 2;
+      double c = 0.88 - 0.77 * x;
+      c = (c + (2 - a) / c) / 2;
+      return (8 * (c + (2 - a) / c) - (b + (2 - 2 * x) / b)) / 6;
+   }
+
    public static float aTanFloat(int y, int x) {
       float coeff_1 = (float) (Math.PI / 4d);
       float coeff_2 = 3f * coeff_1;
@@ -67,6 +156,53 @@ public class MathUtils {
       x = Double.longBitsToDouble(i);
       x = x * (1.5 - xhalf * x * x);
       return x;
+   }
+
+   /**
+    * Returns an array of size so that the value in the array do not exceed distance.
+    * <br>
+    * <br>
+    * Special cases:
+    * <li>When distance is <= to zero, treat distance as zero and return array with one value 0
+    * <li>When distance is smaller than the smallest fibs value, return array with one value. i.e. the distance
+    * <br>
+    * <br>
+    * Any difference left is added as a fib value in itself in the ordered array.
+    * <br>
+    * @param distance positive distance.
+    * @param fibs an array with values ordered in ascending order. when there are not enough fibs, the last value will be taken
+    * @return asc ordered integers who sum is equal to parameter distance
+    * @throws NullPointerException when fibs is null
+    */
+   public static int[] getFibIncrement(int distance, int[] fibs) {
+      int xFibMax = 0;
+      int count = 0;
+      //if distance is 0, an empty array is returned
+      while (xFibMax < distance) {
+         xFibMax += fibs[count];
+         //prevent an arrayoutofbound exception.
+         if (count + 1 < fibs.length) {
+            count++;
+         }
+      }
+      if (count == 0) {
+         return new int[] { distance };
+      }
+      //now xFibMax is equal or bigger
+      int oldFibmax = xFibMax - fibs[count - 1];
+      int diff = distance - oldFibmax;
+      if (diff != 0) {
+         count--;
+      }
+      //the count is correct
+      int[] xFib = new int[count];
+      for (int i = 0; i < count; i++) {
+         xFib[i] = fibs[i];
+      }
+      if (diff != 0) {
+         xFib = IntUtils.addOrderedIntDouble(xFib, diff);
+      }
+      return xFib;
    }
 
    public static double pow(double x, double y) {
@@ -207,52 +343,5 @@ public class MathUtils {
     */
    public int[] getFibIncrement(int distance) {
       return getFibIncrement(distance, fib);
-   }
-
-   /**
-    * Returns an array of size so that the value in the array do not exceed distance.
-    * <br>
-    * <br>
-    * Special cases:
-    * <li>When distance is <= to zero, treat distance as zero and return array with one value 0
-    * <li>When distance is smaller than the smallest fibs value, return array with one value. i.e. the distance
-    * <br>
-    * <br>
-    * Any difference left is added as a fib value in itself in the ordered array.
-    * <br>
-    * @param distance positive distance.
-    * @param fibs an array with values ordered in ascending order. when there are not enough fibs, the last value will be taken
-    * @return asc ordered integers who sum is equal to parameter distance
-    * @throws NullPointerException when fibs is null
-    */
-   public static int[] getFibIncrement(int distance, int[] fibs) {
-      int xFibMax = 0;
-      int count = 0;
-      //if distance is 0, an empty array is returned
-      while (xFibMax < distance) {
-         xFibMax += fibs[count];
-         //prevent an arrayoutofbound exception.
-         if (count + 1 < fibs.length) {
-            count++;
-         }
-      }
-      if (count == 0) {
-         return new int[] { distance };
-      }
-      //now xFibMax is equal or bigger
-      int oldFibmax = xFibMax - fibs[count - 1];
-      int diff = distance - oldFibmax;
-      if (diff != 0) {
-         count--;
-      }
-      //the count is correct
-      int[] xFib = new int[count];
-      for (int i = 0; i < count; i++) {
-         xFib[i] = fibs[i];
-      }
-      if (diff != 0) {
-         xFib = IntUtils.addOrderedIntDouble(xFib, diff);
-      }
-      return xFib;
    }
 }
