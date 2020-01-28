@@ -18,6 +18,16 @@ import pasa.cbentley.core.src4.structs.IntToStrings;
 
 public class IOUtils implements IStringable {
 
+   private final int   BOM_SIZE  = 4;
+
+   private IKernelHost kernelHost;
+
+   /**
+    * Field must be initialized for reading {@link InputStream} with the method {@link Class#getResourceAsStream(String)}
+    * TODO: remove this.
+    */
+   public Class        REFERENCE = null;
+
    private UCtx uc;
 
    public IOUtils(UCtx uc) {
@@ -42,19 +52,163 @@ public class IOUtils implements IStringable {
       return bos;
    }
 
-   public byte[] streamToByte(InputStream is) throws IOException {
-      return convert(is).toByteArray();
+   public void finalClose(InputStream os) {
+      if (os != null) {
+         try {
+            os.close();
+         } catch (Exception e) {
+            //#debug
+            e.printStackTrace();
+         }
+      }
    }
 
-   private final int   BOM_SIZE  = 4;
+   public void finalClose(OutputStream os) {
+      if (os != null) {
+         try {
+            os.close();
+         } catch (Exception e) {
+            //#debug
+            e.printStackTrace();
+         }
+      }
+   }
+
+   public String fixFileName(String file) {
+      if (file.charAt(0) != '/') {
+         return "/" + file;
+      }
+      return file;
+   }
+
+   private Class getClass(Object o) {
+      if (REFERENCE != null)
+         return REFERENCE;
+      else {
+         if (o == null) {
+            throw new NullPointerException();
+         } else {
+            if (o instanceof Class) {
+               return (Class) o;
+            }
+            return o.getClass();
+         }
+      }
+
+   }
+
+   public IKernelHost getKernelHost() {
+      return kernelHost;
+   }
 
    /**
-    * Field must be initialized for reading {@link InputStream} with the method {@link Class#getResourceAsStream(String)}
-    * TODO: remove this.
+    * handle the lack of / automatically
+    * @param o
+    * @param fileName
+    * @return
     */
-   public Class        REFERENCE = null;
+   public InputStream getStream(Object o, String fileName) {
+      Class c = getClass(o);
+      InputStream is = null;
+      if (kernelHost == null) {
+         is = c.getResourceAsStream(fileName);
+      } else {
+         try {
+            is = kernelHost.getResourceAsStream(fileName);
+         } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+         }
+      }
+      return is;
+   }
 
-   private IKernelHost kernelHost;
+   public byte[] readBytes(InputStream is) throws IOException {
+      int bufferStart = 512;
+      // Create the byte array to hold the data
+      byte[] bytes = new byte[bufferStart];
+      // Read in the bytes
+      int offset = 0;
+      int numRead = 0;
+      while ((numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+         offset += numRead;
+         if (offset >= bytes.length)
+            bytes = uc.getMem().increaseCapacity(bytes, bytes.length + bufferStart);
+         //System.out.println(MemPrint.snapShot("offset"));
+      }
+      //System.out.println(MemPrint.snapShot("before close"));
+
+      is.close();
+      //System.out.println(MemPrint.snapShot("close "));
+
+      byte[] data = new byte[offset];
+      System.arraycopy(bytes, 0, data, 0, data.length);
+      return data;
+   }
+
+   /**
+    * 
+    * @param ui can be null but then REFERENCE must be set
+    * @param fileName
+    * @return
+    */
+   public byte[] readBytes(String fileName) {
+      fileName = fixFileName(fileName);
+      InputStream is = getStream(uc, fileName);
+      try {
+         if (is == null) {
+            return new byte[0];
+         }
+         return readBytes(is);
+      } catch (IOException e) {
+         //#debug
+         e.printStackTrace();
+         //#debug
+         toDLog().pTest("msg", this, IOUtils.class, "readBytes", LVL_05_FINE, true);
+         return null;
+      }
+   }
+
+   public void readFile(IFileCallBack cb, InputStream is, String encod) {
+      try {
+         if (is == null) {
+            //#debug
+            toDLog().pNull("InputStream is null", this, IOUtils.class, "readFile", LVL_05_FINE, true);
+            return;
+         }
+         InputStreamReader isr = new InputStreamReader(is, encod);
+         //TODO parametrize
+         int bufferSize = 512;
+         char[] ar = new char[bufferSize];
+         char[] line = new char[50];
+         int offset = 0;
+         int length = 0;
+         //fill the buffer
+         while (cb.isFileContinue() && (length = isr.read(ar)) != -1) {
+            for (int i = 0; i < length; i++) {
+               if (ar[i] == '\n' || ar[i] == '\r') {
+                  if (offset != 0) {
+                     cb.lineCallBack(line, 0, offset);
+                     offset = 0;
+                  }
+               } else {
+                  line[offset] = ar[i];
+                  offset++;
+                  if (offset >= line.length) {
+                     line = uc.getMem().increaseCapacity(line, line.length);
+                  }
+               }
+            }
+         }
+      } catch (UnsupportedEncodingException e) {
+         //#debug
+         e.printStackTrace();
+      } catch (IOException e) {
+         //#debug
+         e.printStackTrace();
+      }
+
+   }
 
    /**
     * Performant file reading with a call back each time a line is found
@@ -108,61 +262,26 @@ public class IOUtils implements IStringable {
 
    }
 
-   public void readFile(IFileCallBack cb, InputStream is, String encod) {
-      try {
-         if (is == null) {
-            //#debug
-            toDLog().pNull("InputStream is null", this, IOUtils.class, "readFile", LVL_05_FINE, true);
-            return;
-         }
-         InputStreamReader isr = new InputStreamReader(is, encod);
-         //TODO parametrize
-         int bufferSize = 512;
-         char[] ar = new char[bufferSize];
-         char[] line = new char[50];
-         int offset = 0;
-         int length = 0;
-         //fill the buffer
-         while (cb.isFileContinue() && (length = isr.read(ar)) != -1) {
-            for (int i = 0; i < length; i++) {
-               if (ar[i] == '\n' || ar[i] == '\r') {
-                  if (offset != 0) {
-                     cb.lineCallBack(line, 0, offset);
-                     offset = 0;
-                  }
-               } else {
-                  line[offset] = ar[i];
-                  offset++;
-                  if (offset >= line.length) {
-                     line = uc.getMem().increaseCapacity(line, line.length);
-                  }
-               }
-            }
-         }
-      } catch (UnsupportedEncodingException e) {
+   /**
+    * Depending on the platform.. the fileName must have a / in front of its name
+    * @param ui
+    * @param cb
+    * @param fileName
+    * @param encod
+    */
+   public void readFile(IFileCallBack cb, String fileName, String encod) {
+      //         if (fileName.charAt(0) != '/') {
+      //            fileName = "/" + fileName;
+      //         }
+      Class c = getClass(cb);
+      InputStream is = c.getResourceAsStream(fileName);
+      if (is == null) {
+         String msg = "Could not open file for reading " + fileName + " Encod:" + encod + "Check leading /";
          //#debug
-         e.printStackTrace();
-      } catch (IOException e) {
-         //#debug
-         e.printStackTrace();
+         toDLog().pNull(msg, this, IOUtils.class, "readFile", LVL_05_FINE, false);
+
       }
-
-   }
-
-   public IntToStrings readFileIts(String fileName, String encod, int maxLineLength, int initSize) {
-      final IntToStrings its = new IntToStrings(uc, initSize);
-      IFileCallBack cb = new IFileCallBack() {
-
-         public void lineCallBack(char[] b, int offset, int length) {
-            its.add(new String(b, offset, length));
-         }
-
-         public boolean isFileContinue() {
-            return true;
-         }
-      };
-      readFile(cb, fileName, encod);
-      return its;
+      readFile(cb, is, encod);
    }
 
    /**
@@ -185,66 +304,6 @@ public class IOUtils implements IStringable {
          toDLog().pNull("InputStream is null", this, IOUtils.class, "readFile", LVL_05_FINE, true);
       }
       readFile(cb, is, encod, maxLineLength);
-   }
-
-   /**
-    * Depending on the platform.. the fileName must have a / in front of its name
-    * @param ui
-    * @param cb
-    * @param fileName
-    * @param encod
-    */
-   public void readFile(IFileCallBack cb, String fileName, String encod) {
-      //         if (fileName.charAt(0) != '/') {
-      //            fileName = "/" + fileName;
-      //         }
-      Class c = getClass(cb);
-      InputStream is = c.getResourceAsStream(fileName);
-      if (is == null) {
-         String msg = "Could not open file for reading " + fileName + " Encod:" + encod + "Check leading /";
-         //#debug
-         toDLog().pNull(msg, this, IOUtils.class, "readFile", LVL_05_FINE, false);
-    
-      }
-      readFile(cb, is, encod);
-   }
-
-   private Class getClass(Object o) {
-      if (REFERENCE != null)
-         return REFERENCE;
-      else {
-         if (o == null) {
-            throw new NullPointerException();
-         } else {
-            if (o instanceof Class) {
-               return (Class) o;
-            }
-            return o.getClass();
-         }
-      }
-
-   }
-
-   /**
-    * handle the lack of / automatically
-    * @param o
-    * @param fileName
-    * @return
-    */
-   public InputStream getStream(Object o, String fileName) {
-      Class c = getClass(o);
-      InputStream is = null;
-      if (kernelHost == null) {
-         is = c.getResourceAsStream(fileName);
-      } else {
-         try {
-            is = kernelHost.getResourceAsStream(fileName);
-         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-         }
-      }
-      return is;
    }
 
    /**
@@ -283,78 +342,6 @@ public class IOUtils implements IStringable {
       return sb;
    }
 
-   public int readSetBytes(String fileName, byte[] bytes, int offset) {
-      StringBBuilder sb = new StringBBuilder(uc);
-      try {
-         InputStream is = getStream(uc, fileName);
-         int numRead = 0;
-         int total = 0;
-         while ((numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-            offset += numRead;
-            total += numRead;
-         }
-         return total;
-      } catch (IOException e) {
-         sb.append(e.getMessage());
-         //#debug
-         e.printStackTrace();
-         return 0;
-      }
-   }
-
-   public String fixFileName(String file) {
-      if (file.charAt(0) != '/') {
-         return "/" + file;
-      }
-      return file;
-   }
-
-   /**
-    * 
-    * @param ui can be null but then REFERENCE must be set
-    * @param fileName
-    * @return
-    */
-   public byte[] readBytes(String fileName) {
-      fileName = fixFileName(fileName);
-      InputStream is = getStream(uc, fileName);
-      try {
-         if (is == null) {
-            return new byte[0];
-         }
-         return readBytes(is);
-      } catch (IOException e) {
-         //#debug
-         e.printStackTrace();
-         //#debug
-         toDLog().pTest("msg", this, IOUtils.class, "readBytes", LVL_05_FINE, true);
-         return null;
-      }
-   }
-
-   public byte[] readBytes(InputStream is) throws IOException {
-      int bufferStart = 512;
-      // Create the byte array to hold the data
-      byte[] bytes = new byte[bufferStart];
-      // Read in the bytes
-      int offset = 0;
-      int numRead = 0;
-      while ((numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-         offset += numRead;
-         if (offset >= bytes.length)
-            bytes = uc.getMem().increaseCapacity(bytes, bytes.length + bufferStart);
-         //System.out.println(MemPrint.snapShot("offset"));
-      }
-      //System.out.println(MemPrint.snapShot("before close"));
-
-      is.close();
-      //System.out.println(MemPrint.snapShot("close "));
-
-      byte[] data = new byte[offset];
-      System.arraycopy(bytes, 0, data, 0, data.length);
-      return data;
-   }
-
    /**
     * Read the file
     * <br>
@@ -391,26 +378,56 @@ public class IOUtils implements IStringable {
       return sb.toString();
    }
 
-   public void finalClose(InputStream os) {
-      if (os != null) {
-         try {
-            os.close();
-         } catch (Exception e) {
-            //#debug
-            e.printStackTrace();
+   public IntToStrings readFileIts(String fileName, String encod, int maxLineLength, int initSize) {
+      final IntToStrings its = new IntToStrings(uc, initSize);
+      IFileCallBack cb = new IFileCallBack() {
+
+         public boolean isFileContinue() {
+            return true;
          }
+
+         public void lineCallBack(char[] b, int offset, int length) {
+            its.add(new String(b, offset, length));
+         }
+      };
+      readFile(cb, fileName, encod);
+      return its;
+   }
+
+   public int readSetBytes(String fileName, byte[] bytes, int offset) {
+      StringBBuilder sb = new StringBBuilder(uc);
+      try {
+         InputStream is = getStream(uc, fileName);
+         int numRead = 0;
+         int total = 0;
+         while ((numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+            offset += numRead;
+            total += numRead;
+         }
+         return total;
+      } catch (IOException e) {
+         sb.append(e.getMessage());
+         //#debug
+         e.printStackTrace();
+         return 0;
       }
    }
 
-   public void finalClose(OutputStream os) {
-      if (os != null) {
-         try {
-            os.close();
-         } catch (Exception e) {
-            //#debug
-            e.printStackTrace();
-         }
-      }
+   /**
+    * Sets the {@link IKernelHost}
+    * 
+    * {@link IOUtils} can work without one.
+    * 
+    * But some platform will implement {@link IKernelHost#getResourceAsStream(String)}
+    * more efficiently
+    * @param kernelHost
+    */
+   public void setKernelHost(IKernelHost kernelHost) {
+      this.kernelHost = kernelHost;
+   }
+
+   public byte[] streamToByte(InputStream is) throws IOException {
+      return convert(is).toByteArray();
    }
 
    //#mdebug
@@ -431,10 +448,6 @@ public class IOUtils implements IStringable {
       return Dctx.toString1Line(this);
    }
 
-   private void toStringPrivate(Dctx dc) {
-
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "IOUtils");
       toStringPrivate(dc);
@@ -444,14 +457,9 @@ public class IOUtils implements IStringable {
       return uc;
    }
 
-   public IKernelHost getKernelHost() {
-      return kernelHost;
-   }
+   private void toStringPrivate(Dctx dc) {
 
-   public void setKernelHost(IKernelHost kernelHost) {
-      this.kernelHost = kernelHost;
    }
-
    //#enddebug
 
 }
