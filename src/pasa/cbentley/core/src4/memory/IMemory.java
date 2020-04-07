@@ -169,7 +169,7 @@ public interface IMemory extends IStringable {
     * @param free
     */
    public void addMemFreeable(IMemFreeable free);
-   
+
    /**
     * Remove an {@link IMemFreeable} that was added with {@link IMemory#addMemFreeable(IMemFreeable)}
     * @param free
@@ -257,7 +257,7 @@ public interface IMemory extends IStringable {
     * @return
     */
    public int[][] ensureCapacity(int[][] ar, int size, int grow);
-   
+
    /**
     * new entries are created with a size of startSize
     * @param ar
@@ -281,6 +281,20 @@ public interface IMemory extends IStringable {
     * @return
     */
    public Object[] ensureCapacity(Object[] ar, int size, int grow);
+
+   /**
+    * Ensures that <code>size</code>  does not throw an {@link ArrayIndexOutOfBoundsException}.
+    * 
+    * Grow array so size + grow is total length
+    * 
+    * If array is null. returns a array of size (size+grow)
+    * 
+    * @param ar
+    * @param size
+    * @param grow
+    * @return
+    */
+   public byte[][] ensureCapacity(byte[][] ar, int size, int grow);
 
    /**
     * Increase the capacity of the int array, creating the gap at position
