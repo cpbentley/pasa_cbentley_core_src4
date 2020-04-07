@@ -12,16 +12,16 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
  */
 public class MemorySimpleCreator implements IMemory {
 
-   private UCtx uc;
+   private UCtx         uc;
 
    private IntToObjects freeables;
-   
+
    public MemorySimpleCreator(UCtx uc) {
       this.uc = uc;
    }
 
    public void addMemFreeable(IMemFreeable free) {
-      if(freeables == null) {
+      if (freeables == null) {
          freeables = new IntToObjects(uc);
       }
       freeables.add(free);
@@ -35,7 +35,7 @@ public class MemorySimpleCreator implements IMemory {
       System.arraycopy(data, 0, ndata, 0, data.length);
       return ndata;
    }
-   
+
    public char[] clone(char[] ar) {
       if (ar == null) {
          return null;
@@ -62,7 +62,7 @@ public class MemorySimpleCreator implements IMemory {
       System.arraycopy(ar, 0, clone, 0, ar.length);
       return clone;
    }
-   
+
    public Object[] clone(Object[] ar) {
       if (ar == null) {
          return null;
@@ -149,7 +149,7 @@ public class MemorySimpleCreator implements IMemory {
       System.arraycopy(oldData, 0, ar, 0, oldData.length);
       return ar;
    }
-   
+
    public int[][] ensureCapacity(int[][] ar, int size, int grow, int startSize) {
       if (ar == null) {
          return new int[size + grow][startSize];
@@ -165,8 +165,23 @@ public class MemorySimpleCreator implements IMemory {
       System.arraycopy(oldData, 0, ar, 0, oldData.length);
       return ar;
    }
-   
-   
+
+   public byte[][] ensureCapacity(byte[][] ar, int size, int grow, int startSize) {
+      if (ar == null) {
+         return new byte[size + grow][startSize];
+      }
+      if (size + grow < ar.length)
+         return ar;
+
+      //#debug
+      toDLog().pMemory("ints.length=" + ar.length + " size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
+
+      byte[][] oldData = ar;
+      ar = new byte[size + grow][startSize];
+      System.arraycopy(oldData, 0, ar, 0, oldData.length);
+      return ar;
+   }
+
    /**
     * 
     * @param ar
@@ -322,7 +337,7 @@ public class MemorySimpleCreator implements IMemory {
       System.arraycopy(oldData, 0, array, 0, oldData.length);
       return array;
    }
-   
+
    public int[][] increaseCapacity(int[][] ar, int addition, int position) {
       throw new RuntimeException();
    }
@@ -411,7 +426,6 @@ public class MemorySimpleCreator implements IMemory {
       System.gc();
    }
 
-   
    //#mdebug
    public IDLog toDLog() {
       return uc.toDLog();
@@ -442,5 +456,4 @@ public class MemorySimpleCreator implements IMemory {
       freeables.removeRef(free);
    }
 
- 
 }

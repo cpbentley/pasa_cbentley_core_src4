@@ -292,9 +292,10 @@ public interface IMemory extends IStringable {
     * @param ar
     * @param size
     * @param grow
+    * @param startSize size of new arrays
     * @return
     */
-   public byte[][] ensureCapacity(byte[][] ar, int size, int grow);
+   public byte[][] ensureCapacity(byte[][] ar, int size, int grow, int startSize);
 
    /**
     * Increase the capacity of the int array, creating the gap at position
