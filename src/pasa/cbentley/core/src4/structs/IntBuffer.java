@@ -43,6 +43,11 @@ public class IntBuffer implements IStringable {
       this(uc, 1, 1);
    }
 
+   /**
+    * 
+    * @param uc
+    * @param num
+    */
    public IntBuffer(UCtx uc, int num) {
       this(uc, num, 3);
    }
@@ -53,18 +58,30 @@ public class IntBuffer implements IStringable {
     * @param increment few adds take a small increment., lots take a big increment
     */
    public IntBuffer(UCtx uc, int startSize, int increment) {
-      setInts(new int[startSize]);
-      this.increment = increment;
-      this.uc = uc;
+      this(uc, new int[startSize + 1], increment);
    }
 
    /**
-    * Uses the reference!
+    * Uses the reference unless null or 0 size!
     * @param ar
     */
    public IntBuffer(UCtx uc, int[] ar) {
-      setInts(ar);
+      this(uc, ar, 3);
+   }
+
+   /**
+    * 
+    * @param uc
+    * @param ar Uses the reference unless null or 0 size!
+    * @param increment
+    */
+   public IntBuffer(UCtx uc, int[] ar, int increment) {
       this.uc = uc;
+      this.increment = increment;
+      if (ar == null || ar.length == 0) {
+         ar = new int[1];
+      }
+      setInts(ar);
    }
 
    /**
