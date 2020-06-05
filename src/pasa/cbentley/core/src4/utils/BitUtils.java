@@ -534,6 +534,38 @@ public class BitUtils {
       return (val & mask) == mask;
    }
 
+   public static boolean isEven(int val) {
+      return (val & 1) == 0;
+   }
+
+   public static boolean isOdd(int val) {
+      return (val & 1) != 0;
+   }
+
+   /**
+    * Burn the value in the first bits of data
+    * @param data
+    * @param value
+    * @return
+    */
+   public static int setByte1(int data, int value) {
+      int shifted = ((value & 0xFF) << 24);
+      int datan = (data & 0x00FFFFFF);
+      return shifted + datan;
+   }
+
+   public static int setByte2(int data, int value) {
+      return ((value & 0xFF) << 16) + (data & 0xFF00FFFF);
+   }
+
+   public static int setByte3(int data, int value) {
+      return ((value & 0xFF) << 8) + (data & 0xFFFF00FF);
+   }
+
+   public static int setByte4(int data, int value) {
+      return ((value & 0xFF) << 0) + (data & 0xFFFFFF00);
+   }
+
    public static int readBit(byte[] b, BitCoordinate c) {
       c.incrementOne();
       return c.getBit(b);
@@ -778,6 +810,25 @@ public class BitUtils {
       int end = Math.min(shiftsize + firstbyte, data.length);
       for (int i = firstbyte; i < end; i++) {
          data[i] = 0;
+      }
+   }
+
+   /** 
+    * Rotates array so that ith value goes to i+value.
+    */
+   public void rotateArray(byte[] array, int value) {
+      int j = value;
+      int i = value;
+      int num = array.length;
+      while (i != 0) {
+         int m = j;
+         j = (j + value) % num;
+         byte b = array[m];
+         array[m] = array[j];
+         array[j] = b;
+         if (j == i) {
+            j = --i;
+         }
       }
    }
 

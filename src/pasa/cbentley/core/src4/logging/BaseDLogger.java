@@ -188,6 +188,10 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_NULL, ITechTags.FLAG_25_PRINT_NULL, lvl, oneLine);
    }
 
+   public void pNull(String msg, IStringable str, Class c, String method) {
+      pNull(msg, str, c, method, getLevelDefault(), false);
+   }
+
    public void pSound(String msg, IStringable str, Class c, String method) {
       pSound(msg, str, c, method, getLevelDefault(), false);
    }
@@ -235,6 +239,24 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    public void pWork(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_WORK, ITechTags.FLAG_06_PRINT_WORK, lvl, oneLine);
    }
+
+   public void toString(Dctx dc) {
+      dc.root(this, BaseDLogger.class, "@line5");
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, BaseDLogger.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   
 
    //#enddebug
 

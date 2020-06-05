@@ -13,6 +13,10 @@ package pasa.cbentley.core.src4.interfaces;
  */
 public interface C extends ITech {
 
+   public static final int LINE_0_HORIZONTAL       = 0;
+
+   public static final int LINE_1_VERTICAL         = 1;
+
    public static final int ANGLE_LEFT_180          = 180;
 
    /**

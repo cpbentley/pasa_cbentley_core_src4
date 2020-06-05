@@ -6,11 +6,14 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
+ * Base implementation of the {@link IStringProducer} contract.
+ * 
+ * Implementating code contexts 
  * 
  * @author Charles Bentley
  *
  */
-public abstract class StringProdBase implements IStringProducer, IStringable {
+public abstract class StringProducerAbstract implements IStringProducer, IStringable {
 
    protected LocaleID[] lids;
 
@@ -23,7 +26,7 @@ public abstract class StringProdBase implements IStringProducer, IStringable {
     * @param uc
     * @param ar
     */
-   public StringProdBase(UCtx uc, LocaleID[] ar) {
+   public StringProducerAbstract(UCtx uc, LocaleID[] ar) {
       this.uc = uc;
       lids = ar;
       setLocalID(ar[0]);
@@ -53,6 +56,10 @@ public abstract class StringProdBase implements IStringProducer, IStringable {
       return null;
    }
 
+   public UCtx getUCtx() {
+      return uc;
+   }
+
    /**
     * Called upon start of Appli or when Language is changed.
     * <br>
@@ -72,7 +79,7 @@ public abstract class StringProdBase implements IStringProducer, IStringable {
    public UCtx toStringGetUCtx() {
       return uc;
    }
-   
+
    public IDLog toDLog() {
       return uc.toDLog();
    }
@@ -84,7 +91,7 @@ public abstract class StringProdBase implements IStringProducer, IStringable {
    public void toString(Dctx dc) {
       dc.root(this, "StringProdBase");
       dc.nlLvl("CurrentLocale", current);
-      dc.nlLvlArray1Line("Locales", lids);
+      dc.nlLvlArray1Line(lids, "Locales");
    }
 
    public void toString1Line(Dctx dc) {

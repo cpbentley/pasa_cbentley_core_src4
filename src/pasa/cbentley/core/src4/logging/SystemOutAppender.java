@@ -59,8 +59,22 @@ public class SystemOutAppender extends BaseAppender {
             cname = cname.substring(cname.lastIndexOf('.') + 1, cname.length());
          }
       }
+      String method = entry.getMethod();
+      int indexLine = -1;
+      if((indexLine = method.indexOf("@line")) != -1) {
+        String methodStr = method.substring(0, indexLine);
+        String lineNumber = method.substring(indexLine + "@line".length(), method.length());
+        sb.append(" ");
+        sb.append("(");
+        sb.append(cname);
+        sb.append(".java:");
+        sb.append(lineNumber);
+        sb.append(")#");
+        sb.append(methodStr);
+      } else {
       String mstr = cname + "#" + entry.getMethod();
       sb.append(mstr);
+      }
       sb.append(" ");
 
       boolean hasMessage = false;
@@ -85,6 +99,7 @@ public class SystemOutAppender extends BaseAppender {
             String objnl = "\n\t"; //the newline tab for the DCtx of the Stringable
             Dctx dc = new Dctx(uc, objnl);
             stringable.toString(dc);
+            dc.toStringCtx();
             String str = dc.toString();
             if (str != null && !str.equals("")) {
                sb.append(objnl);

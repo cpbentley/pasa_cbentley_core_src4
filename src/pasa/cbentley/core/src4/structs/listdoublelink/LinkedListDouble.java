@@ -2,6 +2,7 @@ package pasa.cbentley.core.src4.structs.listdoublelink;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -215,20 +216,33 @@ public class LinkedListDouble implements IStringable {
    }
 
    //#mdebug
+   public IDLog toDLog() {
+      return toStringGetUCtx().toDLog();
+   }
+
    public String toString() {
       return Dctx.toString(this);
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "LinkedListDouble");
-      dc.appendVarWithSpace("Size", size);
-      //dc.nlLvl(head, "Head");
-      //dc.nlLvl(tail, "Tail");
+      dc.root(this, LinkedListDouble.class, "@line229");
+      toStringPrivate(dc);
+
       ListElement le = getHead();
       int count = 0;
       while (le != null) {
          dc.nl();
-         dc.append("Element#" + (count + 1) + " " + le.toString1Line());
+         dc.append("Element#");
+         dc.append((count + 1));
+         dc.append(" ");
+         if (le == head) {
+            dc.append("Head");
+         }
+         if (le == tail) {
+            dc.append("Tail");
+         }
+         dc.append(" ");
+         dc.append(le.toString1Line());
          count++;
          le = le.getNext();
       }
@@ -238,12 +252,19 @@ public class LinkedListDouble implements IStringable {
       return Dctx.toString1Line(this);
    }
 
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("Size", size);
+   }
+
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "LinkedListDouble");
+      dc.root1Line(this, LinkedListDouble.class);
+      toStringPrivate(dc);
    }
 
    public UCtx toStringGetUCtx() {
       return uc;
    }
+
    //#enddebug
+
 }

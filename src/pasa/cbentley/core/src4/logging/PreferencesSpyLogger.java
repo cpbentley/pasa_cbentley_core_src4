@@ -4,6 +4,7 @@ import java.io.OutputStream;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.IPrefs;
+import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 
 /**
@@ -16,7 +17,7 @@ import pasa.cbentley.core.src4.structs.IntToStrings;
  */
 public class PreferencesSpyLogger implements IPrefs {
 
-   private IPrefs                 prefs;
+   private IPrefs       prefs;
 
    protected final UCtx uc;
 
@@ -31,7 +32,7 @@ public class PreferencesSpyLogger implements IPrefs {
    public void clear() {
       //#debug
       toDLog().pFlow("", this, PreferencesSpyLogger.class, "clear", LVL_05_FINE, true);
-   
+
       prefs.clear();
    }
 
@@ -78,6 +79,12 @@ public class PreferencesSpyLogger implements IPrefs {
       //#debug
       toDLog().pFlow("returns " + uc.getStrU().getString(values, separator) + " for key=" + key + " separator=" + separator, this, PreferencesSpyLogger.class, "get", ITechLvl.LVL_04_FINER, true);
       return values;
+   }
+
+   public void importPrefs(BADataIS dis) {
+      //#debug
+      toDLog().pFlow("", this, PreferencesSpyLogger.class, "importPrefs", LVL_05_FINE, true);
+      prefs.importPrefs(dis);
    }
 
    public void put(String key, String value) {

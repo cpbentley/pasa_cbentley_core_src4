@@ -57,10 +57,11 @@ public class DLogEntry implements ITechLvl {
     */
    private long        count;
 
-   
    private int         lvl;
 
    private int         flagsDev;
+
+   private Class       classStringable;
 
    public DLogEntry() {
       lvl = LVL_05_FINE;
@@ -88,8 +89,20 @@ public class DLogEntry implements ITechLvl {
       return new LogEntryType();
    }
 
+   /**
+    * 
+    * @return
+    */
    public Class getClassL() {
       return classL;
+   }
+
+   public Class getClassStringable() {
+      return classStringable;
+   }
+
+   public void setClassStringable(Class c) {
+      this.classStringable = c;
    }
 
    public void setClassL(Class c) {
@@ -144,7 +157,6 @@ public class DLogEntry implements ITechLvl {
       this.stringable = stringable;
    }
 
-
    public String getString1Line() {
       if (string1Line == null) {
          if (stringable == null) {
@@ -166,8 +178,6 @@ public class DLogEntry implements ITechLvl {
       }
       return stringFull;
    }
-
-
 
    /**
     * Converts all objects to String. derefence objects linked to application

@@ -18,10 +18,8 @@ public class LogJournal extends LogAdapter implements IDLog, ITechTags {
    //#mdebug
    private IntToObjects ito;
 
-   private UCtx         uc;
-
    public LogJournal(UCtx uc) {
-      this.uc = uc;
+      super(uc);
       ito = new IntToObjects(uc);
    }
 

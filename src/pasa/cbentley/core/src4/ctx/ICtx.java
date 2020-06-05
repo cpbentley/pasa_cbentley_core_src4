@@ -1,6 +1,5 @@
 package pasa.cbentley.core.src4.ctx;
 
-
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
@@ -36,6 +35,7 @@ public interface ICtx extends IStringable {
     * <br>
     * a Module ctx.
     * <br>
+    * A Statically defined ID on a concrete class of {@link ICtx}
     * what about sub classing? isA relationship.. subclass must keep the same ID
     * @return 0 is not ID defined
     */
@@ -48,15 +48,27 @@ public interface ICtx extends IStringable {
    public int getRegistrationID();
 
    /**
-    * Returns a snapshot of the current state/settings/data used by the Module classes.
+    * Returns a snapshot of the current state/settings/data used by the {@link ICtx} classes.
     * <br>
-    * Method is used by the {@link IStaticObjCtrl} to write module state to disk.
+    * Method is used by the {@link CtxManager} to write module state to disk.
     * <br>
     * The module must have a chain of hooks to all class that need to save state or settings.
     * <br>
     * @return a byte array of a {@link ByteOrder}
     */
    public byte[] getSettings();
+
+   /**
+    * Children context in a array
+    * @return null if {@link UCtx} top context
+    */
+   public ICtx[] getCtxSub();
+
+   /**
+    * Returns the configuration of the code context
+    * @return
+    */
+   public IConfig getConfig();
 
    /**
     * 
@@ -104,8 +116,13 @@ public interface ICtx extends IStringable {
 
    public boolean toStringHasToStringFlag(int flag);
 
+   public int toStringGetToStringFlags();
+
    public String toStringProducerID(int pid);
 
    public void toStringSetToStringFlag(int flag, boolean v);
    //#enddebug
+
+
+
 }

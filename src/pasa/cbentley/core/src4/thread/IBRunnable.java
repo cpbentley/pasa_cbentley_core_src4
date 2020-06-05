@@ -43,11 +43,15 @@ public interface IBRunnable extends Runnable, IStringable, ITechRunnable {
    public void requestNewState(int state);
 
    /**
-    * 
-    * @param lis
+    * Adds the listener
+    * @param lis {@link IBRunnableListener}
     */
    public void addListener(IBRunnableListener lis);
 
+   /**
+    * Removes the listener if added
+    * @param lis
+    */
    public void removeListener(IBRunnableListener lis);
 
    /**

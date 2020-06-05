@@ -922,7 +922,7 @@ public class IntUtils implements IStringable {
    }
 
    public static void writeIntsByteLong(byte[] data, int offset, int[] cs, int coffset, int clen) {
-      data[offset] = (byte)clen;
+      data[offset] = (byte) clen;
       int index = offset + 1;
       for (int i = 0; i < clen; i++) {
          int integer = cs[coffset + i];
@@ -1427,7 +1427,7 @@ public class IntUtils implements IStringable {
     * @param offset
     * @param len
     */
-   public void sortBasicAscending(int[] array, int offset, int len) {
+   public static void sortBasicAscending(int[] array, int offset, int len) {
       int f = offset + len;
       boolean asc = true;
       int val = 0;
@@ -1545,8 +1545,12 @@ public class IntUtils implements IStringable {
    }
 
    public String toStringIntArray(int[] ar) {
+      return toStringIntArray(ar, ",");
+   }
+
+   public String toStringIntArray(int[] ar, String sep) {
       Dctx dc = new Dctx(uc);
-      toStringIntArray(dc, ar, ",");
+      toStringIntArray(dc, ar, sep);
       return dc.toString();
    }
 

@@ -2,6 +2,7 @@ package pasa.cbentley.core.src4.interfaces;
 
 import java.io.OutputStream;
 
+import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 
@@ -20,6 +21,8 @@ public interface IPrefs extends IStringable {
     * @return
     */
    public void put(String key, String[] strs, char separator);
+
+   public void importPrefs(BADataIS dis);
 
    /**
     * Empty array if no data, if no separator, it will return a array with one String

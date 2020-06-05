@@ -121,6 +121,10 @@ public abstract class RootDLogger implements IDLog {
          entry.setCount(count);
          entry.setMethod(method);
          entry.setClassL(c);
+         
+         if (stringable != null) {
+            entry.setClassStringable(stringable.getClass());
+         }
          entry.setMsg(msg);
          entry.setTagString(tagString);
          entry.setTagID(tagID);
@@ -129,6 +133,36 @@ public abstract class RootDLogger implements IDLog {
          entry.setLevel(lvl);
          appenders[i].processLogEntry(entry);
       }
+   }
+
+   public IDLog toDLog() {
+      return toStringGetUCtx().toDLog();
+   }
+
+   public String toString() {
+      return Dctx.toString(this);
+   }
+
+   public void toString(Dctx dc) {
+      dc.root(this, RootDLogger.class, "@line5");
+      toStringPrivate(dc);
+   }
+
+   public String toString1Line() {
+      return Dctx.toString1Line(this);
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, RootDLogger.class);
+      toStringPrivate(dc);
+   }
+
+   public UCtx toStringGetUCtx() {
+      return uc;
    }
 
    //#enddebug

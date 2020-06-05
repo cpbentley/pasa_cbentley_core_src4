@@ -124,7 +124,7 @@ public class CircularObjects implements IStringable {
       dc.root(this, "CircularObjects");
       dc.appendVarWithSpace("nextFreePosition", nextFreePosition);
       dc.appendVarWithSpace("nonNulls", nonNulls);
-      dc.nlLvlArray1Line("", ar, 0, ar.length);
+      dc.nlLvlArray1Line(ar, 0, ar.length, "");
    }
 
    public UCtx toStringGetUCtx() {

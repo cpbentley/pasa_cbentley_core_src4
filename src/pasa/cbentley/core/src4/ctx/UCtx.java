@@ -1,5 +1,6 @@
 package pasa.cbentley.core.src4.ctx;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 
@@ -7,6 +8,8 @@ import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.helpers.UserLogJournal;
+import pasa.cbentley.core.src4.i8n.IStringProducer;
+import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.interfaces.ITech;
@@ -40,38 +43,111 @@ import pasa.cbentley.core.src4.utils.StringUtils;
 import pasa.cbentley.core.src4.utils.URLUtils;
 
 /**
- * {@link UCtx} (Universal context), along with {@link ICtx} and {@link CtxManager},  provide the core basis for the Module Context Pattern.
+ * {@link UCtx} (Universal context), along with {@link ICtx} and {@link CtxManager},  provide the core basis for the Code Context Pattern.
  * <p>
- * <b>src4</b> suffixed module means all code must be src4 compatible for Java embedded. 
+ * <b>src4</b> suffixed code contexts means all code must be src4 compatible for Java embedded. 
  * </p>
- * <b>Requirements</b> of the <b>Module Context Pattern</b>:
- * <li>Each module of code must define a <code>.ctx</code> package in which a ModuleNameCtx class is defined.
- * <li>Convention: All methods, fields and static constants are sorted alphabetically with constant at the top then fields the methods.
- * <li>The context module class provides access to all static object/singletons. Those objects become instances of the module context instance.
- * <li>Dependency Injection 1: every class of a module has the module ctx instance in the first parameter of the constructor. It is saved as a <code>protected final</code> as a class field. 
- * <li>Dependency Injection 2: a module ctx class is constructor injected its dependencies of other known module ctxs.
- * <li>Dependency Injection 3: Unknown modules are injected as an interface preferably as final in the constructor or if necessary in a setter.
- * <li>
- * <li>The static keyword is only allowed for public constants and methods that <i>will</i> be inlined. This rule prevents any static state.
+ * 
+ * <p>
+ * <b>General conventions</b> :
+ * <li>Java Code is the Law. Code is written to easy step over debug. Good and up to date comments surely helps but you must be able to step into the code and read it
+ * to know what is going on.
+ * <li>No reflection as it prevents efficient tree shaking. Pluggable Object factories shall be used instead.
+ * <li>Because Code is Law, Annotations are not used.
+ * <li>Because Code is Law, XML files are not used.
  * <li>Naming Convention 1: All interfaces start with I, except one letter interfaces such as {@link C}.
- * <li>Interfaces without a clear root in a package are put in a .interfaces package.
- * <li>A contrario, package specific interfaces such a {@link IDLog} are located in their respective packages.
+ * <li>Convention: All methods, fields and static constants are sorted alphabetically with constant at the top then fields then methods.
+ * <li> Conventions Prefixed Auto completion. Good IDEs will provide you a list of possiblities usually with Ctrl+Space
+ * <ul>
+ * <li>set prefix on methods that modifiy the state of a class. Setters allow for more than 1 parameters. Want to know settingAll methods, fields and static constants are sorted alphabetically with constant at the top then fields then methods.
+ * <li>get prefix on methods that read. its allows  methods for settingAll methods, fields and static constants are sorted alphabetically with constant at the top then fields then methods.
+ * <li>Example of prefixed naming convention {@link java.awt.event.WindowListener} where all methods are prefixed with window .
+ * </ul>
+ * <li>Lazy suffix when the getter creating from a null. This leaks implementation details and that's ok in many cases as we want to make it known
+ * the reference returned is always the same.
+ * <ul>
+ * <li>factory.getImageRootLazy() check if factory field imageRoot is null and initialize the instance.
+ * </ul>
+ * <li> One Class. One File. Corollary: avoid anynomyous classes.
+ * <li> Its 90% always more readable to remove anonymous classes. You are forced to acknowledge the state required and it is easier to {@link IStringable} it.
+ * </p>
+ * 
+ * <br>
+ * 
+ * <p>
+ * <b>Debug Framework and Conventions</b> :
+ * <li>We use //#debug //#mdebug //#enddebug directives to remove all debugging code from production code. 
+ * <li>All debug methods and fields are prefixed with toString
+ * <li>Method names prefixed with <code>to</code> are reserved for debugging. 
+ * <li>Avoid method names that start with letters u,v,w,x,y,z. This allows debug code to be easily visible at the end of a file.
+ * <li>One Class One File. All debug methods are easily visible at the end of a file.
+ * <li>toString() method outputs the debug visualization of the class. This must be implemented.
+ * <li>All toString and miscellanous debug code must be enclosed by antenna preprocessing directives #debug #mdebug/#enddebug. 
+ * <li>Code should not ever rely on toString() methods for making logic decisions. It always was and always will be fragile.
+ * 
+ * <br>
+ * Historically, {@link UCtx} was born out of the need to access the Debug Context (name {@link Dctx}) in a non static way.
+ * All debug frameworks/libraries that uses static references had to be scrapped, because even debug static state had to disappear.
+ * So every single object has to have a reference to an {@link UCtx} instance to access at least the default configuration of {@link Dctx}.
+ * the toString() method of every {@link IStringable} uses the default configuration from {@link UCtx} to create its {@link Dctx}.
+ * This setup allows you to create custom Debug Context {@link Dctx} and ask a class to debug itself using it, without messing with the defaults.
+ * </p>
+ * 
+ * <br>
+ * 
+ * <p>
+ * <b>Requirements</b> of the <b>Code Context Pattern</b>:
+ * <li>Each corpus/module/project of code must define a <code>.ctx</code> package in which a ProjectNameCtx class is defined. Name is suffixed with Ctx.
+ * <li>Schematically, the ProjectNameCtx class provides access to all previously static objects/singletons. Those objects become instances of this class.
+ * <li>At minimum, the ProjectNameCtx class provides a Java-based code description of its dependencies to other code contexts in its constructor.
+ * <li>A TemplateNameCtx can be abstract so as to provide a template for more specific code contexts, hiding implementation to code contexts using it. 
+ * <li>It looks like a God object pattern, but applied to a corpus of code. So Code Context Pattern introduces a clean hierarchy.
+ * <li>Rule #3 The constructor of the <code>ProjectNameCtx</code> has a <code>IConfigProjectName</code> extends {@link IConfig} as first parameter. An implementation of <code>IConfigProjectName</code> is used to configure the code context.
+ * <ul>
+ * <li>This rule allows you to configure a very complex hierarchy with a clean set of Java classes, respecting the convention that Java Code is Law. 
+ * <li>Yet provides the flexibility to implement the {@link IConfig} interfaces using text file or XML files.
+ * </ul>
+ * <li>Rule #4 The constructor of the ProjectNameCtx contains all the dependencies to other code contexts.
+ * <li>Field references of code contexts are saved as <code>protected final</code> as a class field. 
+ * <li>What does the .ctx package contains?
+ * <ul>
+ * <li> {@link IConfig} and possibly a default Java implementation of it.
  * <li>IEvents prefixed interfaces such as {@link IEventsCore} are located in ctx package.
- *
+ * <li>{@link IFlagsToString} prefixed interfaces used to dynamically configure a {@link Dctx}
+ * <li>{@link ToStringStaticUc} for debugging integer constant object of the code context
  * <li> The <code>.ctx</code> contains an IEvents interface and IStrings and any interface defining
+ * 
+ * </ul>
+ * 
+ * <li>Interfaces without a clear root in a package are put in a <code>.interfaces</code> package of the code context.
+ * <li>A contrario, package specific interfaces such a {@link IDLog} are located in their respective packages.
+ *
  * <i>static</i> unique int/long ids that are registered in the {@link CtxManager} at runtime.
  * <li> every set of constants is defined in a ITech prefixed interface
  * that extends {@link ITech}. {@link ITech} works as a marker. 
- * <li>Since the core code is written to be src4 compatible, every constant is declared public static final
  * <li>Debug of those values are managed by {@link ToStringStaticBase} sub classes.
- * <br>
- * <li>Naming Convention: Inverse Completion i.e. specific to less specific.. SwingCtx, YourAppSwingCtx, AndroidCtx. Variables often short like uc, sc, bac,
- * getters getSC() / getSwingCtx, getUC().
- * <li>All debug methods are prefixed with toString
- * <li>All toString and miscellanous debug code must be enclosed by antenna preprocessing directives #debug #mdebug/#enddebug. 
  * </li>
+ * </p>
  * 
  * 
+ * <p>
+ * <b>Code Context Pattern Conventions</b> :
+ * <li>Since the core code is written to be src4 compatible, every constant is declared <code>public static final</code>
+ * <li>Naming: Inverse Completion i.e. specific to less specific.. SwingCtx, YourAppSwingCtx, AndroidCtx. 
+ * <li>Instance variables most often will be short like uc, sc, bac,
+ * <li>Getters for code context instances can be of the following 2 forms. 
+ *  <ul>
+ *  <li>SwingCtx -> getSC() / getSwingCtx 
+ *  <li>UCtx -> getUC / getUCtx()
+ *  <li>JavaGameCtx -> getJGC() / getJavaGameCtx() 
+ *  </ul>
+ * </p>
+ * <p>
+ * <b>Consequences</b> of the <b>Code Context Pattern</b>:
+ * <li>The static keyword is only allowed for public constants and methods that <i>will</i> be inlined. This rule prevents any static state.
+ * <li>By looking at the constructor of a ProjectNameCtx, you know its dependencies to other code contexts.
+ * <li>Rule #4 prevent dependency injections
+ * </p>
  * <p>
  * <b>Module Dependencies</b>
  * <br>
@@ -139,7 +215,7 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  */
 public class UCtx implements ICtx, IEventsCore {
 
-   public static final int CTX_ID           = 1;
+   public static final int CTX_ID = 1;
 
    private ArrayUtils      au;
 
@@ -147,13 +223,11 @@ public class UCtx implements ICtx, IEventsCore {
 
    private ColorUtils      coloru;
 
+   private IConfigU        config;
+
    private CtxManager      ctxManager;
 
    private CharUtils       cu;
-
-   //Used to be static. not anymore. its a variable of the context
-   //so that it can be configured dynamically. to test crashes etc.
-   protected String        DEFAULT_ENCODING = "UTF-8";
 
    //#debug
    private IDLog           dlog;
@@ -168,13 +242,20 @@ public class UCtx implements ICtx, IEventsCore {
 
    private LongUtils       lu;
 
+   private MathUtils       mathUtils;
+
    private IMemory         mem;
 
-   private int             moduleID;
+   private Random          random = null;
 
-   private Random          random           = null;
+   private int             registrationID;
 
    private IStrComparator  strc;
+
+   /**
+    * Might be null.
+    */
+   private IStringProducer stringProducer;
 
    private StringUtils     stru;
 
@@ -189,21 +270,15 @@ public class UCtx implements ICtx, IEventsCore {
 
    private WorkerThread    workerThread;
 
+   private String          encoding;
+
    /**
     * Assume a simple Java Host 
     */
    public UCtx() {
+      config = new ConfigUDef(this);
       setCtxManager(new CtxManager(this));
       aInit();
-   }
-
-   private MathUtils mathUtils;
-
-   public MathUtils getMathUtils() {
-      if (mathUtils == null) {
-         mathUtils = new MathUtils(this);
-      }
-      return mathUtils;
    }
 
    /**
@@ -211,10 +286,17 @@ public class UCtx implements ICtx, IEventsCore {
     * @param cm
     */
    public UCtx(CtxManager cm) {
+      config = new ConfigUDef(this);
       if (cm == null) {
          throw new NullPointerException();
       }
       this.setCtxManager(cm);
+      aInit();
+   }
+
+   public UCtx(IConfigU config) {
+      this.config = config;
+      setCtxManager(new CtxManager(this));
       aInit();
    }
 
@@ -231,17 +313,48 @@ public class UCtx implements ICtx, IEventsCore {
       au = new ArrayUtils(this);
       iou = new IOUtils(this);
 
-      //#debug
       this.userLog = new UserLogSystemOut(this);
+
       //#debug
       dlog = new BaseDLogger(this);
 
       eventBusRoot = new EventBusArray(this, this, getEventBaseTopology());
-      moduleID = ctxManager.registerCtx(this);
+      registrationID = ctxManager.registerCtx(this);
+
+      ctxManager.registerStaticID(this, IStringsKernel.SID_STRINGS_1);
+      ctxManager.registerStaticID(this, IEventsCore.SID_EVENTS_2);
+
+      encoding = config.getDefaultEncoding();
+      //#debug
+      config.toStringSetDebugUCtx(this);
    }
 
    public void bip(Exception e, long bip) {
 
+   }
+
+   public BADataIS createNewBADataIS(byte[] data) {
+      BAByteIS bis = new BAByteIS(this, data);
+      BADataIS dis = new BADataIS(this, bis);
+      return dis;
+   }
+
+   public BADataIS createNewBADataIS(byte[] data, int offset) {
+      BAByteIS bis = new BAByteIS(this, data, offset, data.length);
+      BADataIS dis = new BADataIS(this, bis);
+      return dis;
+   }
+
+   public BADataIS createNewBADataIS(InputStream is) throws IOException {
+      BAByteIS bis = new BAByteIS(this, this.getIOU().streamToByte(is));
+      BADataIS dis = new BADataIS(this, bis);
+      return dis;
+   }
+
+   public BADataOS createNewBADataOS() {
+      BAByteOS bos = new BAByteOS(this);
+      BADataOS bada = new BADataOS(this, bos);
+      return bada;
    }
 
    public ArrayUtils getAU() {
@@ -256,6 +369,18 @@ public class UCtx implements ICtx, IEventsCore {
       return coloru;
    }
 
+   /**
+    * Master config that can impact the behavior of the whole ctx hierarchy
+    * @return
+    */
+   public IConfig getConfig() {
+      return config;
+   }
+
+   public IConfigU getConfigU() {
+      return config;
+   }
+
    public int getCtxID() {
       return CTX_ID;
    }
@@ -264,38 +389,32 @@ public class UCtx implements ICtx, IEventsCore {
       return ctxManager;
    }
 
+   public ICtx[] getCtxSub() {
+      return null;
+   }
+
    public CharUtils getCU() {
       return cu;
    }
 
-   public BADataIS createNewBADataIS(byte[] data, int offset) {
-      BAByteIS bis = new BAByteIS(this, data, offset, data.length);
-      BADataIS dis = new BADataIS(this, bis);
-      return dis;
-   }
-
-   public BADataIS createNewBADataIS(byte[] data) {
-      BAByteIS bis = new BAByteIS(this, data);
-      BADataIS dis = new BADataIS(this, bis);
-      return dis;
-   }
-
-   public BADataOS createNewBADataOS() {
-      BAByteOS bos = new BAByteOS(this);
-      BADataOS bada = new BADataOS(this, bos);
-      return bada;
-   }
-
+   /**
+    * This field used to be a statically defined variable.
+    * 
+    * Now it is an instance configurable by {@link IConfigU} and settable
+    * on the context.
+    * @return
+    */
    public String getDefaultEncoding() {
-      return DEFAULT_ENCODING;
+      return encoding;
    }
 
    public int[] getEventBaseTopology() {
       int[] events = new int[BASE_EVENTS];
-      events[PID_0_ANY] = EID_MEMORY_X_NUM;
-      events[PID_1_FRAMEWORK] = EID_FRAMEWORK_X_NUM;
-      events[PID_2_HOST] = EID_HOST_X_NUM;
-      events[PID_3_MEMORY] = EID_MEMORY_X_NUM;
+      events[PID_0_ANY] = PID_0_ANY_X_NUM;
+      events[PID_1_FRAMEWORK] = PID_1_FRAMEWORK_X_NUM;
+      events[PID_2_HOST] = PID_2_HOST_X_NUM;
+      events[PID_3_MEMORY] = PID_3_MEMORY_X_NUM;
+      events[PID_4_LIFE] = PID_4_LIFE_X_NUM;
       return events;
    }
 
@@ -327,6 +446,13 @@ public class UCtx implements ICtx, IEventsCore {
       return lu;
    }
 
+   public MathUtils getMathUtils() {
+      if (mathUtils == null) {
+         mathUtils = new MathUtils(this);
+      }
+      return mathUtils;
+   }
+
    public IMemory getMem() {
       return mem;
    }
@@ -349,7 +475,7 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public int getRegistrationID() {
-      return moduleID;
+      return registrationID;
    }
 
    public byte[] getSettings() {
@@ -367,6 +493,17 @@ public class UCtx implements ICtx, IEventsCore {
          strc = new StringComparator(this);
       }
       return strc;
+   }
+
+   public IStringProducer getStringProducer() {
+      return stringProducer;
+   }
+
+   public IStringProducer getStringProducerNotNull() {
+      if (stringProducer == null) {
+         throw new IllegalStateException("IStringProducer cannot be null. Initialize with setter");
+      }
+      return stringProducer;
    }
 
    public StringUtils getStrU() {
@@ -408,7 +545,7 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    //#mdebug
-   public void setDlog(IDLog log) {
+   public void toStringSetDLog(IDLog log) {
       if (log != null) {
          dlog = log;
       }
@@ -429,6 +566,18 @@ public class UCtx implements ICtx, IEventsCore {
     */
    public void setStrComparator(IStrComparator c) {
       this.strc = c;
+   }
+
+   /**
+    * 
+    * @param encoding
+    */
+   public void setDefaultEncoding(String encoding) {
+      this.encoding = encoding;
+   }
+
+   public void setStringProducer(IStringProducer stringProducer) {
+      this.stringProducer = stringProducer;
    }
 
    public void setStrU(StringUtils stru) {
@@ -479,8 +628,12 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "UCtx");
+      dc.root(this, UCtx.class, 544);
       toStringPrivate(dc);
+      dc.nlLvl(config, IConfigU.class);
+      dc.nlLvl(ctxManager, "ctxManager");
+      dc.nlLvl(eventBusRoot, "eventBusRoot");
+      dc.nlLvl(dlog, "dlog");
    }
 
    public boolean toString(Dctx dctx, Object o) {
@@ -511,17 +664,23 @@ public class UCtx implements ICtx, IEventsCore {
       toStringPrivate(dc);
    }
 
+   public void toStringCheckNull(Object o) {
+      if (o == null) {
+         throw new NullPointerException();
+      }
+   }
+
    public String toStringEventID(int pid, int eid) {
       switch (pid) {
          case PID_0_ANY:
             return "Any";
          case PID_1_FRAMEWORK:
             switch (eid) {
-               case EID_FRAMEWORK_0_ANY:
+               case PID_1_FRAMEWORK_0_ANY:
                   return "Any";
-               case EID_FRAMEWORK_1_CTX_CREATED:
+               case PID_1_FRAMEWORK_1_CTX_CREATED:
                   return "CtxCreated";
-               case EID_FRAMEWORK_2_LANGUAGE_CHANGED:
+               case PID_1_FRAMEWORK_2_LANGUAGE_CHANGED:
                   return "LanguageChanged";
                default:
                   return "UnknownEID" + eid;
@@ -530,13 +689,13 @@ public class UCtx implements ICtx, IEventsCore {
             return "Host";
          case PID_3_MEMORY:
             switch (eid) {
-               case EID_MEMORY_0_ANY:
+               case PID_3_MEMORY_0_ANY:
                   return "Any";
-               case EID_MEMORY_1_OUT_OF_MEMORY_GC:
+               case PID_3_MEMORY_1_OUT_OF_MEMORY_GC:
                   return "OutOfMemoryGC";
-               case EID_MEMORY_2_USER_REQUESTED_GC:
+               case PID_3_MEMORY_2_USER_REQUESTED_GC:
                   return "UserRequestedGC";
-               case EID_MEMORY_3_OBJECT_DESTROY:
+               case PID_3_MEMORY_3_OBJECT_DESTROY:
                   return "ObjectDestroy";
                default:
                   return "UnknownEID" + eid;
@@ -562,7 +721,8 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      dc.appendVarWithSpace("ctxid", getCtxID());
+      dc.appendVarWithSpace("RegistrationID", getRegistrationID());
    }
 
    public String toStringProducerID(int pid) {
@@ -587,6 +747,10 @@ public class UCtx implements ICtx, IEventsCore {
     */
    public void toStringSetToStringFlag(int flag, boolean v) {
       toStringFlags = BitUtils.setFlag(toStringFlags, flag, v);
+   }
+
+   public int toStringGetToStringFlags() {
+      return toStringFlags;
    }
 
    //#enddebug

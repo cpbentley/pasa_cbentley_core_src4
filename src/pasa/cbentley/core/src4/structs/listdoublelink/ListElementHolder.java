@@ -52,7 +52,7 @@ public class ListElementHolder extends ListElement {
       dc.root1Line(this, "ListElementHolder");
       if (o instanceof IStringable) {
          IStringable is = (IStringable) o;
-         dc.nlLvlOneLine(is, "");
+         dc.nlLvl1Line(is, "");
       }
    }
    //#enddebug

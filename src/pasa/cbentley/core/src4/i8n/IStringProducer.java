@@ -1,6 +1,8 @@
 package pasa.cbentley.core.src4.i8n;
 
 import pasa.cbentley.core.src4.ctx.ICtx;
+import pasa.cbentley.core.src4.ctx.IEventsCore;
+import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -9,6 +11,8 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * In order to modify the Language, it will depends on the implementation.
  * <br>
  * The application sees this interface.
+ * 
+ * {@link IEventsCore#PID_1_FRAMEWORK_2_LANGUAGE_CHANGED}
  * 
  * @author Charles Bentley
  *
@@ -111,11 +115,13 @@ public interface IStringProducer extends IStringable {
    public String getString(String key);
 
    /**
-    * Loads the Strings associated with the {@link IModule}.
+    * Loads the Strings associated with the {@link ICtx}.
     * <br>
     * Tracks all path IDs. Those roots will be given to new {@link IStringProducer}
     * if one is changed
     * <br>
+    * This method leaks some implementation detail, we need a pathID.. But the structure of the files and their 
+    * content will depend on the implementation.
     * @param cl
     * @param pathid
     */
@@ -152,5 +158,7 @@ public interface IStringProducer extends IStringable {
     * @return
     */
    public IStringMapper getStringMapper();
+   
+   public UCtx getUCtx();
 
 }

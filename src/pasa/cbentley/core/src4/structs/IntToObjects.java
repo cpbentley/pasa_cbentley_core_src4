@@ -5,6 +5,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.core.src4.utils.BitUtils;
 import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
@@ -28,6 +29,7 @@ public class IntToObjects implements IStringable {
    public int         nextempty = 0;
 
    /**
+    * Cannot be null
     */
    public Object[]    objects;
 
@@ -88,6 +90,11 @@ public class IntToObjects implements IStringable {
     */
    public void add(int i, Object o) {
       this.add(o, i);
+   }
+
+   public int addReturn(Object o, int value) {
+      this.add(o, value);
+      return nextempty - 1;
    }
 
    public void add(Object o) {
@@ -175,6 +182,12 @@ public class IntToObjects implements IStringable {
    public void addUnique(Object o) {
       if (findObjectRef(o) == -1) {
          this.add(o, 0);
+      }
+   }
+
+   public void addUnique(Object o, int value) {
+      if (findObjectRef(o) == -1) {
+         this.add(o, value);
       }
    }
 
@@ -280,6 +293,14 @@ public class IntToObjects implements IStringable {
       return -1;
    }
 
+   public boolean hasIntFlag(int index, int flag) {
+      return BitUtils.hasFlag(ints[index], flag);
+   }
+
+   public boolean hasInt(int mint) {
+      return findInt(mint) != -1;
+   }
+
    /**
     * Finds the first line with integer i and returns the object.
     * <br>
@@ -317,6 +338,16 @@ public class IntToObjects implements IStringable {
          }
       }
       return -1;
+   }
+
+   /**
+    * Treating the int value as flags, set the bit flag to b value
+    * @param index
+    * @param flag
+    * @param b
+    */
+   public void setIntFlag(int index, int flag, boolean b) {
+      ints[index] = BitUtils.setFlag(ints[index], flag, b);
    }
 
    /**
@@ -364,6 +395,10 @@ public class IntToObjects implements IStringable {
 
    public int getInt(int index) {
       return ints[index];
+   }
+
+   public void incrementInt(int index, int val) {
+      ints[index] += val;
    }
 
    public int[] getInts() {
@@ -446,6 +481,10 @@ public class IntToObjects implements IStringable {
    public void growArray() {
       growArray(1);
    }
+   
+   public Object getLast() {
+      return objects[nextempty-1];
+   }
 
    public void growArray(int increment) {
       int incr = ints.length + increment;
@@ -480,12 +519,17 @@ public class IntToObjects implements IStringable {
       return false;
    }
 
+   /**
+    * Insert object at index, moving all other objects up
+    * @param o
+    * @param index
+    */
    public void insertObject(Object o, int index) {
       insertObject(o, 0, index);
    }
 
    /**
-    * 
+    * Insert object at index, moving all other objects up
     * @param o
     * @param index
     */
@@ -619,35 +663,36 @@ public class IntToObjects implements IStringable {
    /**
     * 
     */
-   public void toString(Dctx sb) {
-      sb.root(this, "IntToObjects");
-      sb.append(" [size=" + nextempty + "]");
+   public void toString(Dctx dc) {
+      dc.root(this, IntToObjects.class, "@line656");
+      dc.appendVarWithSpace("size", nextempty);
+
       for (int i = 0; i < nextempty; i++) {
-         sb.nl();
-         sb.append((i + 1) + "=");
-         sb.append(ints[i]);
-         sb.append('\t');
+         dc.nl();
+         dc.append((i + 1) + "=");
+         dc.append(ints[i]);
+         dc.append('\t');
          Object o = objects[i];
          if (o != null) {
             if (o instanceof IStringable) {
-               if (sb.isExpand()) {
-                  ((IStringable) o).toString(sb);
+               if (dc.isExpand()) {
+                  ((IStringable) o).toString(dc);
                } else {
-                  ((IStringable) o).toString1Line(sb.nLevel());
+                  ((IStringable) o).toString1Line(dc);
                }
             } else {
                String str = o.toString();
-               if (!sb.isExpand()) {
+               if (!dc.isExpand()) {
                   //cut after the first line
                   int in = str.indexOf('\n');
                   if (in != -1) {
                      str = str.substring(0, in);
                   }
                }
-               sb.append(str);
+               dc.append(str);
             }
          } else {
-            sb.append("null");
+            dc.append("null");
          }
       }
    }
@@ -661,39 +706,44 @@ public class IntToObjects implements IStringable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "IntToObjects");
+      dc.root1Line(this, IntToObjects.class);
       dc.append(" [size=" + nextempty + "]");
    }
 
-   public void toStringForLine(Dctx sb) {
-      sb.root(this, "IntToObjects");
-      sb.append(" [size=" + nextempty + "]");
+   public void toStringForLine(Dctx dc) {
+      dc.root(this, "IntToObjects");
+      dc.append(" [size=" + nextempty + "]");
+      String total = String.valueOf(nextempty);
+      int numChars = total.length();
       for (int i = 0; i < nextempty; i++) {
-         sb.nl();
-         sb.append((i + 1) + "=");
-         sb.append(ints[i]);
-         sb.append('\t');
+         dc.nl();
+         int num = (i + 1);
+         String strNum = uc.getStrU().prettyIntPaddStr(num, numChars, " ");
+         dc.append(strNum);
+         dc.append("=");
+         dc.append(ints[i]);
+         dc.append('\t');
          Object o = objects[i];
          if (o != null) {
             if (o instanceof IStringable) {
-               if (sb.isExpand()) {
-                  ((IStringable) o).toString(sb.Level());
+               if (dc.isExpand()) {
+                  ((IStringable) o).toString(dc.Level());
                } else {
-                  ((IStringable) o).toString1Line(sb.Level());
+                  ((IStringable) o).toString1Line(dc.Level());
                }
             } else {
                String str = o.toString();
-               if (!sb.isExpand()) {
+               if (!dc.isExpand()) {
                   //cut after the first line
                   int in = str.indexOf('\n');
                   if (in != -1) {
                      str = str.substring(0, in);
                   }
                }
-               sb.append(str);
+               dc.append(str);
             }
          } else {
-            sb.append("null");
+            dc.append("null");
          }
       }
    }

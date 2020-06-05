@@ -105,11 +105,11 @@ public class ListElement implements IStringable {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "ListElement");
+      dc.root(this, ListElement.class,108);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "ListElement");
+      dc.root1Line(this, ListElement.class);
    }
 
    public UCtx toStringGetUCtx() {

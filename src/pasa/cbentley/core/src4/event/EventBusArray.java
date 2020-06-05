@@ -50,7 +50,6 @@ public class EventBusArray implements IEventBus, IEventConsumer {
     * columns are event consumers
     */
    private IntToObjects[] producerIDToConsumerArray;
-   
 
    private UCtx           uc;
 
@@ -79,7 +78,7 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       listenersToAllEvents = new IntToObjects(uc);
 
       this.topologyStatic = producersNumEvents;
-      
+
       //construct the structure to host the regular mapping
       IntToObjects[] producerIDToConsumerArray = new IntToObjects[producersNumEvents.length];
       for (int i = 0; i < producerIDToConsumerArray.length; i++) {
@@ -93,17 +92,17 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       if (contextOwner != uc) {
          eventBus = uc.getEventBusRoot();
       }
-      eventBus.addConsumer(this, IEventsCore.PID_3_MEMORY, IEventsCore.EID_MEMORY_3_OBJECT_DESTROY);
+      eventBus.addConsumer(this, IEventsCore.PID_3_MEMORY, IEventsCore.PID_3_MEMORY_3_OBJECT_DESTROY);
    }
 
    public int getNumStaticProducers() {
       return topologyStatic.length;
    }
-   
+
    public int createNewProducerID(int topoloyNumEvents) {
       int producerID = producerIDToConsumerArray.length;
       int offsetNull = ArrayUtils.getFirstNullIndex(producerIDToConsumerArray);
-      if(offsetNull == -1) {
+      if (offsetNull == -1) {
          IntToObjects[] arrayNew = uc.getAU().increaseCapacity(producerIDToConsumerArray, 1);
          producerIDToConsumerArray = arrayNew;
       } else {
@@ -395,10 +394,13 @@ public class EventBusArray implements IEventBus, IEventConsumer {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "EventBusArray");
-      dc.nlLvlOneLine(contextOwner);
+      dc.root(this, EventBusArray.class,397);
+      dc.nlLvl1Line(contextOwner);
       dc.nl();
       dc.append("Listeners To All Events");
+      dc.append(" #");
+      dc.append(listenersToAllEvents.nextempty);
+      dc.append(" ");
       for (int pid = 0; pid < listenersToAllEvents.nextempty; pid++) {
          dc.append("Producer " + pid + " = " + contextOwner.toStringProducerID(pid));
          IntToObjects ito = producerIDToConsumerArray[pid];
@@ -408,22 +410,23 @@ public class EventBusArray implements IEventBus, IEventConsumer {
             Object o = ito.objects[eid];
             if (o instanceof IEventConsumer) {
                //we only have one
-               dc.nlLvlOneLine((IEventConsumer) o);
+               dc.nlLvl1Line((IEventConsumer) o);
             } else {
                IntToObjects listeners = (IntToObjects) o;
                for (int i = 0; i < listeners.nextempty; i++) {
-                  dc.nlLvlOneLine((IEventConsumer) listeners.getObjectAtIndex(i));
+                  dc.nlLvl1Line((IEventConsumer) listeners.getObjectAtIndex(i));
                }
             }
          }
       }
       dc.nl();
       dc.append("Specific PID listeners");
+      dc.appendVarWithSpace("#", producerIDToConsumerArray.length);
       for (int pid = 0; pid < producerIDToConsumerArray.length; pid++) {
          dc.nl();
          dc.append("Producer " + pid + " = " + contextOwner.toStringProducerID(pid));
          IntToObjects ito = producerIDToConsumerArray[pid];
-         dc.append("# of events =" + ito.getLength());
+         dc.append("-> # of events =" + ito.getLength());
          //iterate over events
          dc.tab();
          for (int eid = 0; eid < ito.nextempty; eid++) {
@@ -432,12 +435,12 @@ public class EventBusArray implements IEventBus, IEventConsumer {
             Object o = ito.objects[eid];
             if (o instanceof IEventConsumer) {
                //we only have one
-               dc.nlLvlOneLine((IEventConsumer) o);
+               dc.nlLvl1Line((IEventConsumer) o);
             } else {
                IntToObjects listeners = (IntToObjects) o;
                if (listeners != null) {
                   for (int i = 0; i < listeners.nextempty; i++) {
-                     dc.nlLvlOneLine((IEventConsumer) listeners.getObjectAtIndex(i));
+                     dc.nlLvl1Line((IEventConsumer) listeners.getObjectAtIndex(i));
                   }
                } else {
                   dc.append("null... no consumers for eid = " + eid);
@@ -453,7 +456,7 @@ public class EventBusArray implements IEventBus, IEventConsumer {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "EvChannel");
+      dc.root1Line(this, EventBusArray.class);
    }
 
    public UCtx toStringGetUCtx() {

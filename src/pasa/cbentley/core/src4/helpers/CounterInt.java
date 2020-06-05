@@ -11,6 +11,10 @@ public class CounterInt implements IStringable {
 
    private UCtx uc;
 
+   public CounterInt(UCtx uc) {
+      this(uc, 0);
+   }
+
    public CounterInt(UCtx uc, int value) {
       this.uc = uc;
       this.value = value;

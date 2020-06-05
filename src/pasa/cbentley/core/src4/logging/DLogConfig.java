@@ -99,15 +99,15 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       if (type.hasDevFlag(DEV_3_STACK)) {
          entryOfConf.setConfigResFlag(CONFIG_FLAG_3_STACK, true);
       }
-      
-      if(hasFlagPrint(MASTER_FLAG_07_THREAD_DATA)) {
+
+      if (hasFlagPrint(MASTER_FLAG_07_THREAD_DATA)) {
          entryOfConf.setConfigResFlag(CONFIG_FLAG_04_SHOW_THREAD, true);
       }
       //Dev override master flag
       if (type.hasDevFlag(DEV_4_THREAD)) {
          entryOfConf.setConfigResFlag(CONFIG_FLAG_04_SHOW_THREAD, true);
       }
-   
+
       return entryOfConf;
    }
 
@@ -211,7 +211,12 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
          if (isClassAccepted) {
             return true;
          }
-
+         if (hasFlagPrint(MASTER_FLAG_09_TREAT_STRINGABLE_CLASS)) {
+            boolean isClassStringableAccepted = isClassAccepted(type.getClassStringable());
+            if (isClassStringableAccepted) {
+               return true;
+            }
+         }
          return false;
       }
       return false;
@@ -236,7 +241,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       if (hasFlagPrint(MASTER_FLAG_05_IGNORE_FLAGS)) {
          return true;
       } else {
-         if(flagTag == FLAG_01_PRINT_ALWAYS) {
+         if (flagTag == FLAG_01_PRINT_ALWAYS) {
             return true;
          }
          if (hasFlagPrint(MASTER_FLAG_08_OPEN_ALL_BUT_FALSE)) {
@@ -455,7 +460,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
    public void setLevelTag(int lvl, int tag) {
       this.logLevel = lvl;
    }
-   
+
    /**
     * Force one lines one class tag
     */

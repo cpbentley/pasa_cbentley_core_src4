@@ -28,7 +28,7 @@ public class IOUtils implements IStringable {
     */
    public Class        REFERENCE = null;
 
-   private UCtx uc;
+   private UCtx        uc;
 
    public IOUtils(UCtx uc) {
       this.uc = uc;
@@ -301,9 +301,15 @@ public class IOUtils implements IStringable {
       InputStream is = c.getResourceAsStream(fileName);
       if (is == null) {
          //#debug
-         toDLog().pNull("InputStream is null", this, IOUtils.class, "readFile", LVL_05_FINE, true);
+         toDLog().pNull("InputStream is null for fileName=" + fileName + " encod=" + encod, this, IOUtils.class, "readFile", LVL_05_FINE, true);
       }
       readFile(cb, is, encod, maxLineLength);
+   }
+
+   public InputStream getInputStream(Object caller, String fileName) {
+      Class c = getClass(caller);
+      InputStream is = c.getResourceAsStream(fileName);
+      return is;
    }
 
    /**

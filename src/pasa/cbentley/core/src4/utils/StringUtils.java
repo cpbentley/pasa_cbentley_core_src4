@@ -1076,6 +1076,23 @@ public class StringUtils {
       this.uc = uc;
    }
 
+   public String addLineNumbers(String str) {
+      StringBBuilder sb = new StringBBuilder(uc);
+      int index = 0;
+      int beginIndex = 0;
+      int lineCount = 1;
+      while ((index = str.indexOf("\n", beginIndex)) != -1) {
+         String line = str.substring(beginIndex, index);
+         String strL = prettyStringPadBack(String.valueOf(lineCount), 3, ' ');
+         sb.append(strL);
+         sb.append(line);
+         sb.append('\n');
+         beginIndex = index + 1;
+         lineCount++;
+      }
+      return sb.toString();
+   }
+
    /**
     * -1 when source is smaller
     * 1 when source is bigger
@@ -1429,6 +1446,12 @@ public class StringUtils {
       return array;
    }
 
+   /**
+    * [1,2,3],":" -> "1:2:3"
+    * @param ar
+    * @param separator
+    * @return
+    */
    public String getString(int[] ar, String separator) {
       if (ar == null) {
          return "null";
@@ -1507,6 +1530,9 @@ public class StringUtils {
     * <br>
     * <br>
     * If the char is the last, returns empty string
+    * 
+    * Example: home4you,4 -> you
+    *  
     * @param str
     * @param delEnd
     * @return
@@ -1522,6 +1548,28 @@ public class StringUtils {
       return null;
    }
 
+   /**
+    * pasa.cbentley,. -> cbentley
+    * pasa.cbentley,! -> pasa.cbentley
+    * @param str
+    * @param del
+    * @return
+    */
+   public String getStringAfterLastIndex(String str, char del) {
+      int lastIndex = str.lastIndexOf(del);
+      if (lastIndex == -1) {
+         return str;
+      } else {
+         return str.substring(lastIndex + 1);
+      }
+   }
+
+   /**
+    * Example: home4you,4 -> home
+    * @param str
+    * @param delEnd
+    * @return
+    */
    public String getSubstringStartToChar(String str, char delEnd) {
       int indexEnd = str.indexOf(delEnd);
       if (indexEnd != -1) {
@@ -1530,6 +1578,12 @@ public class StringUtils {
       return null;
    }
 
+   /**
+    * 
+    * @param str
+    * @param delEnd
+    * @return
+    */
    public String getSubstringStartToString(String str, String delEnd) {
       int indexEnd = str.indexOf(delEnd);
       if (indexEnd != -1) {

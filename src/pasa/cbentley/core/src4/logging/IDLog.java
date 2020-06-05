@@ -26,7 +26,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  *
  * @see ITechTags
  */
-public interface IDLog {
+public interface IDLog extends IStringable {
 
    //#mdebug
    /**
@@ -138,6 +138,8 @@ public interface IDLog {
    public void pModel(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
 
    public void pNull(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pNull(String msg, IStringable str, Class c, String method);
 
    public void pSound(String msg, IStringable str, Class c, String method);
 

@@ -53,7 +53,8 @@ public interface IDLogConfig extends IStringable, ITechConfig {
     * Switch on the Full Positive Print flag for this class.
     * <br>
     * This means that all print statements will go through for that class
-    * except for the {@link IDLog#MASTER_FLAG_01_BLOCK_ALL_PRINT}.<br>
+    * except for the {@link IDLog#MASTER_FLAG_01_BLOCK_ALL_PRINT}.
+    * <br>
     * <br>
     * This method is usefull to debug a specific class without affecting other tags in other classes.
     * @param c
@@ -72,6 +73,7 @@ public interface IDLogConfig extends IStringable, ITechConfig {
     * Adds the class C to positive print list. The Class will print true flags.
     * Only those classes will be able to print when flag is set to only 
     *  {@link IDLog#MASTER_FLAG_03_ONLY_POSITIVES}
+    *  
     * @param c
     * @param v
     */

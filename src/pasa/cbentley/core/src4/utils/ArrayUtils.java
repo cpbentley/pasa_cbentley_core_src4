@@ -1,6 +1,7 @@
 package pasa.cbentley.core.src4.utils;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.interfaces.IFactoryBase;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 
@@ -229,6 +230,11 @@ public class ArrayUtils {
       return -1;
    }
 
+   /**
+    * 
+    * @param array
+    * @return -1 if no nulls
+    */
    public static int getLastNotNullIndex(Object[] array) {
       for (int i = array.length - 1; i >= 0; i--) {
          if (array[i] != null) {
@@ -236,6 +242,51 @@ public class ArrayUtils {
          }
       }
       return -1;
+   }
+
+   /**
+    * Trim from front as soon as one reference is null
+    * @param ar
+    * @return
+    */
+   public Object[] getTrim(Object[] ar) {
+      return getTrim(ar, null);
+   }
+
+   public Object[] getTrim(Object[] ar, IFactoryBase fac) {
+      int count = ArrayUtils.getLastNotNullIndex(ar);
+      if (count == -1) { //only nulls
+         count = 0;
+      }
+      int size = count + 1;
+      Object[] pa = null;
+      if (fac == null) {
+         pa = new Object[size];
+      } else {
+         pa = fac.createArray(size);
+      }
+      for (int i = 0; i < pa.length; i++) {
+         pa[i] = ar[i];
+      }
+      return pa;
+   }
+
+   /**
+    * Returns a copy of the array
+    * Trim from the rear of the array. As soon as one reference is not null
+    * @param ar
+    * @return
+    */
+   public Object[] getTrimRear(Object[] ar) {
+      int count = ArrayUtils.getLastNullIndex(ar);
+      if (count == -1) {
+         count = ar.length;
+      }
+      Object[] pa = new Object[count];
+      for (int i = 0; i < pa.length; i++) {
+         pa[i] = ar[i];
+      }
+      return pa;
    }
 
    public static int getLastNullIndex(Object[] array) {

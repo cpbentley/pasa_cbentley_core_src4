@@ -57,6 +57,8 @@ public interface ITechTags extends ITech {
     */
    public static final int    FLAG_25_PRINT_NULL      = 1 << 24;
 
+   public static final int    FLAG_ALL      = -1;
+
    public static final String STRING_ALWAYS           = "Always";
 
    public static final String STRING_ANIM             = "Anim  ";

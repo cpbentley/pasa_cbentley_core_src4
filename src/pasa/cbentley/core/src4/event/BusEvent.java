@@ -138,9 +138,9 @@ public class BusEvent implements IStringable, ITechThread {
    }
 
    public void clearForReUse() {
-      
+
    }
-   
+
    public Object getParamO2() {
       return paramO2;
    }
@@ -178,6 +178,10 @@ public class BusEvent implements IStringable, ITechThread {
       flags = BitUtils.setFlag(flags, flag, v);
    }
 
+   public void setFlagActedTrue() {
+      setFlag(BusEvent.FLAG_1_ACTED, true);
+   }
+
    public void setParam1(int param1) {
       this.param1 = param1;
    }
@@ -199,18 +203,21 @@ public class BusEvent implements IStringable, ITechThread {
    public void putOnBusMainNow() {
       this.busOwner.putOnBus(this, THREAD_MODE_1_MAIN_NOW);
    }
+
    /**
     * Sends this event on its busowner with thread {@link ITechThread#THREAD_MODE_2_MAIN_LATER} 
     */
    public void putOnBusMainLater() {
       this.busOwner.putOnBus(this, THREAD_MODE_2_MAIN_LATER);
    }
+
    /**
     * Sends this event on its busowner with thread {@link ITechThread#THREAD_MODE_3_WORKER} 
     */
    public void putOnBusWorker() {
       this.busOwner.putOnBus(this, THREAD_MODE_3_WORKER);
    }
+
    /**
     * Sends this event on its busowner with a dynamic thread type
     * <li> {@link ITechThread#THREAD_MODE_0_POST_NOW} 
@@ -218,7 +225,7 @@ public class BusEvent implements IStringable, ITechThread {
     * <li> {@link ITechThread#THREAD_MODE_2_MAIN_LATER} 
     * <li> {@link ITechThread#THREAD_MODE_3_WORKER} 
     */
-   public void putOnBus( int threadType) {
+   public void putOnBus(int threadType) {
       this.busOwner.putOnBus(this, threadType);
    }
 
@@ -253,10 +260,9 @@ public class BusEvent implements IStringable, ITechThread {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "BusEvent");
-      dc.nlLvlOneLine(busOwner.getCtxOwner());
+      dc.root(this, BusEvent.class,263);
       toStringPrivate(dc);
-      dc.nl();
+      dc.nlLvl1Line(busOwner.getCtxOwner());
       dc.nlLvlObject("ParamObject1", paramO1);
       dc.nlLvlObject("ParamObject2", paramO2);
       dc.nlLvlObject("Producer", producer);
@@ -277,7 +283,7 @@ public class BusEvent implements IStringable, ITechThread {
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "BusEvent");
-      dc.nlLvlOneLine(busOwner.getCtxOwner());
+      dc.nlLvl1Line(busOwner.getCtxOwner());
       toStringPrivate(dc);
       if (producer != null) {
          dc.append("by " + producer.getClass().getName());

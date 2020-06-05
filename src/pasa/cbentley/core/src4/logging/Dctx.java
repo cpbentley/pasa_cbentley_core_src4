@@ -6,35 +6,39 @@ import java.util.Vector;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IFlagsToString;
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.helpers.CounterInt;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.structs.IntToStrings;
+import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
- * Bastard context (lowercase C letter)
+ * Bastard context (lowercase C letter), so not a code context. 
+ * It provides a debug context to the {@link IStringable#toString(Dctx)} and {@link IStringable#toString1Line(Dctx)} methods
+ * <br>
+ * <br>
  * 
- * Tracks which class has been toString.
+ * Provides extensive support methods for writing {@link IStringable#toString()} methods
+ * which basically all objects in our code implement.
  * <br>
- * Cuts
- * <br>
+ * 
+ * <li>Tracks which class has been toString.
  * Tracks the whole toString from the start by using a {@link IntToObjects}
  * to track debugged classes.
- * <br>
- * One {@link StringBuilder} for the whole process.
- * <br>
- * Each level can have its own {@link StringBuilder} for hiding purposes
- * <br>
- * <br>
- * Hide some levels.
  * 
- * <br>
  * @author Charles Bentley
  *
  */
 public class Dctx implements IFlagsToString {
    //#mdebug
 
+   /**
+    * Static method for debugging. Supposedly to be inlined but since its debug code, it will be removed in production.
+    * Makes a 3 line method into a 1 line.
+    * @param is
+    * @return
+    */
    public static String toString(IStringable is) {
       Dctx c = new Dctx(is.toStringGetUCtx(), "\n\t");
       is.toString(c);
@@ -47,32 +51,57 @@ public class Dctx implements IFlagsToString {
       return c.toString();
    }
 
+   private String         defaultLine     = "30";
+
    private int            flags;
+
+   private IntToObjects   flagsData;
+
+   private boolean        isClassLinks;
 
    private boolean        isCompact;
 
-   private String         nl;
+   private boolean        isExpand;
 
-   private int            nlNum;
+   private boolean        isLineNumbers   = true;
+
+   private char[]         linesArray      = new char[] { '│', '↑', '║', '↓', '├' };
+
+   /**
+    *  ⋮ ⼁ ︴｜ ⍭  ⎜ ⎨ ⧸ ┠ ∫  '┇' ║ │ ├ ▌ █
+    *    https://www.compart.com/en/unicode/block/U+2500 box drawing
+    */
+   private char[]         linesArrayStart = new char[] { '┌', '→', '╓', '←', '╒' };
 
    private IntToStrings   nulls;
+
+   private CounterInt     numLines;
+
+   private int            numTabs;
 
    private Dctx           parent;
 
    /**
-    * propagated from parents
+    * Track multi lines objects and the line at which it is printed
     */
-   private IntToObjects   processedObjects;
+   private IntToObjects   processedObjectsMulti;
 
-   private IntToObjects   processingSingleLines;
-
-   private String         rootTitle;
+   /**
+    * Track single line objects and the line at which it is printed
+    */
+   private IntToObjects   processingObjectsSingle;
 
    private StringBBuilder sb;
 
    private int            tick;
 
+   private String         titlePrefix;
+
+   private String         titleSuffix;
+
    private IntToObjects   track;
+
+   private IntToObjects   trackedCtx;
 
    private UCtx           uc;
 
@@ -82,39 +111,64 @@ public class Dctx implements IFlagsToString {
 
    /**
     * Creates a {@link Dctx} with parent
+    * 
+    * @param uc
     * @param parent
+    * @param tabNumExtra
     */
-   public Dctx(UCtx uc, Dctx parent) {
-      this(uc, parent, 0);
-   }
-
-   public Dctx(UCtx uc, Dctx parent, int i) {
+   private Dctx(UCtx uc, Dctx parent) {
       if (uc == null) {
          throw new NullPointerException();
       }
       this.uc = uc;
       this.parent = parent;
-      String tab = "";
-      for (int j = 0; j < i; j++) {
-         tab = tab + "\t";
-      }
-      nl = parent.nl + tab;
-      sb = parent.sb;
-      nulls = new IntToStrings(uc);
-      processedObjects = parent.processedObjects;
-      processingSingleLines = parent.processingSingleLines;
+      this.sb = parent.sb;
+      //tab method is called during the root method once the title has been written
+      this.nlRoot = parent.nlRoot;
+      this.nlTabs = parent.nlTabs;
+      this.numTabs = parent.numTabs;
+      //must be a reference t
+      this.numLines = parent.numLines;
+
+      this.nulls = new IntToStrings(uc);
+      this.processedObjectsMulti = parent.processedObjectsMulti;
+      this.flagsData = parent.flagsData;
+      this.trackedCtx = parent.trackedCtx;
+      this.processingObjectsSingle = parent.processingObjectsSingle;
+
+      this.isClassLinks = parent.isClassLinks;
+      this.isCompact = parent.isCompact;
+      this.isExpand = parent.isExpand;
+      this.isLineNumbers = parent.isLineNumbers;
    }
 
+   private String nlRoot;
+
+   private String nlTabs;
+
+   /**
+    * 
+    * @param uc
+    * @param nl provides the base nl string
+    */
    public Dctx(UCtx uc, String nl) {
       if (uc == null) {
          throw new NullPointerException();
       }
       this.uc = uc;
-      this.nl = nl;
+      if (nl == null || nl.length() == 0) {
+         nl = "\n";
+      }
+      this.nlRoot = nl;
+      this.nlTabs = "";
       sb = new StringBBuilder(uc, 4000);
       nulls = new IntToStrings(uc);
-      processedObjects = new IntToObjects(uc);
-      processingSingleLines = new IntToObjects(uc);
+      flagsData = new IntToObjects(uc);
+      processedObjectsMulti = new IntToObjects(uc);
+      trackedCtx = new IntToObjects(uc);
+      processingObjectsSingle = new IntToObjects(uc);
+      numLines = new CounterInt(uc);
+      isClassLinks = uc.getConfigU().toStringIsUsingClassLinks();
    }
 
    public void append(boolean v) {
@@ -177,6 +231,35 @@ public class Dctx implements IFlagsToString {
       sb.append(string);
    }
 
+   /**
+    * 
+    * @param title
+    * @param array
+    * @param columnSize
+    */
+   public void appendVar(String title, byte[] array, int columnSize, String sep) {
+      sb.append(title);
+      sb.append('=');
+      if (array == null) {
+         sb.append("byte[] is null");
+      } else {
+         if (columnSize < 0) {
+            columnSize = 1;
+         }
+         int count = 0;
+         for (int i = 0; i < array.length; i++) {
+            if (count == columnSize) {
+               sb.nl();
+               count = 0;
+            }
+            sb.append(String.valueOf(array[i]));
+            sb.append(sep);
+            count++;
+         }
+      }
+
+   }
+
    public void append(String[] strs, int offset, int len, String sep) {
       for (int i = offset; i < offset + len; i++) {
          if (i != offset) {
@@ -186,16 +269,23 @@ public class Dctx implements IFlagsToString {
       }
    }
 
-   public void appendName(Class cs) {
-      String name = cs.getName();
-      int v = name.lastIndexOf('.');
-      if (v == -1) {
-         v = 0;
-      } else {
-         v++;
-      }
-      sb.append('#');
-      sb.append(name.substring(v, name.length()));
+   public void append(String[] strs, String sep) {
+      this.append(strs, 0, strs.length, sep);
+   }
+
+   public void appendColorRGB(int colorRGB) {
+      sb.append(uc.getColorU().toStringColorRGB(colorRGB));
+   }
+
+   public void appendColorWithSpace(String color, int rgb) {
+      sb.append(' ');
+      sb.append(color);
+      sb.append('=');
+      sb.append(uc.getColorU().toStringColor(rgb));
+   }
+
+   public void line() {
+      this.nl();
    }
 
    public void appendPretty(String val, int value, int max) {
@@ -215,6 +305,12 @@ public class Dctx implements IFlagsToString {
       sb.append(s);
       sb.append('=');
       sb.append(v);
+   }
+
+   public void appendVar(String s, long v) {
+      sb.append(s);
+      sb.append('=');
+      sb.append(String.valueOf(v));
    }
 
    public void appendVar(String s, Object v) {
@@ -280,11 +376,26 @@ public class Dctx implements IFlagsToString {
       sb.append(String.valueOf(v));
    }
 
+   public void appendVarWithSpace(String s, float v, int numDecimals) {
+      sb.append(' ');
+      sb.append(s);
+      sb.append('=');
+      sb.append(uc.getStrU().prettyFloat(v, numDecimals));
+   }
+
    public void appendVarWithSpace(String s, int v) {
       sb.append(' ');
       sb.append(s);
       sb.append('=');
       sb.append(v);
+   }
+
+   public void appendVarWithSpace(String s, int[] ar) {
+      debugAlone(s, ar, " ");
+   }
+
+   public void appendVarWithSpace(String s, int[] ar, String sep) {
+      debugAlone(s, ar, sep);
    }
 
    public void appendVarWithSpace(String s, Integer v) {
@@ -358,6 +469,17 @@ public class Dctx implements IFlagsToString {
       sb.append(string);
    }
 
+   public void appendWithSpaceArrayNullOnly(Object[] ar, String t) {
+      if (ar == null) {
+         if (t.endsWith("s")) {
+            append(t + " are nulls");
+         } else {
+            append(t + " is null");
+         }
+         return;
+      }
+   }
+
    public void appendWithSpaceIfNotNull(char c, String name, char d) {
       if (name != null) {
          this.append(' ');
@@ -377,40 +499,56 @@ public class Dctx implements IFlagsToString {
       }
    }
 
-   public void debugNlSep(int[] ar) {
-      if (ar == null) {
-         this.append("null");
-      } else {
-         for (int i = 0; i < ar.length; i++) {
-            this.append(i + "=" + ar[i] + nl);
+   public void debugAlone(int[] ar, String sep) {
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            append(sep);
          }
+         append(ar[i]);
       }
    }
 
-   private void doRootTitle() {
-      if (rootTitle != null && rootTitle.length() != 0) {
+   public void debugAlone(String title, int[] ar, String sep) {
+      sb.append(title);
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            append(sep);
+         }
+         append(ar[i]);
+      }
+   }
+
+   private void doTitlePrefix() {
+      if (titlePrefix != null) {
+         sb.append(titlePrefix);
+         sb.append('=');
+      }
+   }
+
+   private void doTitleSuffix() {
+      if (titleSuffix != null && titleSuffix.length() != 0) {
          sb.append(' ');
          sb.append('[');
-         sb.append(rootTitle);
+         sb.append(titleSuffix);
          sb.append(']');
       }
    }
 
-   /**
-    * 
-    * @param str
-    * @param dd
-    * @return
-    */
-   public Dctx exclusive(String str, IStringable dd) {
-      Dctx dc = new Dctx(uc, nl + "\t");
-      dc.append(str);
-      dd.toString(dc);
-      return dc;
+   private String getClassSimpleName(Class cl) {
+      String str = uc.getStrU().getStringAfterLastIndex(cl.getName(), '.');
+      return str;
    }
 
    public int getCount() {
       return sb.getCount();
+   }
+
+   private char getLevelStartChar() {
+      return linesArrayStart[numTabs % linesArrayStart.length];
+   }
+
+   private char getLevelStartChar1Line() {
+      return '#';
    }
 
    public StringBBuilder getSB() {
@@ -418,13 +556,19 @@ public class Dctx implements IFlagsToString {
    }
 
    /**
+    * Flag from a marked prefixed interface {@link IFlagsToString}
     * 
     * @param ctx
     * @param flag
     * @return
     */
    public boolean hasFlagData(ICtx ctx, int flag) {
-      return false;
+      int index = flagsData.findObjectRef(ctx);
+      if (index == -1) {
+         return ctx.toStringHasToStringFlag(flag);
+      } else {
+         return flagsData.hasIntFlag(index, flag);
+      }
    }
 
    public boolean isCompact() {
@@ -432,11 +576,15 @@ public class Dctx implements IFlagsToString {
    }
 
    /**
-    * Convert to data flag
+    * true when showing multi line objects in arrays and data structures such as {@link IntToObjects}
     * @return
     */
    public boolean isExpand() {
-      return BitUtils.hasFlag(flags, FLAG_1_EXPAND);
+      return isExpand;
+   }
+
+   public boolean isLineNumbers() {
+      return isLineNumbers;
    }
 
    public boolean isTick() {
@@ -464,25 +612,17 @@ public class Dctx implements IFlagsToString {
       }
    }
 
-   public void nl() {
-      sb.append(nl);
-   }
-
-   public void nlAppend(String string) {
-      nl();
-      append(string);
-   }
-
    /**
-    * Print a nline.
-    * Create a new {@link Dctx} increasing tabulation by 1.
+    * Creates a new {@link Dctx} child of the current one.
+    * <br>
+    * A new line is appended.
+    * Tabulation is not increased.
     * 
-    * @return
+    * @return {@link Dctx}
     */
-   public Dctx nLevel() {
-      nl();
-      Dctx dc = new Dctx(uc, this);
-      return dc;
+   public Dctx newLevel() {
+      int flags = 0;
+      return newLevel(flags);
    }
 
    /**
@@ -490,38 +630,107 @@ public class Dctx implements IFlagsToString {
     * @param flags
     * @return
     */
-   public Dctx nLevel(int flags) {
+   public Dctx newLevel(int flags) {
       nl();
       Dctx c = new Dctx(uc, this);
       c.flags = flags;
       return c;
    }
 
-   public Dctx nLevel1Line() {
+   public Dctx newLevel1Line() {
       append(' ');
       Dctx dc = new Dctx(uc, this);
       return dc;
    }
 
-   public Dctx nLevelTab() {
+   public Dctx newLevelTab() {
       nl();
       Dctx dc = new Dctx(uc, this);
       dc.tab();
       return dc;
    }
 
-   /**
-    * 
-    * @return
-    */
-   public Dctx nlLvl() {
-      Dctx dc = nLevel(0);
-      return dc;
+   public void nlSpace() {
+      nl();
+      space();
    }
 
-   public Dctx nlLvl(int flags) {
-      Dctx dc = nLevel(flags);
-      return dc;
+   public void nl() {
+      numLines.increment();
+      if (isLineNumbers) {
+         String strLineNumber = uc.getStrU().prettyIntPaddStr(numLines.getCount(), 4, " ");
+         sb.append(nlRoot);
+         sb.append(strLineNumber);
+         sb.append(nlTabs);
+      } else {
+         sb.append(nlRoot);
+         sb.append(nlTabs);
+      }
+   }
+
+   public void nlAppend(String string) {
+      nl();
+      append(string);
+   }
+
+   public void nlArrayRaw(Object[] param, String string) {
+      sb.nl();
+      if (param == null) {
+         sb.append(string + " is null");
+      } else {
+         sb.append(string + " size=" + param.length);
+         int countNulls = ArrayUtils.countNulls(param);
+         sb.append("nulls=");
+         sb.append(countNulls);
+      }
+   }
+
+   public void nlFrontTitle(int[] data, String title) {
+      this.nl();
+      if (title != null) {
+         append(title);
+         append("=");
+      }
+      if (data != null) {
+         String str = uc.getIU().debugString(data);
+         this.append(str);
+      } else {
+         this.append(" int[] is null");
+      }
+   }
+
+   public void nlLvl(IntToObjects ito, String t, String titleRow, IStringableInt stringerInt) {
+      nl();
+      if (ito == null) {
+         sb.append(t + " is null");
+      } else {
+         int num = ito.getLength();
+         sb.append(t);
+         sb.append(" with ");
+         sb.append(num);
+         sb.append(" elements");
+         for (int i = 0; i < num; i++) {
+            nl();
+            append(i);
+            append(" : ");
+            append(titleRow);
+            append(" [");
+            append(ito.ints[i]);
+            append("]");
+            if (stringerInt != null) {
+               nl();
+               append(" ");
+               append(stringerInt.toString(ito.ints[i]));
+            }
+            nl();
+            Object o = ito.objects[i];
+            if (o instanceof IStringable) {
+               nlLvl("", (IStringable) o);
+            } else {
+               append(o.toString());
+            }
+         }
+      }
    }
 
    /**
@@ -534,38 +743,54 @@ public class Dctx implements IFlagsToString {
       nlLvl("", is);
    }
 
+   /**
+    * Suffixed title to {@link IStringable} root name.
+    * <br>
+    * Title is the simple class name.
+    * @param str
+    * @param class1
+    */
    public void nlLvl(IStringable str, Class class1) {
-      nlLvl(str, class1.getName());
+      String title = getClassSimpleName(class1);
+      nlLvl(str, title);
    }
 
    /**
-    * Sets a root title 
+    * Suffixed title to {@link IStringable} root name.
+    * <br>
+    * Cue is because the title parameter is after {@link IStringable}.
     * @param is
-    * @param t
+    * @param title
     */
-   public void nlLvl(IStringable is, String t) {
-      nlLvl(t, is, 0, true);
+   public void nlLvl(IStringable is, String title) {
+      nlLvl(title, is, 0, true);
    }
 
    /**
     * 
-    * @param str
+    * @param title
     * @param ints
     * @param numIntPerLine
     */
-   public void nlLvl(String str, int[] ints, int numIntPerLine) {
-      sb.append(nl);
-      sb.append(str);
-      sb.append(nl + "\t");
-      int count = 0;
-      for (int j = 0; j < ints.length; j++) {
-         sb.append(ints[j]);
-         sb.append(" ");
-         count++;
-         if (count == numIntPerLine) {
-            count = 0;
-            sb.append(nl + "\t");
+   public void nlLvl(String title, int[] ints, int numIntPerLine) {
+      nl();
+      if (ints == null) {
+         sb.append(title + " is null");
+      } else {
+         sb.append(title);
+         this.nl();
+         this.tab();
+         int count = 0;
+         for (int j = 0; j < ints.length; j++) {
+            sb.append(ints[j]);
+            sb.append(" ");
+            count++;
+            if (count == numIntPerLine) {
+               count = 0;
+               this.nl();
+            }
          }
+         this.tabRemove();
       }
    }
 
@@ -590,12 +815,19 @@ public class Dctx implements IFlagsToString {
       nlLvl(title, is, flags, false);
    }
 
-   public void nlLvl(String title, IStringable is, int flags, boolean flip) {
-      nlLvl(title, is, flags, flip, false);
+   /**
+    * Suffixed title to the root name
+    * @param title
+    * @param is
+    * @param flags
+    * @param isTitleSuffix
+    */
+   public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix) {
+      nlLvl(title, is, flags, isTitleSuffix, false);
    }
 
    public void nlLvl(String title, IStringable is, int flags, boolean flip, boolean list) {
-      nlLvl(title, is, flags, flip, list, false);
+      nlLvl(title, is, flags, flip, list, true);
    }
 
    /**
@@ -603,46 +835,106 @@ public class Dctx implements IFlagsToString {
     * @param title
     * @param is
     * @param flags
-    * @param flip when true, the title goes after the root name, when false title=
-    * @param list when true, if the {@link IStringable} is null, it is added to a list of null.
-    * @param titleOnlyIfNull
+    * @param isTitleSuffix when true, the title is printed after the root name, when false title=
+    * @param listNulls when true, if the {@link IStringable} is null, it is added to a list of nulls for current level.
+    * @param showTitleWhenNotNull when true, show title when {@link IStringable} is not null.
     * That list is printed by the call {@link Dctx#listNulls()}
     */
-   public void nlLvl(String title, IStringable is, int flags, boolean flip, boolean list, boolean titleOnlyIfNull) {
+   public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix, boolean listNulls, boolean showTitleWhenNotNull) {
       if (is == null) {
-         if (list) {
+         if (listNulls) {
             nulls.add(title);
          } else {
-            Dctx dc = nLevel(flags);
+            Dctx dc = newLevel(flags);
             dc.append(title + " is Null");
          }
       } else {
-         Dctx dc = nLevel(flags);
-         if (!titleOnlyIfNull) {
+         Dctx dc = newLevel(flags);
+         if (showTitleWhenNotNull) {
             if (title.length() != 0) {
-               if (flip) {
+               if (isTitleSuffix) {
                   //set root title
-                  dc.setRootTitle(title);
+                  dc.setTitleSuffix(title);
                } else {
-                  dc.append(title);
-                  dc.append("=");
+                  //title
+                  dc.setTitlePrefix(title);
                }
             }
          }
-         int reference = processedObjects.getObjectIndex(is);
-         if (reference != -1) {
+         int referenceIndex = processedObjectsMulti.getObjectIndex(is);
+         if (referenceIndex != -1) {
             //TODO sets a string reference to the object id
             //by using in the int to object id as the reference
             //dc.setRootReference(reference);
+            if (isLineNumbers) {
+               int lineNum = processedObjectsMulti.getInt(referenceIndex);
+               this.append("@Line[");
+               this.append(lineNum);
+               this.append("]");
+            }
             is.toString1Line(dc);
          } else {
-            processedObjects.add(is);
             is.toString(dc);
          }
       }
    }
 
+   public void nlLvl1Line(IStringable is) {
+      nl();
+      int index = processingObjectsSingle.getObjectIndex(is);
+      if (index != -1) {
+         String str = getClassSimpleName(is.getClass());
+         if (isLineNumbers) {
+            append(getLevelStartChar());
+            append("@Line");
+            append(processingObjectsSingle.getInt(index));
+            append("]");
+            append(str);
+         } else {
+            append(str + " is already oneline printed above");
+         }
+      } else {
+         processingObjectsSingle.add(is, numLines.getCount());
+         is.toString1Line(this);
+      }
+   }
+
+   public void nlLvlCtx(ICtx ctx, Class cl) {
+      this.nlLvl(ctx, cl);
+   }
+
+   /**
+    * 
+    * @param is
+    * @param title when null, ignores the title
+    */
+   public void nlLvl1Line(IStringable is, String title) {
+      //break cycle don't print if we are currently printing
+      //this one liner
+      if (processingObjectsSingle.hasObject(is)) {
+         String str = getClassSimpleName(is.getClass());
+         append(title + " is already printed above");
+      } else {
+         Dctx dc = newLevel();
+         if (is == null) {
+            dc.append(title + " is Null");
+         } else {
+            if (title.length() != 0) {
+               dc.append(title);
+               dc.append("=");
+            }
+            processingObjectsSingle.add(is);
+            is.toString1Line(dc);
+         }
+      }
+   }
+
    public void nlLvlArray(Object[] ar, String t) {
+      if (ar == null) {
+         nl();
+         append(t + " is null");
+         return;
+      }
       IStringable[] ars = new IStringable[ar.length];
       for (int i = 0; i < ar.length; i++) {
          ars[i] = (IStringable) ar[i];
@@ -652,72 +944,70 @@ public class Dctx implements IFlagsToString {
 
    /**
     * one line or not?
-    * @param t
+    * @param title
     * @param is
     */
-   public void nlLvlArray(String t, IStringable[] is) {
+   public void nlLvlArray(String title, IStringable[] is) {
       if (is == null) {
-         nlLvlArray(t, is, 0, 0);
+         nlLvlArray(title, is, 0, 0);
       } else {
-         nlLvlArray(t, is, 0, is.length);
-      }
-   }
-
-   public void nlLvlArray(String t, IStringable[] is, int offset, int len) {
-      nl();
-      if (is == null) {
-         append(t + " is null");
-      } else {
-         sb.append("#" + t);
-         sb.append(" from " + offset + " to " + (offset + len - 1));
-         sb.append(" len");
-         sb.append('=');
-         sb.append(is.length);
-         for (int i = offset; i < offset + len; i++) {
-            if (is[i] == null) {
-               nnl();
-               sb.append(i + " = null");
-            } else if (is[i] instanceof IStringable) {
-               IStringable io = (IStringable) is[i];
-               //TODO we 
-               nlLvl(String.valueOf(i), io);
-            }
-         }
+         nlLvlArray(title, is, 0, is.length);
       }
    }
 
    /**
-    * 
-    * @param string
+    * Shows title when null.
+    * @param title
     * @param is
+    * @param offset
+    * @param len
     */
-   public void nlLvlArray1Line(String string, Object[] is) {
+   public void nlLvlArray(String title, IStringable[] is, int offset, int len) {
       nl();
-      sb.append("#" + string);
-      sb.append('=');
-      sb.append(is.length);
-      for (int i = 0; i < is.length; i++) {
-         nnl();
-         if (is[i] == null) {
-            sb.append("null");
-         } else if (is[i] instanceof IStringable) {
-            IStringable io = (IStringable) is[i];
-            io.toString1Line(this);
+      if (is == null) {
+         append(title + " is [null]"); //tells us its an array
+      } else {
+         sb.append(getLevelStartChar());
+         sb.append("[");
+         sb.append(title);
+         sb.append("]");
+         if (offset == 0 && is.length == len) {
+            //usual case of full array
+            appendVarWithSpace("size", len);
          } else {
-            sb.append(is[i].toString());
+            sb.append(" [");
+            sb.append(" from offset " + offset + " to " + (offset + len - 1));
+            sb.append(" len");
+            sb.append('=');
+            sb.append(is.length);
+            sb.append("]");
+         }
+         for (int i = offset; i < offset + len; i++) {
+            tab();
+            String stri = String.valueOf(i);
+            if (is[i] == null) {
+               nl();
+               sb.append(i + " = null");
+            } else if (is[i] instanceof IStringable) {
+               IStringable io = (IStringable) is[i];
+               nlLvl(stri, io);
+            }
+            tabRemove();
          }
       }
    }
 
-   public void nlLvlArray1Line(String string, Object[] is, int offset, int len) {
+   public void nlLvlArray1Line(Object[] is, int offset, int len, String string) {
       nl();
-      sb.append("#" + string);
+      sb.append(getLevelStartChar());
+      sb.append(string);
       sb.append(" from " + offset + " to " + (offset + len));
       sb.append(" RealLen");
       sb.append('=');
       sb.append(is.length);
       for (int i = offset; i < offset + len; i++) {
-         nnl();
+         nl();
+         tab();
          sb.append(i + " = ");
          if (is[i] == null) {
             sb.append("null");
@@ -728,6 +1018,33 @@ public class Dctx implements IFlagsToString {
             //cut it after the first \n
             sb.append(uc.getStrU().trimAtNewLine(is[i].toString()));
          }
+         tabRemove();
+      }
+   }
+
+   /**
+    * 
+    * @param is
+    * @param string
+    */
+   public void nlLvlArray1Line(Object[] is, String string) {
+      nl();
+      sb.append(getLevelStartChar());
+      sb.append(string);
+      sb.append('=');
+      sb.append(is.length);
+      for (int i = 0; i < is.length; i++) {
+         nl();
+         tab();
+         if (is[i] == null) {
+            sb.append("null");
+         } else if (is[i] instanceof IStringable) {
+            IStringable io = (IStringable) is[i];
+            io.toString1Line(this);
+         } else {
+            sb.append(is[i].toString());
+         }
+         tabRemove();
       }
    }
 
@@ -748,7 +1065,7 @@ public class Dctx implements IFlagsToString {
          sb.append(is.length);
          for (int i = 0; i < is.length; i++) {
             if (is[i] == null) {
-               nnl(); //we have a new line below
+               nl(); //we have a new line below
                sb.append(i + " = null");
             } else if (is[i] instanceof IStringable) {
                IStringable io = (IStringable) is[i];
@@ -809,17 +1126,32 @@ public class Dctx implements IFlagsToString {
       }
    }
 
+   /**
+    * Prints the array only if not null.
+    * @param ar
+    * @param t
+    */
+   public void nlLvlArrayNullIgnore(Object[] ar, String t) {
+      if (ar == null) {
+         return;
+      }
+      IStringable[] ars = new IStringable[ar.length];
+      for (int i = 0; i < ar.length; i++) {
+         ars[i] = (IStringable) ar[i];
+      }
+      nlLvlArray(t, ars);
+   }
+
    public void nlLvlIgnoreNull(String t, IStringable is) {
       Dctx dc = new Dctx(uc, this);
       dc.flags = flags;
       dc.nl();
       if (is != null) {
-         if (processedObjects.hasObject(is)) {
+         if (processedObjectsMulti.hasObject(is)) {
             dc.append(t);
             dc.append(" ");
             is.toString1Line(dc);
          } else {
-            processedObjects.add(is);
             dc.append(t);
             dc.append(" ");
             is.toString(dc);
@@ -833,12 +1165,12 @@ public class Dctx implements IFlagsToString {
     * @param is
     */
    public void nlLvlIndentIfNotNull(String title, IStringable is) {
-      Dctx dc = nLevel(flags);
+      Dctx dc = newLevel(flags);
       if (is == null) {
          dc.append(title + " is Null");
       } else {
          dc.append(title);
-         if (processedObjects.hasObject(is)) {
+         if (processedObjectsMulti.hasObject(is)) {
             is.toString1Line(dc);
          } else {
             //we don't add it because it will be added in the call below
@@ -848,6 +1180,11 @@ public class Dctx implements IFlagsToString {
       }
    }
 
+   /**
+    * Shows title when not null. but if null, add to null list
+    * @param t
+    * @param is
+    */
    public void nlLvlList(String t, IStringable is) {
       nlLvl(t, is, 0, false, true);
    }
@@ -856,8 +1193,8 @@ public class Dctx implements IFlagsToString {
       nlLvl(title, is, flags, flip, true);
    }
 
-   public void nlLvlNoTitle(String t, IStringable is) {
-      nlLvl(t, is, 0);
+   public void nlLvlNullTitle(String t, IStringable is) {
+      nlLvlNullTitle(t, is, 0);
    }
 
    /**
@@ -866,50 +1203,29 @@ public class Dctx implements IFlagsToString {
     * @param is
     * @param flags
     */
-   public void nlLvlNoTitle(String t, IStringable is, int flags) {
-      Dctx dc = nLevel(flags);
+   public void nlLvlNullTitle(String t, IStringable is, int flags) {
+      Dctx dc = newLevel(flags);
       if (is == null) {
          dc.append(t + " is Null");
       } else {
-         if (processedObjects.hasObject(is)) {
+         if (processedObjectsMulti.hasObject(is)) {
             is.toString1Line(dc);
          } else {
-            processedObjects.add(is);
             is.toString(dc);
          }
       }
    }
 
-   public void nlLvlNoTitleList(String t, IStringable is) {
-      Dctx dc = nLevel(0);
+   public void nlLvlNullTitleList(String t, IStringable is) {
+      Dctx dc = newLevel(0);
       if (is == null) {
          nulls.add(t);
       } else {
-         if (processedObjects.hasObject(is)) {
+         if (processedObjectsMulti.hasObject(is)) {
             is.toString1Line(dc);
          } else {
-            processedObjects.add(is);
             is.toString(dc);
          }
-      }
-   }
-
-   public void debugAlone(String title, int[] ar, String sep) {
-      sb.append(title);
-      for (int i = 0; i < ar.length; i++) {
-         if (i != 0) {
-            append(sep);
-         }
-         append(ar[i]);
-      }
-   }
-
-   public void debugAlone(int[] ar, String sep) {
-      for (int i = 0; i < ar.length; i++) {
-         if (i != 0) {
-            append(sep);
-         }
-         append(ar[i]);
       }
    }
 
@@ -940,54 +1256,11 @@ public class Dctx implements IFlagsToString {
       }
    }
 
-   public void nlLvlObject(String string, Object o) {
-      Dctx dc = new Dctx(uc, this);
+   public void nlLvlObject(String title, Object o) {
       if (o == null) {
-         dc.append("null");
-      } else if (o instanceof IStringable) {
-         IStringable consumer = (IStringable) o;
-         if (isExpand()) {
-            consumer.toString(dc);
-         } else {
-            consumer.toString1Line(dc);
-         }
+         nlLvl(title, null);
       } else {
-         String str = o.toString();
-         dc.append(str);
-      }
-   }
-
-   public void nlLvlOneLine(IStringable is) {
-      nl();
-      if (processingSingleLines.hasObject(is)) {
-         append(is.getClass().getName() + " is already printed above");
-      } else {
-         processingSingleLines.add(is);
-         is.toString1Line(this);
-      }
-   }
-
-   public void nlLvlOneLine(IStringable is, String t) {
-      nlLvlOneLine(t, is);
-   }
-
-   public void nlLvlOneLine(String t, IStringable is) {
-      //break cycle don't print if we are currently printing
-      //this one liner
-      if (processingSingleLines.hasObject(is)) {
-         append(t + " is already printed above");
-      } else {
-         Dctx dc = nLevel();
-         if (is == null) {
-            dc.append(t + " is Null");
-         } else {
-            if (t.length() != 0) {
-               dc.append(t);
-               dc.append("=");
-            }
-            processingSingleLines.add(is);
-            is.toString1Line(dc);
-         }
+         nlLvl(title, new StringableWrapper(uc, o));
       }
    }
 
@@ -997,7 +1270,10 @@ public class Dctx implements IFlagsToString {
     * @param t
     */
    public void nlLvlTitleIfNull(IStringable is, String t) {
-      nlLvl(t, is, 0, true, true, true);
+      boolean showTitleWhenNotNull = false;
+      boolean listNulls = true;
+      boolean isTitleSuffix = true; //irrelevant when title not showned
+      nlLvl(t, is, 0, isTitleSuffix, listNulls, showTitleWhenNotNull);
    }
 
    public void nlLvlVector(Vector v) {
@@ -1019,7 +1295,7 @@ public class Dctx implements IFlagsToString {
    }
 
    public void nlThread(String title, Thread t) {
-      Dctx dc = nLevel(0);
+      Dctx dc = newLevel(0);
       if (t == null) {
          dc.append(title + " is null");
       } else {
@@ -1031,7 +1307,7 @@ public class Dctx implements IFlagsToString {
    }
 
    public void nlVar(String s, boolean v) {
-      sb.append(nl);
+      nl();
       sb.append(s);
       sb.append('=');
       if (v) {
@@ -1053,12 +1329,12 @@ public class Dctx implements IFlagsToString {
    }
 
    public void nlVar(String s, String v) {
-      sb.append(nl);
+      nl();
       appendVar(s, v);
    }
 
    public void nlVarOneLine(String string, IStringable is) {
-      sb.append(nl);
+      nl();
       if (is != null) {
          sb.append(string);
          sb.append('=');
@@ -1081,40 +1357,18 @@ public class Dctx implements IFlagsToString {
       }
    }
 
-   public void nnl() {
-      sb.append(nl + "\t");
-   }
-
-   public Dctx nnLvl() {
-      Dctx c = new Dctx(uc, this, 2);
-      return c;
-   }
-
-   public void nnnl() {
-      sb.append(nl + "\t\t");
+   public void nlTab() {
+      nl();
+      tab();
    }
 
    public void oneLine(IStringable is) {
+      //this.append(" ");
       is.toString1Line(this);
    }
 
    public void printExclusive(Dctx deviceD) {
       append(deviceD.toString());
-   }
-
-   /**
-    * Remove NL temporaryly and replace it with a space
-    */
-   public String removeNL() {
-      String n = nl;
-
-      return n;
-   }
-
-   public String replaceNL(String str) {
-      String n = nl;
-      nl = str;
-      return n;
    }
 
    /**
@@ -1125,6 +1379,41 @@ public class Dctx implements IFlagsToString {
       sb.decrementCount(v);
    }
 
+   public void root(Object o, Class cl) {
+      String str = getClassSimpleName(cl);
+      this.root(o, str, defaultLine);
+   }
+
+   public void root(Object o, Class cl, ICtx ctx) {
+      String str = getClassSimpleName(cl);
+      this.root(o, str, defaultLine);
+
+   }
+
+   public void root(Object o, Class cl, int line) {
+      String str = getClassSimpleName(cl);
+      this.root(o, str, String.valueOf(line));
+
+   }
+
+   /**
+    * 
+    * @param o
+    * @param c
+    * @param line
+    */
+   public void root(Object o, Class cl, String line) {
+      String str = getClassSimpleName(cl);
+      if (line.startsWith("@line")) {
+         line = line.substring(5);
+      }
+      root(o, str, line);
+   }
+
+   public void root(Object o, String str) {
+      this.root(o, str, defaultLine);
+   }
+
    /**
     * Displays a root. 
     * <br>
@@ -1132,26 +1421,109 @@ public class Dctx implements IFlagsToString {
     * @param o when null, print that
     * @param str
     */
-   public void root(Object o, String str) {
-      sb.append('#');
-      append(str);
-      doRootTitle();
-      processedObjects.add(o);
-      processedObjects.add(str);
+   public void root(Object o, String str, String line) {
+      if (isLineNumbers && numLines.getCount() == 0) {
+         numLines.increment();
+         String strLine = uc.getStrU().prettyIntPaddStr(numLines.getCount(), 4, " ");
+         sb.append(strLine);
+      }
+      if (isClassLinks) {
+         sb.append(getLevelStartChar());
+         doTitlePrefix();
+         sb.append(' ');
+         sb.append('(');
+         append(str);
+         append(".java:");
+         append(line);
+         append(")");
+      } else {
+         sb.append(getLevelStartChar());
+         doTitlePrefix();
+         append(str);
+      }
+
+      doTitleSuffix();
+      processedObjectsMulti.addUnique(o, numLines.getCount());
+
       tab();
+
+   }
+
+   public void root1Line(Object o, Class cl) {
+      String str = getClassSimpleName(cl);
+      this.root1Line(o, str);
    }
 
    public void root1Line(Object o, String str) {
-      sb.append('#');
+      sb.append(getLevelStartChar1Line());
+      doTitlePrefix();
       sb.append(str);
       setCompact(true);
-      doRootTitle();
+      doTitleSuffix();
    }
 
-   public void rootSub(String str) {
-      sb.append('#');
+   public void rootCtx(ICtx ctx, Class cl) {
+      this.trackedCtx.addUnique(ctx);
+      String str = getClassSimpleName(cl);
+      append("RootCtx=");
+      if (isClassLinks) {
+         sb.append(' ');
+         sb.append('(');
+         append(str);
+         append(".java:40)");
+      } else {
+         append(str);
+      }
+   }
+
+   public void rootN(Object o, String str) {
+      sb.append(getLevelStartChar());
+      doTitlePrefix();
       append(str);
+      doTitleSuffix();
+      processedObjectsMulti.add(o, numLines.getCount());
+      processedObjectsMulti.add(str);
       tab();
+   }
+
+   public void rootN1Line(Object o, String str) {
+      sb.append(getLevelStartChar1Line());
+      doTitlePrefix();
+      sb.append(str);
+      setCompact(true);
+      doTitleSuffix();
+   }
+
+   public void rootN(Object o, String str, Class cl, int line) {
+      //add a suffix
+      if (isClassLinks) {
+         String strCl = getClassSimpleName(cl);
+         StringBBuilder sb = new StringBBuilder(uc);
+         sb.append(' ');
+         sb.append('(');
+         sb.append(strCl);
+         sb.append(".java:");
+         sb.append(line);
+         sb.append(")");
+         setTitlePrefix(sb.toString());
+      }
+      this.rootN(o, str);
+   }
+
+   public void rootN1Line(Object o, String str, Class cl, int line) {
+      //add a suffix
+      if (isClassLinks) {
+         String strCl = getClassSimpleName(cl);
+         StringBBuilder sb = new StringBBuilder(uc);
+         sb.append(' ');
+         sb.append('(');
+         sb.append(strCl);
+         sb.append(".java:");
+         sb.append(line);
+         sb.append(")");
+         setTitlePrefix(sb.toString());
+      }
+      this.rootN1Line(o, str);
    }
 
    /**
@@ -1200,15 +1572,36 @@ public class Dctx implements IFlagsToString {
    }
 
    public void setExpand(boolean v) {
-      setFlag(FLAG_1_EXPAND, v);
+      isExpand = v;
    }
 
    public void setFlag(int flag, boolean v) {
       flags = BitUtils.setFlag(flags, flag, v);
    }
 
-   private void setRootTitle(String title) {
-      rootTitle = title;
+   public void setFlagData(ICtx ctx, int flag, boolean b) {
+      int index = flagsData.findObjectRef(ctx);
+      if (index == -1) {
+         //not even there
+         index = flagsData.addReturn(ctx, ctx.toStringGetToStringFlags());
+      }
+      flagsData.setIntFlag(index, flag, b);
+   }
+
+   public void setLineNumbers(boolean isLineNumbers) {
+      this.isLineNumbers = isLineNumbers;
+   }
+
+   private void setTitlePrefix(String title) {
+      titlePrefix = title;
+   }
+
+   private void setTitleSuffix(String title) {
+      titleSuffix = title;
+   }
+
+   public void space() {
+      this.append(" ");
    }
 
    /**
@@ -1218,7 +1611,7 @@ public class Dctx implements IFlagsToString {
     * @return
     */
    public Dctx sup() {
-      Dctx d = nLevel();
+      Dctx d = newLevel();
       return d;
    }
 
@@ -1231,21 +1624,31 @@ public class Dctx implements IFlagsToString {
     * Increase tabulation
     */
    public void tab() {
-      nl = nl + "│   ";
-      nlNum++;
+      char c = linesArray[numTabs % linesArray.length];
+      nlTabs = nlTabs + c + strInterTab;
+      numTabs++;
    }
+
+   private String strInterTab = "  ";
 
    /**
     * Decrease tabulation
     */
    public void tabRemove() {
-      if (nlNum > 0) {
-         nlNum--;
-         nl = "\n  ";
-         for (int i = 0; i < nlNum; i++) {
-            nl = nl + "│   ";
-         }
+      if (numTabs > 0) {
+         numTabs--;
+         nlTabs = getNlTab(numTabs);
       }
+   }
+
+   public String getNlTab(int numTabs) {
+      StringBBuilder sb = new StringBBuilder(uc);
+      for (int i = 0; i < numTabs; i++) {
+         char c = linesArray[i % linesArray.length];
+         sb.append(c);
+         sb.append(strInterTab);
+      }
+      return sb.toString();
    }
 
    /**
@@ -1259,14 +1662,43 @@ public class Dctx implements IFlagsToString {
       return sb.toString();
    }
 
-   public void nlLvl(int[] data, String title) {
-      this.nl();
-      String str = uc.getIU().debugString(data);
-      this.append(str);
+   /**
+    * Append data about the ctxs. This is not always desirable
+    */
+   public void toStringCtx() {
+      for (int i = 0; i < trackedCtx.getLength(); i++) {
+         ICtx ctx = (ICtx) trackedCtx.getObjectAtIndex(i);
+         ICtx[] subs = ctx.getCtxSub();
+         for (int j = 0; j < subs.length; j++) {
+            int index = trackedCtx.getObjectIndex(subs[j]);
+            if (index != -1) {
+               trackedCtx.incrementInt(index, 1);
+            }
+         }
+      }
+      trackedCtx.sortInt(true);
+      for (int i = 0; i < trackedCtx.getLength(); i++) {
+         ICtx ctx = (ICtx) trackedCtx.getObjectAtIndex(i);
+         int refs = trackedCtx.getInt(i);
+         this.nlLvl(ctx, "refs=" + refs);
+      }
    }
 
-   public void appendColorRGB(int colorRGB) {
-      sb.append(uc.getColorU().toStringColorRGB(colorRGB));
+   public void appendFlagsPositive(int flags, String title, IntToStrings data) {
+      sb.append(title);
+      sb.append(" as TRUE = ");
+      int count = 0;
+      for (int i = 0; i < data.getSize(); i++) {
+         int flag = data.getInt(i);
+         if (BitUtils.hasFlag(flags, flag)) {
+            String str = data.getString(i);
+            if (count != 0) {
+               sb.append(",");
+            }
+            sb.append(str);
+            count++;
+         }
+      }
    }
 
    //#enddebug

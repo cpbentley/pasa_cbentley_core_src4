@@ -51,6 +51,8 @@ public abstract class AbstractBRunnable implements IBRunnable {
     */
    private int                  flags        = 0;
 
+   private boolean              isWaiting    = true;
+
    protected IBRunnableListener listener;
 
    /**
@@ -62,6 +64,11 @@ public abstract class AbstractBRunnable implements IBRunnable {
     * The lock on which the task will wait when paused
     */
    private Object               lock         = new Integer(0);
+
+   /**
+    * Used for monitoring the Paused state
+    */
+   private MutexSignal          mutex;
 
    /**
     * Real current state of the {@link IMRunnable}.
@@ -81,14 +88,12 @@ public abstract class AbstractBRunnable implements IBRunnable {
     */
    private volatile int         stateRequest = 0;
 
-   private UCtx                 uc;
-
    /**
-    * Used for monitoring the Paused state
+    * Set only once so it is safe as a getter. Or Is it not? Check with another expert
     */
-   private MutexSignal          mutex;
+   private Thread thisThread;
 
-   private boolean              isWaiting    = true;
+   protected final UCtx         uc;
 
    public AbstractBRunnable(UCtx uc) {
       this.uc = uc;
@@ -100,20 +105,54 @@ public abstract class AbstractBRunnable implements IBRunnable {
       flags = flag;
    }
 
+   /**
+    * 
+    */
+   public void addListener(IBRunnableListener lis) {
+      if (listener == null) {
+         this.listener = lis;
+      } else {
+         if (listeners == null) {
+            listeners = new Vector(1);
+            listeners.addElement(lis);
+         }
+      }
+   }
+
+   /**
+    * Called when an exception prevented the task from finishing.
+    * <br>
+    * Set the state to Error
+    * @param e
+    */
+   public void exception(Exception e) {
+      state = ITechRunnable.STATE_4_CANCELED_ERROR;
+      //send it to listeners
+      if (listener != null) {
+         listener.runnerException(this, e);
+      }
+      if (listeners != null) {
+         Enumeration it = listeners.elements();
+         while (it.hasMoreElements()) {
+            IBRunnableListener lisv = (IBRunnableListener) it.nextElement();
+            lisv.runnerException(this, e);
+         }
+      }
+   }
+
    public Object getLock() {
       return lock;
    }
 
+   public MutexSignal getPauseLock() {
+      if (mutex == null) {
+         mutex = new MutexSignal(uc);
+      }
+      return mutex;
+   }
+
    public int getState() {
       return state;
-   }
-
-   public boolean isStateRunning() {
-      return state == STATE_0_RUNNING;
-   }
-
-   public boolean isStatePaused() {
-      return state == STATE_1_PAUSED;
    }
 
    /**
@@ -122,6 +161,10 @@ public abstract class AbstractBRunnable implements IBRunnable {
     */
    public int getStateRequest() {
       return stateRequest;
+   }
+
+   public Thread getThread() {
+      return thisThread;
    }
 
    /**
@@ -135,11 +178,7 @@ public abstract class AbstractBRunnable implements IBRunnable {
       return (flags & flag) == flag;
    }
 
-   public MutexSignal getPauseLock() {
-      if (mutex == null) {
-         mutex = new MutexSignal(uc);
-      }
-      return mutex;
+   protected void interruptedPleaseExit() {
    }
 
    /**
@@ -231,6 +270,23 @@ public abstract class AbstractBRunnable implements IBRunnable {
    }
 
    /**
+    * By default returns false
+    * @param e
+    * @return
+    */
+   protected boolean isExceptionThreadInterrupted(Exception e) {
+      return false;
+   }
+
+   public boolean isStatePaused() {
+      return state == STATE_1_PAUSED;
+   }
+
+   public boolean isStateRunning() {
+      return state == STATE_0_RUNNING;
+   }
+
+   /**
     * Can be used by sub classes to notify an update of the Run state.
     * @param newState
     */
@@ -248,96 +304,8 @@ public abstract class AbstractBRunnable implements IBRunnable {
    }
 
    /**
-    * Set only once so it is safe as a getter. Or Is it not? Check with another expert
+    * 
     */
-   private Thread thisThread;
-
-   public Thread getThread() {
-      return thisThread;
-   }
-
-   public void run() {
-      try {
-         thisThread = Thread.currentThread();
-         runAbstract();
-         if (state != ITechRunnable.STATE_2_CANCELED && state != ITechRunnable.STATE_5_INTERRUPTED) {
-            state = ITechRunnable.STATE_6_FINISHED;
-         }
-         notifyNewState(state);
-      } catch (Exception e) {
-
-         //this exception might be OK.. some libraries may throw some kind of exceptions when interrupted.
-         //ask implementation if this exception has the meaning of thread interrupted=true
-         //We have to do this because in src4 we don't have access to isInterrupted() on Thread object
-         if (isExceptionThreadInterrupted(e)) {
-            //this will occur when task is stuck in a low level IO task and UI user interrupts it.
-            //Most of the time, this case should not happen anyways, implementation must check isContinue
-            //when running this class in a SwingWorker thread for example, you should
-            //in src4 we don't have access to isInterrupted on Thread object
-            //set state to interrupted manually
-            state = STATE_5_INTERRUPTED;
-            //tell implementation to cleanly go away. This should n
-            interruptedPleaseExit();
-         } else {
-            //#debug
-            toDLog().pEx("Error during task execution", this, AbstractBRunnable.class, "run", e);
-
-            //an exception occured during the task.. what do we do about it?
-            exception(e);
-         }
-      }
-
-   }
-
-   protected void interruptedPleaseExit() {
-   }
-
-   /**
-    * By default returns false
-    * @param e
-    * @return
-    */
-   protected boolean isExceptionThreadInterrupted(Exception e) {
-      return false;
-   }
-
-   /**
-    * Called when an exception prevented the task from finishing.
-    * <br>
-    * Set the state to Error
-    * @param e
-    */
-   public void exception(Exception e) {
-      state = ITechRunnable.STATE_4_CANCELED_ERROR;
-      //send it to listeners
-      if (listener != null) {
-         listener.runnerException(this, e);
-      }
-      if (listeners != null) {
-         Enumeration it = listeners.elements();
-         while (it.hasMoreElements()) {
-            IBRunnableListener lisv = (IBRunnableListener) it.nextElement();
-            lisv.runnerException(this, e);
-         }
-      }
-   }
-
-   /**
-    * {@link AbstractBRunnable} will set the state to {@link ITechRunnable#STATE_3_STOPPED} if not canceled
-    */
-   public abstract void runAbstract();
-
-   public void addListener(IBRunnableListener lis) {
-      if (listener == null) {
-         this.listener = lis;
-      } else {
-         if (listeners == null) {
-            listeners = new Vector(1);
-            listeners.addElement(lis);
-         }
-      }
-   }
-
    public void removeListener(IBRunnableListener lis) {
       if (listener == lis) {
          listener = null;
@@ -345,13 +313,6 @@ public abstract class AbstractBRunnable implements IBRunnable {
          listeners.removeElement(lis);
       }
 
-   }
-
-   public void setRunFlag(int flag, boolean v) {
-      if (v)
-         flags = flags | flag;
-      else
-         flags = flags & ~flag;
    }
 
    /**
@@ -401,7 +362,59 @@ public abstract class AbstractBRunnable implements IBRunnable {
       }
    }
 
+   public void run() {
+      try {
+         thisThread = Thread.currentThread();
+         runAbstract();
+         if (state != ITechRunnable.STATE_2_CANCELED && state != ITechRunnable.STATE_5_INTERRUPTED) {
+            state = ITechRunnable.STATE_6_FINISHED;
+         }
+         notifyNewState(state);
+      } catch (Exception e) {
+
+         //this exception might be OK.. some libraries may throw some kind of exceptions when interrupted.
+         //ask implementation if this exception has the meaning of thread interrupted=true
+         //We have to do this because in src4 we don't have access to isInterrupted() on Thread object
+         if (isExceptionThreadInterrupted(e)) {
+            //this will occur when task is stuck in a low level IO task and UI user interrupts it.
+            //Most of the time, this case should not happen anyways, implementation must check isContinue
+            //when running this class in a SwingWorker thread for example, you should
+            //in src4 we don't have access to isInterrupted on Thread object
+            //set state to interrupted manually
+            state = STATE_5_INTERRUPTED;
+            //tell implementation to cleanly go away. This should n
+            interruptedPleaseExit();
+         } else {
+            //#debug
+            toDLog().pEx("Error during task execution", this, AbstractBRunnable.class, "run", e);
+
+            //an exception occured during the task.. what do we do about it?
+            exception(e);
+         }
+      }
+
+   }
+
+   /**
+    * {@link AbstractBRunnable} will set the state to {@link ITechRunnable#STATE_3_STOPPED} if not canceled
+    */
+   public abstract void runAbstract();
+
+   /**
+    * 
+    */
+   public void setRunFlag(int flag, boolean v) {
+      if (v)
+         flags = flags | flag;
+      else
+         flags = flags & ~flag;
+   }
+
    //#mdebug
+   public IDLog toDLog() {
+      return uc.toDLog();
+   }
+
    public String toString() {
       return Dctx.toString(this);
    }
@@ -419,10 +432,6 @@ public abstract class AbstractBRunnable implements IBRunnable {
 
    }
 
-   public IDLog toDLog() {
-      return uc.toDLog();
-   }
-
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }
@@ -432,13 +441,13 @@ public abstract class AbstractBRunnable implements IBRunnable {
       toStringPrivate(dc);
    }
 
+   public UCtx toStringGetUCtx() {
+      return uc;
+   }
+
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("state", toStringState(state));
       dc.appendVarWithSpace("stateRequest", toStringState(stateRequest));
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
    }
    //#enddebug
 }

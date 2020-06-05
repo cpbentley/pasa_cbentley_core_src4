@@ -328,6 +328,12 @@ public class CharUtils {
       }
    }
 
+   public byte[] getByteCharsIntLong(char[] cs, int coffset, int clen) {
+      byte[] data = new byte[4 + clen * 2];
+      writeCharsIntLong(data, 0, cs, coffset, clen);
+      return data;
+   }
+   
    /**
     * Read by {@link CharUtils#getCharsIntLong(byte[], int)}
     * @param cs

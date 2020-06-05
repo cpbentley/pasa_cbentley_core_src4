@@ -171,7 +171,7 @@ public class BAByteIS extends InputStream implements IStringable {
       if (pos < count) {
          return (buf[pos++] & 0xff);
       }
-      throw new IllegalStateException();
+      throw new IllegalStateException("pos[" + pos + "] >= count[" + count + "]. Full lenght=" + buf.length);
    }
 
    /**

@@ -354,11 +354,32 @@ public class BADataOS implements DataOutput {
       }
    }
 
+   /**
+    * Supports null String. {@link BADataIS#readString()}
+    * @param s
+    */
    public void writeString(String s) {
-      writeInt(s.length());
-      int len = s.length();
-      for (int i = 0; i < len; i++) {
-         writeChar(s.charAt(i));
+      if (s == null) {
+         write(0);
+      } else {
+         write(1);
+         writeInt(s.length());
+         int len = s.length();
+         for (int i = 0; i < len; i++) {
+            writeChar(s.charAt(i));
+         }
+      }
+   }
+
+   public void writeStrings(String[] strs) {
+      if (strs == null) {
+         write(0);
+      } else {
+         write(1);
+         writeInt(strs.length);
+         for (int i = 0; i < strs.length; i++) {
+            writeString(strs[i]);
+         }
       }
    }
 

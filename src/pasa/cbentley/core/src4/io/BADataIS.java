@@ -59,7 +59,7 @@ public class BADataIS implements DataInput, IStringable {
     *               valid modified UTF-8 encoding of a Unicode string.
     * @see        java.io.DataInputStream#readUnsignedShort()
     */
-   private final static String readUTF(BADataIS in) {
+   protected final static String readUTF(BADataIS in) {
       int utflen = in.readUnsignedShort();
       byte[] bytearr = null;
       char[] chararr = null;
@@ -136,13 +136,13 @@ public class BADataIS implements DataInput, IStringable {
       return new String(chararr, 0, chararr_count);
    }
 
-   private byte         bytearr[]    = new byte[80];
+   protected byte       bytearr[]    = new byte[80];
 
-   private char         chararr[]    = new char[80];
+   protected char       chararr[]    = new char[80];
 
-   BAByteIS             in;
+   protected BAByteIS   in;
 
-   private byte         readBuffer[] = new byte[8];
+   protected byte       readBuffer[] = new byte[8];
 
    protected final UCtx uc;
 
@@ -261,6 +261,8 @@ public class BADataIS implements DataInput, IStringable {
    //remove this stupid method. not part of the light embedded DataInput interface
 
    /**
+    * 
+    * @throws IllegalStateException if called with not enough data
     */
    public int readInt() {
       int ch1 = in.read();
@@ -330,8 +332,25 @@ public class BADataIS implements DataInput, IStringable {
     * @return
     */
    public String readString() {
+      int nullByte = read();
+      if (nullByte == 0) {
+         return null;
+      }
       char[] ar = readChars();
       return new String(ar);
+   }
+
+   public String[] readStrings() {
+      int nullByte = read();
+      if (nullByte == 0) {
+         return null;
+      }
+      int num = readInt();
+      String[] ar = uc.getMem().createArrayString(num);
+      for (int i = 0; i < num; i++) {
+         ar[i] = readString();
+      }
+      return ar;
    }
 
    public int[] readIntArrayByteLong() {

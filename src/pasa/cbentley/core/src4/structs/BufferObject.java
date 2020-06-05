@@ -9,7 +9,9 @@ import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
- * Src 4 compatible for Strings only.
+ * Double ended buffer. You can append in front or at the end.
+ * 
+ * Src 4 compatible.
  * 
  * core.src5 has a BufferObject for generics.
  * 
@@ -18,24 +20,23 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  */
 public class BufferObject implements IStringable {
 
-   private int            count     = 0;
+   private int      count     = 0;
 
-   private int            offset    = 0;
+   private int      offset    = 0;
 
    /**
     * must be 1 or higher
     */
-   private int            increment = 5;
-
+   private int      increment = 5;
 
    /**
     * index 0 starts at 0 and gives the last used value.
     * Therefore it also gives the number of elements
     * buffer size = ints.length - 1 - int[0]
     */
-   private Object[]       objects;
+   private Object[] objects;
 
-   private UCtx           uc;
+   private UCtx     uc;
 
    /**
     * 1,1
@@ -69,6 +70,21 @@ public class BufferObject implements IStringable {
       this.uc = uc;
    }
 
+   public int getObjectIndex(Object o) {
+      int start = this.offset;
+      int end = start + count;
+      for (int j = start; j < end; j++) {
+         if (objects[j] == o) {
+            return j;
+         }
+      }
+      return -1;
+   }
+
+   public boolean hasReference(Object o) {
+      return getObjectIndex(o) != -1;
+   }
+
    /**
     * append String to the {@link BufferObject}
     * @param str
@@ -97,7 +113,8 @@ public class BufferObject implements IStringable {
          ArrayUtils.shiftIntUp(objects, 2, offset, offset + count - 1, false);
          offset += 2;
       }
-      objects[offset - 1] = obj;
+      offset--;
+      objects[offset] = obj;
       count++;
    }
 
@@ -226,6 +243,9 @@ public class BufferObject implements IStringable {
       return count;
    }
 
+   public int getLength() {
+      return count;
+   }
 
    /**
     * 
@@ -278,7 +298,6 @@ public class BufferObject implements IStringable {
    public void set(Object[] objects) {
       this.objects = objects;
    }
-
 
    //#mdebug
    public String toString() {

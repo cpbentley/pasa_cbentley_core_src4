@@ -2,6 +2,7 @@ package pasa.cbentley.core.src4.helpers;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.utils.CharUtils;
+import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
  * 
@@ -79,6 +80,28 @@ public class StringBBuilder {
       this.append(String.valueOf(amount));
    }
 
+   public void append(String str, int num) {
+      this.append(str, num, ' ');
+   }
+
+   /**
+    * Append so that num exactly characters are appened, use char to fill up
+    * @param str
+    * @param num
+    * @param fill
+    */
+   public void append(String str, int num, char fill) {
+      int strLen = str.length();
+      if (strLen > num) {
+         this.append(str.substring(0, num));
+      } else {
+         this.append(str);
+         for (int i = 0; i < num - strLen; i++) {
+            this.append(fill);
+         }
+      }
+   }
+
    /**
     * 
     * @param str
@@ -139,6 +162,11 @@ public class StringBBuilder {
     */
    public void appendPrettyBack(int value, int numChars, char c) {
       appendPretty(value, numChars, c, true);
+   }
+
+   public void appendPretty(float value, int numDecimals) {
+      String str = uc.getStrU().prettyFloat(value, numDecimals);
+      append(str);
    }
 
    /**
@@ -238,11 +266,11 @@ public class StringBBuilder {
    public void replaceAll(String strOld, String strNew) {
       int index = 0;
       int indexIncrement = Math.max(0, strNew.length());
-      while(index != -1 && index < count) {
-         index = replaceFirst(strOld, strNew, index); 
-         if(index != -1) {
+      while (index != -1 && index < count) {
+         index = replaceFirst(strOld, strNew, index);
+         if (index != -1) {
             //we don't want the strNew to interfere whatsover
-            index += indexIncrement; 
+            index += indexIncrement;
          }
       }
    }
@@ -263,7 +291,7 @@ public class StringBBuilder {
 
       if (index != -1) {
          int start = index + numCharsOld;
-         int end = count-1;
+         int end = count - 1;
          CharUtils.shiftChar(charValues, shiftsize, start, end);
          for (int i = 0; i < numCharsNew; i++) {
             charValues[index + i] = strNew.charAt(i);
@@ -272,7 +300,7 @@ public class StringBBuilder {
       }
       return index;
    }
-   
+
    public void replaceFirst(String strOld, String strNew) {
       replaceFirst(strOld, strNew, 0);
    }

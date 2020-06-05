@@ -20,37 +20,49 @@ import pasa.cbentley.core.src4.utils.BitUtils;
 public abstract class ACtx implements ICtx {
 
    /**
+    * The owner of the context
+    */
+   protected final CtxManager cm;
+
+   /**
     * Data of the context. If it exists, it was set
     * during registering in the constructor.
     */
-   private byte[]       data;
+   private byte[]             data;
 
-   private int          id;
+   private int                id;
 
    //#debug
-   private int          toStringFlags;
+   private int                toStringFlags;
 
    /**
     * Each context as a reference to the root {@link UCtx}
     */
-   protected final UCtx uc;
+   protected final UCtx       uc;
+
+   /**
+    * Uses the default {@link CtxManager} from {@link UCtx}
+    * @param uc
+    */
+   public ACtx(UCtx uc) {
+      this(uc, uc.getCtxManager());
+   }
 
    /**
     * 
     * @param uc
+    * @param cm
     */
-   public ACtx(UCtx uc) {
+   public ACtx(UCtx uc, CtxManager cm) {
       this.uc = uc;
-      this.uc.getCtxManager().registerCtx(this);
+      this.cm = cm;
+      id = cm.registerCtx(this);
    }
 
-   /**
-    * true when ctx has saved data from a previous run saved by {@link CtxManager}
-    * @return
-    */
-   public boolean hasCtxData() {
-      return data != null;
+   public IConfig getConfig() {
+      return null;
    }
+
    /**
     * 
     */
@@ -58,11 +70,22 @@ public abstract class ACtx implements ICtx {
       return 0;
    }
 
+   public ICtx[] getCtxSub() {
+      return new ICtx[] { uc };
+   }
+
    /**
     * Domain: TODO starts at 0 or 1?
     */
    public int getRegistrationID() {
       return id;
+   }
+
+   /**
+    * Global method all ctxs
+    */
+   public void implementationProblem() {
+      throw new RuntimeException();
    }
 
    /**
@@ -89,10 +112,11 @@ public abstract class ACtx implements ICtx {
    }
 
    /**
-    * 
+    * true when ctx has saved data from a previous run saved by {@link CtxManager}
+    * @return
     */
-   public void register() {
-      id = uc.getCtxManager().registerCtx(this);
+   public boolean hasCtxData() {
+      return data != null;
    }
 
    public void setSettings(byte[] data) {
@@ -111,6 +135,8 @@ public abstract class ACtx implements ICtx {
    public void toString(Dctx dc) {
       dc.root(this, "ACtx");
       toStringPrivate(dc);
+      dc.appendVarWithSpace("toStringFlags", toStringFlags);
+      dc.nlLvl(uc, UCtx.class);
    }
 
    public boolean toString(Dctx dctx, Object o) {
@@ -134,8 +160,22 @@ public abstract class ACtx implements ICtx {
       toStringPrivate(dc);
    }
 
+   public void toStringAssert(boolean b, String msg) {
+      if (!b) {
+         throw new IllegalStateException("assertion failed : " + msg);
+      }
+   }
+
    public String toStringEventID(int pid, int eid) {
       return null;
+   }
+
+   /**
+    * Return all flags
+    * @return
+    */
+   public int toStringGetToStringFlags() {
+      return toStringFlags;
    }
 
    public UCtx toStringGetUCtx() {
@@ -154,11 +194,22 @@ public abstract class ACtx implements ICtx {
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      dc.appendVarWithSpace("ctxid", getCtxID());
+      dc.appendVarWithSpace("RegistrationID", getRegistrationID());
    }
 
    public String toStringProducerID(int pid) {
       return null;
+   }
+
+   public void toStringSetToStringFlag(int flags) {
+      toStringFlags = flags;
+   }
+
+   public void toStringCheckNull(Object o) {
+      if(o == null) {
+         throw new NullPointerException();
+      }
    }
 
    /**
@@ -167,6 +218,10 @@ public abstract class ACtx implements ICtx {
     */
    public void toStringSetToStringFlag(int flag, boolean v) {
       toStringFlags = BitUtils.setFlag(toStringFlags, flag, v);
+   }
+
+   public void unregister() {
+      uc.getCtxManager().unRegisterCtx(this);
    }
 
    //#enddebug

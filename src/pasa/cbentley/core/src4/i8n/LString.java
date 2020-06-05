@@ -1,6 +1,7 @@
 package pasa.cbentley.core.src4.i8n;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
@@ -16,19 +17,25 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * User selects {@link IString} through interface. Resets cache.
  * User sets a translation.
  * <br>
+ * 
+ * A {@link LString} by default does not registers on the {@link IEventBus}.
+ * 
+ * When a language changes, the application must go through the tree hierarchy of objects
+ * and ask them to update their {@link LString}s.
+ * 
  * @author Charles Bentley
  *
  */
 public class LString implements IString {
 
-   protected String     def;
+   protected String                def;
 
-   protected String     id;
+   protected String                id;
 
    /**
     * When not 0, takes precedence
     */
-   protected int        keyInt;
+   protected int                   keyInt;
 
    /**
     * LocalID of this.
@@ -36,34 +43,59 @@ public class LString implements IString {
     * <br>
     * i.e. a translation could not be found
     */
-   protected LocaleID   lid;
+   protected LocaleID              lid;
 
-   protected String     myString;
+   protected String                myString;
 
-   protected String     prefix;
+   protected String                prefix;
 
-   private boolean      reset = false;
+   private boolean                 reset = false;
 
-   protected String     suffix;
+   protected String                suffix;
 
-   protected final UCtx uc;
+   protected final IStringProducer stringProducer;
 
-   public LString(UCtx dd, int key, String def) {
-      this.keyInt = key;
-      this.def = def;
-      this.uc = dd;
+   /**
+    * Creates an {@link LString} with an integer key. 
+    * No default String is given
+    * @param dd
+    * @param key
+    */
+   public LString(IStringProducer dd, int key) {
+      this(dd,key,null);
    }
 
-   public LString(UCtx uc, String id, String def) {
+   /**
+    * Creates an {@link LString} with a integer key. 
+    * 
+    * @param dd
+    * @param key
+    * @param def
+    */
+   public LString(IStringProducer dd, int key, String def) {
+      this.stringProducer = dd;
+      this.keyInt = key;
+      this.def = def;
+   }
+
+   /**
+    * 
+    * @param uc
+    * @param id
+    * @param def
+    */
+   public LString(IStringProducer uc, String id, String def) {
+      this.stringProducer = uc;
       this.id = id;
       this.def = def;
-      this.uc = uc;
       myString = def;
    }
 
+   /**
+    * Returns the {@link String} represented by this {@link LString}
+    */
    public String getStr() {
       //get current string producer 
-      IStringProducer stringProducer = null;
       LocaleID cid = stringProducer.getLocaleID();
       //check if localID has changed
       if (cid != lid || reset) {
@@ -121,7 +153,7 @@ public class LString implements IString {
    }
 
    public UCtx toStringGetUCtx() {
-      return uc;
+      return stringProducer.getUCtx();
    }
    //#enddebug
 

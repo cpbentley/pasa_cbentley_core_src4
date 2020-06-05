@@ -27,6 +27,21 @@ public class ToStringStaticC extends ToStringStaticBase implements C {
       }
    }
 
+   public static String toStringPos(int pos) {
+      switch (pos) {
+         case POS_0_TOP:
+            return "Top";
+         case POS_1_BOT:
+            return "Bot";
+         case POS_2_LEFT:
+            return "Left";
+         case POS_3_RIGHT:
+            return "Right";
+         default:
+            return "Unknown " + pos;
+      }
+   }
+
    public static String toStringLogicAlignY(int dir) {
       switch (dir) {
          case LOGIC_0_UNDEFINED:
@@ -56,7 +71,7 @@ public class ToStringStaticC extends ToStringStaticBase implements C {
             return "Unknown " + dir;
       }
    }
-   
+
    public static String toStringLogicAlignXStartEnd(int dir) {
       switch (dir) {
          case LOGIC_0_UNDEFINED:

@@ -43,66 +43,87 @@ public interface IEventsCore extends IEvents {
    /**
     * Number of statically defined events
     */
-   public static final int BASE_EVENTS                      = 4;
-
-   public static final int EID_FRAMEWORK_0_ANY              = 0;
-
-   /**
-    * Event generated when 
-    */
-   public static final int EID_FRAMEWORK_1_CTX_CREATED      = 1;
-
-   /**
-    * When a language has been changed
-    */
-   public static final int EID_FRAMEWORK_2_LANGUAGE_CHANGED = 2;
-
-   public static final int EID_FRAMEWORK_X_NUM              = 3;
-
-   public static final int EID_HOST_0_ANY                   = 0;
-
-   public static final int EID_HOST_X_NUM                   = 1;
-
-   /**
-    * Any event by producer {@link IEventsCore#PID_3_MEMORY}
-    */
-   public static final int EID_MEMORY_0_ANY                 = 0;
-
-   public static final int EID_MEMORY_1_OUT_OF_MEMORY_GC    = 1;
-
-   public static final int EID_MEMORY_2_USER_REQUESTED_GC   = 2;
-
-   /**
-    * Event sent with Object as producer when object references have to be removed.
-    * Typically, cache and event bus will want to catch to events
-    * and de reference those objects 
-    */
-   public static final int EID_MEMORY_3_OBJECT_DESTROY      = 3;
-
-   public static final int EID_MEMORY_X_NUM                 = 3;
+   public static final int BASE_EVENTS                        = 5;
 
    /**
     * Reserved
     * Events will of instances must register a dynamic PID
     * outside the static range.
     */
-   public static final int PID_0_ANY                        = 0;
+   public static final int PID_0_ANY                          = 0;
+
+   public static final int PID_0_ANY_X_NUM                    = 1;
 
    /**
     * 
     */
-   public static final int PID_1_FRAMEWORK                  = 1;
+   public static final int PID_1_FRAMEWORK                    = 1;
+
+   public static final int PID_1_FRAMEWORK_0_ANY              = 0;
+
+   /**
+    * Event generated when 
+    */
+   public static final int PID_1_FRAMEWORK_1_CTX_CREATED      = 1;
+
+   /**
+    * When a language has been changed
+    */
+   public static final int PID_1_FRAMEWORK_2_LANGUAGE_CHANGED = 2;
+
+   public static final int PID_1_FRAMEWORK_X_NUM              = 3;
 
    /**
     * Producer ID. Uses it to send event relating to Host events.
     */
-   public static final int PID_2_HOST                       = 2;
+   public static final int PID_2_HOST                         = 2;
+
+   public static final int PID_2_HOST_0_ANY                   = 0;
+
+   public static final int PID_2_HOST_X_NUM                   = 1;
 
    /**
     * The pid used for memory event on the {@link UCtx#getEventBusRoot()} event bus.
     */
-   public static final int PID_3_MEMORY                     = 3;
+   public static final int PID_3_MEMORY                       = 3;
 
-   public static final int SID_EVENTS_2                     = 2;
+   /**
+    * Any event by producer {@link IEventsCore#PID_3_MEMORY}
+    */
+   public static final int PID_3_MEMORY_0_ANY                 = 0;
+
+   public static final int PID_3_MEMORY_1_OUT_OF_MEMORY_GC    = 1;
+
+   public static final int PID_3_MEMORY_2_USER_REQUESTED_GC   = 2;
+
+   /**
+    * Event sent with Object as producer when object references have to be removed.
+    * Typically, cache and event bus will want to catch to events
+    * and de reference those objects 
+    */
+   public static final int PID_3_MEMORY_3_OBJECT_DESTROY      = 3;
+
+   public static final int PID_3_MEMORY_X_NUM                 = 3;
+
+   public static final int PID_4_LIFE                         = 4;
+
+   public static final int PID_4_LIFE_0_ANY                   = 0;
+
+   public static final int PID_4_LIFE_1_STARTED               = 1;
+
+   public static final int PID_4_LIFE_2_PAUSED                = 2;
+
+   public static final int PID_4_LIFE_3_RESUMED               = 3;
+
+   public static final int PID_4_LIFE_4_STOPPED               = 4;
+
+   public static final int PID_4_LIFE_5_DESTROYED             = 5;
+
+   public static final int PID_4_LIFE_X_NUM                   = 6;
+
+   /**
+    * Static ID for events. Registered in {@link CtxManager#registerStaticID(ICtx, int)}
+    */
+   public static final int SID_EVENTS_2                       = 2;
 
 }
