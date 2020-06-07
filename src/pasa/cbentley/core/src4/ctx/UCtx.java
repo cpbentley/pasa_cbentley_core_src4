@@ -298,7 +298,14 @@ public class UCtx implements ICtx, IEventsCore {
       aInit();
    }
 
+   /**
+    * 
+    * @param config when null defaults to {@link ConfigUDef}
+    */
    public UCtx(IConfigU config) {
+      if (config == null) {
+         config = new ConfigUDef(this);
+      }
       this.config = config;
       setCtxManager(new CtxManager(this));
       aInit();
