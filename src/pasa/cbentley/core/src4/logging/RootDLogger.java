@@ -148,7 +148,7 @@ public abstract class RootDLogger implements IDLog {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, RootDLogger.class, "@line5");
+      dc.root(this, RootDLogger.class, "@line151");
       toStringPrivate(dc);
    }
 
@@ -157,7 +157,7 @@ public abstract class RootDLogger implements IDLog {
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      dc.appendVarWithSpace("count", count);
    }
 
    public void toString1Line(Dctx dc) {

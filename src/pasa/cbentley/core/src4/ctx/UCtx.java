@@ -644,7 +644,11 @@ public class UCtx implements ICtx, IEventsCore {
       dc.nlLvl(config, IConfigU.class);
       dc.nlLvl(ctxManager, "ctxManager");
       dc.nlLvl(eventBusRoot, "eventBusRoot");
-      dc.nlLvl(dlog, "dlog");
+      dc.nlLvl(workerThread, "workerThread");
+      dc.nlLvl(mem, "IMemory");
+      dc.appendVarWithSpace("stringProducer", stringProducer);
+      dc.nlLvl(userLog, "IUserlog");
+      dc.nlLvl(dlog, "IDLog");
    }
 
    public boolean toString(Dctx dctx, Object o) {
@@ -734,6 +738,7 @@ public class UCtx implements ICtx, IEventsCore {
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("ctxid", getCtxID());
       dc.appendVarWithSpace("RegistrationID", getRegistrationID());
+      dc.appendVarWithSpace("encoding", encoding);
    }
 
    public String toStringProducerID(int pid) {
@@ -749,6 +754,10 @@ public class UCtx implements ICtx, IEventsCore {
          default:
             return null;
       }
+   }
+
+   public void toStringFlagSetOn(int flag, boolean b, Dctx dctx) {
+      //we don't do anything by default
    }
 
    /**

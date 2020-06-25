@@ -15,6 +15,10 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  * wants different loggers. Each of those code ctx regions will call {@link UCtx#toDLog()} without knowing better.
  * Loggers are effectively encapsulated.
  * 
+ * This class does not implement {@link IStringable}. Debugging it is simply 
+ * 
+ * It does not have a {@link UCtx} reference.
+ * 
  * @author Charles Bentley
  *
  */

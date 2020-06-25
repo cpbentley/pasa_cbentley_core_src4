@@ -215,7 +215,11 @@ public abstract class ACtx implements ICtx {
          throw new NullPointerException();
       }
    }
-
+   
+   public void toStringFlagSetOn(int flag, boolean b, Dctx dctx) {
+      //we don't do anything by default
+   }
+   
    /**
     * @param flag
     * @param v

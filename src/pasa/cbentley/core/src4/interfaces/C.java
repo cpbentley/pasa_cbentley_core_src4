@@ -32,72 +32,72 @@ public interface C extends ITech {
 
    public static final int ANGLE_RIGHT_0           = 0;
 
-   public static final int DIAG_DIR_0TOP_LEFT      = 0;
+   public static final int DIAG_DIR_0_TOP_LEFT      = 0;
 
-   public static final int DIAG_DIR_1TOP_RIGHT     = 1;
+   public static final int DIAG_DIR_1_TOP_RIGHT     = 1;
 
-   public static final int DIAG_DIR_2BOT_LEFT      = 2;
+   public static final int DIAG_DIR_2_BOT_LEFT      = 2;
 
-   public static final int DIAG_DIR_3BOT_RIGHT     = 3;
+   public static final int DIAG_DIR_3_BOT_RIGHT     = 3;
 
    /**
     * Compatible with the first 8 TYPE
     */
-   public static final int DIR_0TOP                = 0;
+   public static final int DIR_0_TOP                = 0;
 
-   public static final int DIR_1BOTTOM             = 1;
+   public static final int DIR_1_BOTTOM             = 1;
 
-   public static final int DIR_2LEFT               = 2;
+   public static final int DIR_2_LEFT               = 2;
 
-   public static final int DIR_3RIGHT              = 3;
+   public static final int DIR_3_RIGHT              = 3;
 
-   public static final int DIR_4TopLeft            = 4;
+   public static final int DIR_4_TopLeft            = 4;
 
-   public static final int DIR_5TopRight           = 5;
+   public static final int DIR_5_TopRight           = 5;
 
-   public static final int DIR_6BotLeft            = 6;
+   public static final int DIR_6_BotLeft            = 6;
 
-   public static final int DIR_7BotRight           = 7;
+   public static final int DIR_7_BotRight           = 7;
 
-   public static final int TYPE_00TOP              = 0;
+   public static final int TYPE_00_TOP              = 0;
 
-   public static final int TYPE_01BOTTOM           = 1;
+   public static final int TYPE_01_BOTTOM           = 1;
 
-   public static final int TYPE_02LEFT             = 2;
+   public static final int TYPE_02_LEFT             = 2;
 
-   public static final int TYPE_03RIGHT            = 3;
+   public static final int TYPE_03_RIGHT            = 3;
 
-   public static final int TYPE_04TopLeft          = 4;
+   public static final int TYPE_04_TopLeft          = 4;
 
-   public static final int TYPE_05TopRight         = 5;
+   public static final int TYPE_05_TopRight         = 5;
 
-   public static final int TYPE_06BotLeft          = 6;
+   public static final int TYPE_06_BotLeft          = 6;
 
-   public static final int TYPE_07BotRight         = 7;
+   public static final int TYPE_07_BotRight         = 7;
 
-   public static final int TYPE_08MID_TopLeft      = 8;
+   public static final int TYPE_08_MID_TopLeft      = 8;
 
-   public static final int TYPE_09MID_TopRight     = 9;
+   public static final int TYPE_09_MID_TopRight     = 9;
 
-   public static final int TYPE_10MID_BotLeft      = 10;
+   public static final int TYPE_10_MID_BotLeft      = 10;
 
-   public static final int TYPE_11MID_BotRight     = 11;
+   public static final int TYPE_11_MID_BotRight     = 11;
 
-   public static final int TYPE_12TopLeftDiagBot   = 12;
+   public static final int TYPE_12_TopLeftDiagBot   = 12;
 
-   public static final int TYPE_13TopLeftDiagRight = 13;
+   public static final int TYPE_13_TopLeftDiagRight = 13;
 
-   public static final int TYPE_14TopRightDiagBot  = 14;
+   public static final int TYPE_14_TopRightDiagBot  = 14;
 
-   public static final int TYPE_15TopRightDiagLeft = 15;
+   public static final int TYPE_15_TopRightDiagLeft = 15;
 
-   public static final int TYPE_16BotLeftDiagTop   = 16;
+   public static final int TYPE_16_BotLeftDiagTop   = 16;
 
-   public static final int TYPE_17BotLeftDiagRight = 17;
+   public static final int TYPE_17_BotLeftDiagRight = 17;
 
-   public static final int TYPE_18BotRightDiagTop  = 18;
+   public static final int TYPE_18_BotRightDiagTop  = 18;
 
-   public static final int TYPE_19BotRightDiagLeft = 19;
+   public static final int TYPE_19_BotRightDiagLeft = 19;
 
    /**
     * Clock wise incremental position on the diag borders

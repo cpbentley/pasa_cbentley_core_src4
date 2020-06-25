@@ -486,7 +486,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "Config");
+      dc.root(this, DLogConfig.class, "@line490");
 
       dc.appendVarWithSpace("logLevel", logLevel);
 
@@ -527,7 +527,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "Config");
+      dc.root1Line(this, DLogConfig.class);
    }
 
    private void toStringFlag(int flag, String msg, Dctx dc) {

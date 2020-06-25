@@ -16,17 +16,24 @@ import pasa.cbentley.core.src4.structs.IntBuffer;
  */
 public class StringUtils {
 
-   public static final int    EN_PAD   = 0;
+   public static final int    EN_PAD                   = 0;
+
+   public static char         NEW_LINE                 = '\n';
+
+   /**
+    * Windows puts a \r in front of new lines
+    */
+   public static char         NEW_LINE_CARRIAGE_RETURN = '\r';
 
    /**
     * Byte for russian characters in UTF-8
     */
-   public static final int    RU_PAD   = 4;
+   public static final int    RU_PAD                   = 4;
 
    /**
     * 
     */
-   public static final String UTF8_BOM = "\uFEFF";
+   public static final String UTF8_BOM                 = "\uFEFF";
 
    /**
     * Append the byte values to the string builder
@@ -132,6 +139,19 @@ public class StringUtils {
          return url.substring(index + delimLeft.length(), lastIndex);
       }
       return null;
+   }
+
+   /**
+    * Fills array [start,end] with filler
+    * @param ar
+    * @param filler
+    * @param start included 
+    * @param end included
+    */
+   public static void fill(String[] ar, String filler, int start, int end) {
+      for (int i = start; i <= end; i++) {
+         ar[i] = filler;
+      }
    }
 
    public static char getChar(int i) {
@@ -306,6 +326,49 @@ public class StringUtils {
     */
    public static byte[] getCharByteArrayPlane(String str, int plane) {
       return getCharByteArrayPlane(str.toCharArray(), 0, str.length(), plane);
+   }
+
+   /**
+    * Returns the index of first occurence of val.
+    * <br>
+    * Index is absolute. if value is at offset, it returns offset.
+    * @param val
+    * @param ar
+    * @param offset
+    * @param len
+    * @param strComparator {@link IStrComparator#isEqual(String, String)}
+    * @return -1 if not found
+    */
+   public static int getFirstIndexEqual(String val, String[] ar, int offset, int len, IStrComparator strComparator) {
+      return getFirstIndexEqual(val, ar, offset, len, strComparator, 1);
+   }
+
+   /**
+    * Code is supposed to be inlined. Its here for better structing
+    * @param val
+    * @param ar
+    * @param offset
+    * @param len
+    * @param strComparator
+    * @param skip
+    * @return
+    */
+   public static int getFirstIndexEqual(String val, String[] ar, int offset, int len, IStrComparator strComparator, int skip) {
+      for (int j = offset; j < offset + len; j += skip) {
+         if (strComparator.isEqual(val, ar[j])) {
+            return j;
+         }
+      }
+      return -1;
+   }
+
+   public static int getFirstIndexSimilar(String val, String[] ar, int offset, int len, IStrComparator strComparator) {
+      for (int j = offset; j < offset + len; j++) {
+         if (strComparator.isSimilar(val, ar[j])) {
+            return j;
+         }
+      }
+      return -1;
    }
 
    /**
@@ -484,49 +547,6 @@ public class StringUtils {
    }
 
    /**
-    * Returns the index of first occurence of val.
-    * <br>
-    * Index is absolute. if value is at offset, it returns offset.
-    * @param val
-    * @param ar
-    * @param offset
-    * @param len
-    * @param strComparator {@link IStrComparator#isEqual(String, String)}
-    * @return -1 if not found
-    */
-   public static int getFirstIndexEqual(String val, String[] ar, int offset, int len, IStrComparator strComparator) {
-      return getFirstIndexEqual(val, ar, offset, len, strComparator, 1);
-   }
-
-   /**
-    * Code is supposed to be inlined. Its here for better structing
-    * @param val
-    * @param ar
-    * @param offset
-    * @param len
-    * @param strComparator
-    * @param skip
-    * @return
-    */
-   public static int getFirstIndexEqual(String val, String[] ar, int offset, int len, IStrComparator strComparator, int skip) {
-      for (int j = offset; j < offset + len; j += skip) {
-         if (strComparator.isEqual(val, ar[j])) {
-            return j;
-         }
-      }
-      return -1;
-   }
-
-   public static int getFirstIndexSimilar(String val, String[] ar, int offset, int len, IStrComparator strComparator) {
-      for (int j = offset; j < offset + len; j++) {
-         if (strComparator.isSimilar(val, ar[j])) {
-            return j;
-         }
-      }
-      return -1;
-   }
-
-   /**
     * @param c char to check
     * @return false if BIG letter. false otherwise
     */
@@ -640,6 +660,9 @@ public class StringUtils {
             if (c == '\r') {
                return true;
             }
+            if (c == '\t') {
+               return true;
+            }
             return false;
       }
       return false;
@@ -656,6 +679,9 @@ public class StringUtils {
       if (c == '\r') {
          return true;
       }
+      if (c == '\t') {
+         return true;
+      }
       return false;
    }
 
@@ -664,79 +690,6 @@ public class StringUtils {
          return;
       for (int i = 0; i < c.length; i++) {
          c[i] = toLowerCase(c[i]);
-      }
-   }
-
-   /**
-    * shift only if start < end
-    * @param ar
-    * @param shiftsize <0 for shifting down
-    * @param start index value starts at 0. inclusive
-    * @param end index value inclusive
-    * @param erase pad the hole with 0s
-    */
-   public static void shiftInt(String[] ar, int shiftsize, int start, int end, boolean erase) {
-      if (start > end)
-         return;
-      if (shiftsize < 0)
-         shiftIntDown(ar, 0 - shiftsize, start, end, erase);
-      else
-         shiftIntUp(ar, shiftsize, start, end, erase);
-   }
-
-   /**
-    * 
-    * 
-    * @param ar array to shift down
-    * @param shiftsize number of units to go down
-    * @param start start index will go down shiftsize
-    * @param end end index will be the last to be shifted
-    * @param erase
-    */
-   public static void shiftIntDown(String[] ar, int shiftsize, int start, int end, boolean erase) {
-      for (int i = start; i <= end; i++) {
-         if (i - shiftsize >= 0) {
-            ar[i - shiftsize] = ar[i];
-         }
-      }
-      if (erase) {
-         fill(ar, null, end - shiftsize + 1, end);
-      }
-   }
-
-   /**
-    * Dumb shifts, erases data in the shift destination.
-    * 
-    * Used by buffers where its known that data above the end point is not relevant
-    * 
-    * @param ar
-    * @param shiftsize number of jummps up in the array
-    * @param start included in the shift
-    * @param end included in the shift
-    * @param erase erase data liberated
-    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
-    */
-   public static void shiftIntUp(String[] ar, int shiftsize, int start, int end, boolean erase) {
-      for (int i = end; i >= start; i--) {
-         if (i + shiftsize < ar.length) {
-            ar[i + shiftsize] = ar[i];
-         }
-      }
-      if (erase) {
-         fill(ar, null, start, start + shiftsize - 1);
-      }
-   }
-
-   /**
-    * Fills array [start,end] with filler
-    * @param ar
-    * @param filler
-    * @param start included 
-    * @param end included
-    */
-   public static void fill(String[] ar, String filler, int start, int end) {
-      for (int i = start; i <= end; i++) {
-         ar[i] = filler;
       }
    }
 
@@ -943,6 +896,66 @@ public class StringUtils {
       }
    }
 
+   /**
+    * shift only if start < end
+    * @param ar
+    * @param shiftsize <0 for shifting down
+    * @param start index value starts at 0. inclusive
+    * @param end index value inclusive
+    * @param erase pad the hole with 0s
+    */
+   public static void shiftInt(String[] ar, int shiftsize, int start, int end, boolean erase) {
+      if (start > end)
+         return;
+      if (shiftsize < 0)
+         shiftIntDown(ar, 0 - shiftsize, start, end, erase);
+      else
+         shiftIntUp(ar, shiftsize, start, end, erase);
+   }
+
+   /**
+    * 
+    * 
+    * @param ar array to shift down
+    * @param shiftsize number of units to go down
+    * @param start start index will go down shiftsize
+    * @param end end index will be the last to be shifted
+    * @param erase
+    */
+   public static void shiftIntDown(String[] ar, int shiftsize, int start, int end, boolean erase) {
+      for (int i = start; i <= end; i++) {
+         if (i - shiftsize >= 0) {
+            ar[i - shiftsize] = ar[i];
+         }
+      }
+      if (erase) {
+         fill(ar, null, end - shiftsize + 1, end);
+      }
+   }
+
+   /**
+    * Dumb shifts, erases data in the shift destination.
+    * 
+    * Used by buffers where its known that data above the end point is not relevant
+    * 
+    * @param ar
+    * @param shiftsize number of jummps up in the array
+    * @param start included in the shift
+    * @param end included in the shift
+    * @param erase erase data liberated
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
+    */
+   public static void shiftIntUp(String[] ar, int shiftsize, int start, int end, boolean erase) {
+      for (int i = end; i >= start; i--) {
+         if (i + shiftsize < ar.length) {
+            ar[i + shiftsize] = ar[i];
+         }
+      }
+      if (erase) {
+         fill(ar, null, start, start + shiftsize - 1);
+      }
+   }
+
    public static char[] sort(char[] c, boolean asc) {
       char tempstr = ' ';
       if (c.length == 1)
@@ -1109,6 +1122,85 @@ public class StringUtils {
    }
 
    /**
+    * Appends the offsets and line length to the IntBuffer.
+    * <br>
+    * <br>
+    * <li>0: starting offset of line in the string
+    * <li>1: number of chars excluding the line break special characters
+    * @param chars
+    * @param offset
+    * @param len
+    * @param b
+    * 
+    */
+   public void getBreaksLineNatural(char[] chars, int offset, int len, IntBuffer b) {
+      int lineLength = 0;
+      int lineStartOffset = offset; //count from offset
+      int start = offset + 0;
+      int end = offset + len;
+      for (int i = start; i < end; i++) {
+         char c = chars[i];
+         if (c == NEW_LINE) {
+            b.addInt(lineStartOffset);
+            b.addInt(lineLength);
+            //start of the next line
+            lineStartOffset = i + 1;
+            lineLength = 0;
+         } else if (c == NEW_LINE_CARRIAGE_RETURN) {
+            b.addInt(lineStartOffset);
+            b.addInt(lineLength);
+            //assume we have a \n afterwards
+            //if none, next letter is eaten
+            lineStartOffset = i + 2;
+            lineLength = 0;
+            i = i + 1;
+         } else {
+            lineLength++;
+         }
+      }
+      //at least one line, might it be empty
+      b.addInt(lineStartOffset);
+      b.addInt(lineLength);
+   }
+
+   public void getBreaksChar(String str, char breakChar) {
+
+   }
+
+   public void getBreaksChar(char[] chars, int offset, int len, IntBuffer b, char breakChar) {
+      int breakLength = 0;
+      int breakStartOffset = offset; //count from offset
+      int start = offset + 0;
+      int end = offset + len;
+      for (int i = start; i < end; i++) {
+         char c = chars[i];
+         if (c == breakChar) {
+            b.addInt(breakStartOffset);
+            b.addInt(breakLength);
+            breakStartOffset = i + 1;
+            breakLength = 0;
+         } else {
+            breakLength++;
+         }
+      }
+      //at least one line, might it be empty
+      b.addInt(breakStartOffset);
+      b.addInt(breakLength);
+   }
+
+   public int[] getBreaksTab(String str) {
+      char[] chars = str.toCharArray();
+      int length = str.length();
+      IntBuffer b = new IntBuffer(uc, 5); //count index position of \n special char
+      getBreaksChar(chars, 0, length, b, '\t');
+      return b.getIntsClonedTrimmed();
+   }
+
+   public void getBreaksTab(char[] chars, int offset, int len, IntBuffer b) {
+      getBreaksChar(chars, offset, len, b, '\t');
+   }
+
+   /**
     * Natural breaking does not take into account {@link Font} data.
     * <br>
     * <br>
@@ -1126,54 +1218,9 @@ public class StringUtils {
     * 
     */
    public int[] getBreaksLineNatural(char[] chars, int offset, int len) {
-      char nl = '\n';
-      char wnl = '\r'; //for windows \r\n
-      //first look for new lines characters indexes relative to offset
       IntBuffer b = new IntBuffer(uc, 5); //count index position of \n special char
-      int letterCount = 0; //count from offset
-      int lineLength = 0;
-      boolean notALine = false;
-      if (chars[offset] == wnl || chars[offset] == nl) {
-         notALine = true;
-      } else {
-         b.addInt(letterCount);
-         lineLength = 1;
-      }
-      letterCount++;
-      for (int i = 1; i < len; i++) {
-         char c = chars[offset + i];
-         if (c == nl) {
-            if (!notALine) {
-               notALine = true;
-               b.addInt(lineLength);
-            }
-         } else if (c == wnl) {
-            if (!notALine) {
-               notALine = true;
-               b.addInt(lineLength);
-            }
-            i++;
-            letterCount++;
-         } else {
-            if (notALine) {
-               //we start a new line
-               b.addInt(letterCount);
-               lineLength = 0;
-               notALine = false;
-            }
-         }
-         lineLength++;
-         letterCount++;
-      }
-      if (!notALine) {
-         //finalize by setting length of last line
-         b.addInt(lineLength);
-      }
-      if (b.getSize() == 0) {
-         return null;
-      } else {
-         return b.getIntsRef();
-      }
+      getBreaksLineNatural(chars, offset, len, b);
+      return b.getIntsClonedTrimmed();
    }
 
    /**
@@ -1183,57 +1230,28 @@ public class StringUtils {
     * @return
     */
    public int[] getBreaksLineNatural(String str) {
-      return getBreaksLineNatural(str.toCharArray(), 0, str.length());
+      char[] charArray = str.toCharArray();
+      int length = str.length();
+      return getBreaksLineNatural(charArray, 0, length);
    }
 
    /**
-    * 
-    * 0: starting offset of line
-    * 1: number of chars excluding the line break
-    * <br>
-    * <br>
-    * Therefore the line breaks 'disappear'
-    * <br>
-    * <br>
-    * 
+    * Appends the breaking data in the {@link IntBuffer}
+    * each line is offset and number of characters in the line
     * @param str
-    * @return not null 
-    * if no breaks just one line
+    * @param b
+    * @throws NullPointerException str is null or b is null 
     */
-   public int[][] getBreaksNaturalMatrix(String str) {
-      char nl = '\n';
-      char wnl = '\r'; //for windows \r\n
-      IntBuffer b = new IntBuffer(uc, 3);
-      for (int i = 0; i < str.length(); i++) {
-         char c = str.charAt(i);
-         if (c == nl) {
-            b.addInt(i);
-         }
-         if (c == wnl) {
-            b.addInt(i);
-            i++;
-         }
-      }
-      if (b.getSize() == 0) {
-         int[][] breaks = new int[1][2];
-         breaks[0][0] = 0;
-         breaks[0][1] = str.length();
-         return breaks;
-      } else {
-         int[][] breaks = new int[b.getSize() + 1][2];
-         int[] vals = b.getIntsClonedTrimmed();
-         breaks[0][0] = 0;
-         breaks[0][1] = vals[0];
-         for (int i = 1; i <= vals.length; i++) {
-            breaks[i][0] = breaks[i - 1][0] + breaks[i - 1][1] + 1;
-            if (i != vals.length) {
-               breaks[i][1] = vals[i] - breaks[i][0];
-            } else {
-               breaks[i][1] = str.length() - breaks[i][0];
-            }
-         }
-         return breaks;
-      }
+   public void getBreaksLineNatural(String str, IntBuffer b) {
+      char[] charArray = str.toCharArray();
+      int length = str.length();
+      getBreaksLineNatural(charArray, 0, length, b);
+   }
+
+   public int[] getBreaksWord(String str) {
+      char[] chars = str.toCharArray();
+      int length = str.length();
+      return getBreaksWord(chars, 0, length, false);
    }
 
    /**
@@ -1274,36 +1292,55 @@ public class StringUtils {
     */
    public int[] getBreaksWord(char[] chars, int offset, int len, boolean invisibleOnly) {
       IntBuffer b = new IntBuffer(uc, 3); //count index position of \n special char
-      //kick start
-      boolean inWord = false;
+      getBreaksWord(chars, offset, len, invisibleOnly, b);
+      return b.getIntsClonedTrimmed();
+   }
+
+   /**
+    * Appends the {@link IntBuffer} with words offsets and lengths
+    * 
+    * @param chars
+    * @param offset
+    * @param len
+    * @param invisibleOnly
+    * @param b
+    */
+   public void getBreaksWord(char[] chars, int offset, int len, boolean invisibleOnly, IntBuffer b) {
+      //kick start, we don't know if we are inside a word or not.
+      boolean isInsideWord = false; //we don't know 
       int wordLetterCount = 0;
-      if (invisibleOnly ? !isWordDelimiterInvisible(chars[offset]) : !isWordDelimiter(chars[offset])) {
-         //start with a word
-         b.addInt(0);
-         inWord = true;
-         wordLetterCount = 1;
-      }
-      for (int i = 1; i < len; i++) {
-         char c = chars[offset + i];
-         if (invisibleOnly ? isWordDelimiterInvisible(c) : isWordDelimiter(c)) {
-            if (inWord) {
+      int wordStartOffset = offset;
+      int start = offset;
+      int end = offset + len;
+      for (int i = start; i < end; i++) {
+         char c = chars[i];
+         boolean isWordDelimiter = invisibleOnly ? isWordDelimiterInvisible(c) : isWordDelimiter(c);
+         if (i == start) {
+            isInsideWord = !isWordDelimiter;
+         }
+         if (isWordDelimiter) {
+            if (isInsideWord) {
+               //we end a word
+               b.addInt(wordStartOffset);
                b.addInt(wordLetterCount);
-               inWord = false;
+               isInsideWord = false;
             }
          } else {
-            if (inWord == false) {
-               inWord = true;
-               wordLetterCount = 0;
-               b.addInt(i);
+            if (!isInsideWord) {
+               //first letter of a new word
+               wordStartOffset = i;
+               wordLetterCount = 1;
+               isInsideWord = true;
+            } else {
+               wordLetterCount++;
             }
          }
-         wordLetterCount++;
       }
-      //finalize.
-      if (inWord) {
+      //for the last letter
+      if (isInsideWord) {
+         b.addInt(wordStartOffset);
          b.addInt(wordLetterCount);
       }
-      return b.getIntsRef();
    }
 
    /**
@@ -1470,27 +1507,6 @@ public class StringUtils {
       return sb.toString();
    }
 
-   /**
-    * Builds a String at offset with a header of 4 bytes
-    * 
-    * @return
-    */
-   public String getStringIntLong(byte[] data, int offset) {
-      char[] cs = uc.getCU().getCharsIntLong(data, offset);
-      return new String(cs);
-   }
-
-   public void writeStringIntLong(String str, byte[] data, int offset) {
-      int length = str.length();
-      IntUtils.writeIntBE(data, offset, length);
-      int index = offset + 4;
-      for (int i = 0; i < length; i++) {
-         char c = str.charAt(i);
-         CharUtils.writeShortBE(data, index, c);
-         index += 2;
-      }
-   }
-
    public String getString(String[] ar, char separator) {
       return getString(ar, String.valueOf(separator));
    }
@@ -1507,6 +1523,32 @@ public class StringUtils {
          sb.append(ar[i]);
       }
       return sb.toString();
+   }
+
+   /**
+    * pasa.cbentley,. -> cbentley
+    * pasa.cbentley,! -> pasa.cbentley
+    * @param str
+    * @param del
+    * @return
+    */
+   public String getStringAfterLastIndex(String str, char del) {
+      int lastIndex = str.lastIndexOf(del);
+      if (lastIndex == -1) {
+         return str;
+      } else {
+         return str.substring(lastIndex + 1);
+      }
+   }
+
+   /**
+    * Builds a String at offset with a header of 4 bytes
+    * 
+    * @return
+    */
+   public String getStringIntLong(byte[] data, int offset) {
+      char[] cs = uc.getCU().getCharsIntLong(data, offset);
+      return new String(cs);
    }
 
    /**
@@ -1550,22 +1592,6 @@ public class StringUtils {
          return str.substring(indexStart + 1);
       }
       return null;
-   }
-
-   /**
-    * pasa.cbentley,. -> cbentley
-    * pasa.cbentley,! -> pasa.cbentley
-    * @param str
-    * @param del
-    * @return
-    */
-   public String getStringAfterLastIndex(String str, char del) {
-      int lastIndex = str.lastIndexOf(del);
-      if (lastIndex == -1) {
-         return str;
-      } else {
-         return str.substring(lastIndex + 1);
-      }
    }
 
    /**
@@ -1671,21 +1697,6 @@ public class StringUtils {
    }
 
    /**
-    * Returns a String with at most the number of decimals. No rounding.
-    * 
-    * 1.025 , 2 -> "1.02" 
-    * 1.025 , 0 -> "1" 
-    * 
-    * @param amountn
-    * @param decimals [0-n]
-    * @return
-    */
-   public String prettyFloat(float amountn, int decimals) {
-      String s = Float.toString(amountn);
-      return prettyDecimalString(s, decimals);
-   }
-
-   /**
     * Cuts the string at first '.' and keep at most
     * @param s if no . returns s
     * @param decimals [0-n] 
@@ -1720,6 +1731,21 @@ public class StringUtils {
 
    public String prettyDouble(double amountn, int decimals) {
       String s = Double.toString(amountn);
+      return prettyDecimalString(s, decimals);
+   }
+
+   /**
+    * Returns a String with at most the number of decimals. No rounding.
+    * 
+    * 1.025 , 2 -> "1.02" 
+    * 1.025 , 0 -> "1" 
+    * 
+    * @param amountn
+    * @param decimals [0-n]
+    * @return
+    */
+   public String prettyFloat(float amountn, int decimals) {
+      String s = Float.toString(amountn);
       return prettyDecimalString(s, decimals);
    }
 
@@ -1824,5 +1850,16 @@ public class StringUtils {
     */
    public String trimAtNewLine(String string) {
       return trimAtChar(string, '\n');
+   }
+
+   public void writeStringIntLong(String str, byte[] data, int offset) {
+      int length = str.length();
+      IntUtils.writeIntBE(data, offset, length);
+      int index = offset + 4;
+      for (int i = 0; i < length; i++) {
+         char c = str.charAt(i);
+         CharUtils.writeShortBE(data, index, c);
+         index += 2;
+      }
    }
 }

@@ -40,8 +40,9 @@ public class StringBBuilder {
 
    public StringBBuilder append(char str[]) {
       int newCount = count + str.length;
-      if (newCount > charValues.length)
+      if (newCount > charValues.length) {
          expandCapacity(newCount);
+      }
       System.arraycopy(str, 0, charValues, count, str.length);
       count = newCount;
       return this;
@@ -49,23 +50,54 @@ public class StringBBuilder {
 
    public void append(char c) {
       int newCount = count + 1;
-      if (newCount > charValues.length)
+      if (newCount > charValues.length) {
          expandCapacity(newCount);
+      }
       charValues[count++] = c;
 
    }
 
+   /**
+    * Appends the content of the char array starting at offset and running for len.
+    * 
+    * @param str
+    * @param offset
+    * @param len
+    * @return itself
+    * @throws ArrayIndexOutOfBoundsException
+    */
    public StringBBuilder append(char str[], int offset, int len) {
-      if (len + offset >= str.length) {
-         //UiLink.bip(6060, offset+":"+len+ " bad append for string builder for appending " + new String(str),true);
-         return this;
-      }
-      int newCount = count + len;
-      if (newCount > charValues.length)
-         expandCapacity(newCount);
+      checkForPotentialNewChars(len);
       System.arraycopy(str, offset, charValues, count, len);
-      count = newCount;
+      count += len;
       return this;
+   }
+
+   /**
+    * 
+    * @param str
+    * @param offset
+    * @param len
+    * @param ignore
+    * @return
+    */
+   public StringBBuilder appendIgnore(char str[], int offset, int len, char ignore) {
+      checkForPotentialNewChars(len);
+      int end = offset + len;
+      for (int i = offset; i < end; i++) {
+         char c = str[i];
+         if (c != ignore) {
+            charValues[count++] = c;
+         }
+      }
+      return this;
+   }
+
+   private void checkForPotentialNewChars(int len) {
+      int newCount = count + len;
+      if (newCount > charValues.length) {
+         expandCapacity(newCount);
+      }
    }
 
    public void append(double amount) {
@@ -107,13 +139,14 @@ public class StringBBuilder {
    }
 
    /**
-    * 
+    * When null, appends "null"
     * @param str
     * @return
     */
    public StringBBuilder append(String str) {
-      if (str == null)
+      if (str == null) {
          str = "null";
+      }
       int len = str.length();
       if (len == 0)
          return this;
@@ -378,6 +411,10 @@ public class StringBBuilder {
    public String toString() {
       String s = new String(charValues, 0, count);
       return s;
+   }
+   
+   public char[] getArrayRef() {
+      return charValues;
    }
 
    public void trimToSize() {

@@ -43,7 +43,7 @@ public class SystemOutAppender extends BaseAppender {
          return;
       }
       //get DLogEntry appenders for this call
-      StringBBuilder sb = new StringBBuilder(uc,500);
+      StringBBuilder sb = new StringBBuilder(uc, 500);
 
       //first enter message. format is hard coded
       String tagString = entry.getTagString();
@@ -65,19 +65,19 @@ public class SystemOutAppender extends BaseAppender {
       }
       String method = entry.getMethod();
       int indexLine = -1;
-      if((indexLine = method.indexOf("@line")) != -1) {
-        String methodStr = method.substring(0, indexLine);
-        String lineNumber = method.substring(indexLine + "@line".length(), method.length());
-        sb.append(" ");
-        sb.append("(");
-        sb.append(cname);
-        sb.append(".java:");
-        sb.append(lineNumber);
-        sb.append(")#");
-        sb.append(methodStr);
+      if ((indexLine = method.indexOf("@line")) != -1) {
+         String methodStr = method.substring(0, indexLine);
+         String lineNumber = method.substring(indexLine + "@line".length(), method.length());
+         sb.append(" ");
+         sb.append("(");
+         sb.append(cname);
+         sb.append(".java:");
+         sb.append(lineNumber);
+         sb.append(")#");
+         sb.append(methodStr);
       } else {
-      String mstr = cname + "#" + entry.getMethod();
-      sb.append(mstr);
+         String mstr = cname + "#" + entry.getMethod();
+         sb.append(mstr);
       }
       sb.append(" ");
 
@@ -113,7 +113,7 @@ public class SystemOutAppender extends BaseAppender {
       }
       String nl = "\n";
       //fill the stack trace of the calls
-      stackTrace(ec,entry, sb, nl, config);
+      stackTrace(ec, entry, sb, nl, config);
 
       String strToPrint = sb.toString();
 
@@ -160,6 +160,22 @@ public class SystemOutAppender extends BaseAppender {
             sb.append(nl);
          }
       }
+   }
+
+   public void toString(Dctx dc) {
+      dc.root(this, SystemOutAppender.class, "@line166");
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, SystemOutAppender.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
    }
 
    //#enddebug

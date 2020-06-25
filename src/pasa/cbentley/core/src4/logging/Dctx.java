@@ -398,6 +398,16 @@ public class Dctx implements IFlagsToString {
       debugAlone(s, ar, " ");
    }
 
+   public void appendVarWithSpace(String s, int[] ar, String sep, boolean size) {
+      sb.append(' ');
+      debugAlone(s, ar, sep, size);
+   }
+
+   public void appendVarWithNewLine(String s, int[] ar, String sep, boolean size) {
+      this.nl();
+      debugAlone(s, ar, sep, size);
+   }
+
    public void appendVarWithSpace(String s, int[] ar, String sep) {
       debugAlone(s, ar, sep);
    }
@@ -510,6 +520,27 @@ public class Dctx implements IFlagsToString {
          }
          append(ar[i]);
       }
+   }
+
+   public void debugAlone(String title, int[] ar, String sep, boolean size) {
+      sb.append(title);
+      sb.append('=');
+      if (ar == null) {
+         sb.append("null");
+         return;
+      }
+      if (size) {
+         sb.append('#');
+         sb.append(ar.length);
+      }
+      sb.append('[');
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            append(sep);
+         }
+         append(ar[i]);
+      }
+      sb.append(']');
    }
 
    public void debugAlone(String title, int[] ar, String sep) {
@@ -1583,6 +1614,12 @@ public class Dctx implements IFlagsToString {
       flags = BitUtils.setFlag(flags, flag, v);
    }
 
+   /**
+    * Sets
+    * @param ctx
+    * @param flag
+    * @param b
+    */
    public void setFlagData(ICtx ctx, int flag, boolean b) {
       int index = flagsData.findObjectRef(ctx);
       if (index == -1) {
@@ -1590,6 +1627,9 @@ public class Dctx implements IFlagsToString {
          index = flagsData.addReturn(ctx, ctx.toStringGetToStringFlags());
       }
       flagsData.setIntFlag(index, flag, b);
+      //enable ctx to set other flags linked to this flag.. but invisible
+      //to the caller of this method
+      ctx.toStringFlagSetOn(flag, b, this);
    }
 
    public void setLineNumbers(boolean isLineNumbers) {
@@ -1688,13 +1728,18 @@ public class Dctx implements IFlagsToString {
       }
    }
 
-   public void appendFlagsPositive(int flags, String title, IntToStrings data) {
+   public void appendFlags(int flags, String title, IntToStrings data, boolean isPositive) {
       sb.append(title);
-      sb.append(" as TRUE = ");
+      if (isPositive) {
+         sb.append(" as TRUE = ");
+      } else {
+         sb.append(" as FALSE = ");
+      }
       int count = 0;
       for (int i = 0; i < data.getSize(); i++) {
          int flag = data.getInt(i);
-         if (BitUtils.hasFlag(flags, flag)) {
+         boolean hasFlag = BitUtils.hasFlag(flags, flag);
+         if ((isPositive && hasFlag) || (!isPositive && !hasFlag)) {
             String str = data.getString(i);
             if (count != 0) {
                sb.append(",");
@@ -1703,6 +1748,14 @@ public class Dctx implements IFlagsToString {
             count++;
          }
       }
+   }
+
+   public void appendFlagsNegative(int flags, String title, IntToStrings data) {
+      this.appendFlags(flags, title, data, false);
+   }
+
+   public void appendFlagsPositive(int flags, String title, IntToStrings data) {
+      this.appendFlags(flags, title, data, true);
    }
 
    //#enddebug

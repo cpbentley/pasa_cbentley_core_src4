@@ -55,10 +55,10 @@ public interface ITechTransform {
     * <li>Border Gradient
     * <br>
     * <b>Dir Switch</b> <br>
-    * <li>Triangle {@link C#DIR_2LEFT} <->  {@link C#DIR_3RIGHT}
-    * <li>Triangle {@link C#DIR_0TOP} <->  {@link C#DIR_1BOTTOM}
-    * <li>Triangle {@link C#DIR_7BotRight} <->  {@link C#DIR_4TopLeft}
-    * <li>Triangle {@link C#DIR_6BotLeft} <->  {@link C#DIR_5TopRight}
+    * <li>Triangle {@link C#DIR_2_LEFT} <->  {@link C#DIR_3_RIGHT}
+    * <li>Triangle {@link C#DIR_0_TOP} <->  {@link C#DIR_1_BOTTOM}
+    * <li>Triangle {@link C#DIR_7_BotRight} <->  {@link C#DIR_4_TopLeft}
+    * <li>Triangle {@link C#DIR_6_BotLeft} <->  {@link C#DIR_5_TopRight}
     * <br>
     * <br>
     * <br> Value/Meaning Equivalent to {@link Sprite#TRANS_3_ROT180} 
@@ -77,10 +77,10 @@ public interface ITechTransform {
     * TODO animation of never ending rotation
     * <br>
     * <b>Dir Switch</b>
-    * <li>{@link C#DIR_7BotRight} -> {@link C#DIR_6BotLeft}
-    * <li>{@link C#DIR_6BotLeft} -> {@link C#DIR_4TopLeft}
-    * <li>{@link C#DIR_4TopLeft} -> {@link C#DIR_5TopRight}
-    * <li>{@link C#DIR_5TopRight} -> {@link C#DIR_7BotRight}
+    * <li>{@link C#DIR_7_BotRight} -> {@link C#DIR_6_BotLeft}
+    * <li>{@link C#DIR_6_BotLeft} -> {@link C#DIR_4_TopLeft}
+    * <li>{@link C#DIR_4_TopLeft} -> {@link C#DIR_5_TopRight}
+    * <li>{@link C#DIR_5_TopRight} -> {@link C#DIR_7_BotRight}
     * 
     * <br>
     * <br> Value/Meaning Equivalent to {@link Sprite#TRANS_5_ROT90} 

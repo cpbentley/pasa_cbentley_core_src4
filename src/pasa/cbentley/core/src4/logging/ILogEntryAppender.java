@@ -23,7 +23,7 @@ package pasa.cbentley.core.src4.logging;
  * @author Charles Bentley
  *
  */
-public interface ILogEntryAppender {
+public interface ILogEntryAppender extends IStringable {
 
    //#mdebug
    

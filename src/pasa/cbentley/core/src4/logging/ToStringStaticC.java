@@ -10,21 +10,21 @@ public class ToStringStaticC extends ToStringStaticBase implements C {
 
    public static String toStringCDir(int dir) {
       switch (dir) {
-         case DIR_0TOP:
+         case DIR_0_TOP:
             return "Top";
-         case DIR_1BOTTOM:
+         case DIR_1_BOTTOM:
             return "Bottom";
-         case DIR_2LEFT:
+         case DIR_2_LEFT:
             return "Left";
-         case DIR_3RIGHT:
+         case DIR_3_RIGHT:
             return "Right";
-         case DIR_4TopLeft:
+         case DIR_4_TopLeft:
             return "TopLeft";
-         case DIR_5TopRight:
+         case DIR_5_TopRight:
             return "TopRight";
-         case DIR_6BotLeft:
+         case DIR_6_BotLeft:
             return "BotLeft";
-         case DIR_7BotRight:
+         case DIR_7_BotRight:
             return "BotRight";
          default:
             return "UnknownDir" + dir;

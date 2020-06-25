@@ -136,8 +136,9 @@ public class IOUtils implements IStringable {
       int numRead = 0;
       while ((numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
          offset += numRead;
-         if (offset >= bytes.length)
+         if (offset >= bytes.length) {
             bytes = uc.getMem().increaseCapacity(bytes, bytes.length + bufferStart);
+         }
          //System.out.println(MemPrint.snapShot("offset"));
       }
       //System.out.println(MemPrint.snapShot("before close"));
@@ -352,17 +353,19 @@ public class IOUtils implements IStringable {
       return sb;
    }
 
+   public StringBBuilder readFileAsBuilder(String fileName, String encod) {
+      return readFileAsBuilder(fileName, encod, false, ' '); //char is irrevelant while false
+   }
+
    /**
-    * Read the file
-    * <br>
-    * <br>
-    * Returns null if there is an exception
-    * @param ui
+    * 
     * @param fileName
     * @param encod
+    * @param isIgnore when true, ignore c while reading
+    * @param c
     * @return
     */
-   public String readFileAsString(String fileName, String encod) {
+   public StringBBuilder readFileAsBuilder(String fileName, String encod, boolean isIgnore, char c) {
       StringBBuilder sb = new StringBBuilder(uc);
       try {
          InputStream is = getStream(uc, fileName);
@@ -373,7 +376,11 @@ public class IOUtils implements IStringable {
          char[] car = new char[256];
          int read = -1;
          while ((read = isr.read(car)) != -1) {
-            sb.append(car, 0, read);
+            if (isIgnore) {
+               sb.appendIgnore(car, 0, read, c);
+            } else {
+               sb.append(car, 0, read);
+            }
          }
       } catch (UnsupportedEncodingException e) {
          //#debug
@@ -385,6 +392,36 @@ public class IOUtils implements IStringable {
          e.printStackTrace();
          return null;
       }
+      return sb;
+   }
+
+   /**
+    * Reads the file as text using given encoding. Removes all \r characters
+    * @param fileName
+    * @param encod
+    * @return
+    */
+   public StringBBuilder readFileAsBuilderWindows(String fileName, String encod) {
+      return readFileAsBuilder(fileName, encod, true, StringUtils.NEW_LINE_CARRIAGE_RETURN);
+   }
+
+   /**
+    * Read the file as text as such.
+    * <br>
+    * <br>
+    * Returns null if there is an exception
+    * @param ui
+    * @param fileName
+    * @param encod
+    * @return
+    */
+   public String readFileAsString(String fileName, String encod) {
+      StringBBuilder sb = readFileAsBuilder(fileName, encod);
+      return sb.toString();
+   }
+
+   public String readFileAsStringWindows(String fileName, String encod) {
+      StringBBuilder sb = readFileAsBuilderWindows(fileName, encod);
       return sb.toString();
    }
 

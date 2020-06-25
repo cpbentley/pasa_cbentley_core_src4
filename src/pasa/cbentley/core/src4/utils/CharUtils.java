@@ -207,6 +207,21 @@ public class CharUtils {
       }
    }
 
+   /**
+    * 
+    * @param ar
+    * @param c
+    * @return true if c is inside the array
+    */
+   public static boolean contains(char[] ar, char c) {
+      for (int i = ar.length - 1; i >= 0; i--) {
+         if (c == ar[i]) {
+            return true;
+         }
+      }
+      return false;
+   }
+
    public static boolean isEqual(char[] c, char[] b) {
       return isEqual(c, 0, c.length, b);
    }
@@ -337,7 +352,7 @@ public class CharUtils {
       writeCharsIntLong(data, 0, cs, coffset, clen);
       return data;
    }
-   
+
    /**
     * Read by {@link CharUtils#getCharsIntLong(byte[], int)}
     * @param cs

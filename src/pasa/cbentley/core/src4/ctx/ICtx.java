@@ -125,6 +125,16 @@ public interface ICtx extends IStringable {
    public String toStringProducerID(int pid);
 
    public void toStringSetToStringFlag(int flag, boolean v);
+
+   /**
+    * Called when a flag was set on {@link Dctx}.
+    * Enables ctx to set other flags linked to this flag.. but invisible 
+    * to the caller of this method
+    * @param flag
+    * @param b
+    * @param dctx
+    */
+   public void toStringFlagSetOn(int flag, boolean b, Dctx dctx);
    //#enddebug
 
 

@@ -11,7 +11,7 @@ public abstract class BaseAppender implements ILogEntryAppender {
    //#mdebug
    protected IDLogConfig config;
 
-   protected UCtx uc;
+   protected UCtx        uc;
 
    public BaseAppender(UCtx uc) {
       this.uc = uc;
@@ -27,6 +27,39 @@ public abstract class BaseAppender implements ILogEntryAppender {
          config = c;
       }
    }
+
+   public IDLog toDLog() {
+      return toStringGetUCtx().toDLog();
+   }
+
+   public String toString() {
+      return Dctx.toString(this);
+   }
+
+   public void toString(Dctx dc) {
+      dc.root(this, BaseAppender.class, "@line40");
+      toStringPrivate(dc);
+      
+      dc.nlLvl(config, "IDLogConfig");
+   }
+
+   public String toString1Line() {
+      return Dctx.toString1Line(this);
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, BaseAppender.class);
+      toStringPrivate(dc);
+   }
+
+   public UCtx toStringGetUCtx() {
+      return uc;
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
+   }
+
    //#enddebug
-   
+
 }
