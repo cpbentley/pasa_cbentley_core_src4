@@ -114,7 +114,7 @@ public class BufferObject implements IStringable {
       if (offset == 0) {
          set(uc.getMem().ensureCapacity(objects, count + 2, increment));
          //shift them all up by 2 and
-         ArrayUtils.shiftIntUp(objects, 2, offset, offset + count - 1, false);
+         ArrayUtils.shiftUp(objects, 2, offset, offset + count - 1, false);
          offset += 2;
       }
       offset--;
@@ -291,7 +291,7 @@ public class BufferObject implements IStringable {
    public void removeAtIndexFor(int index, int size) {
       int start = offset + index + size;
       int end = offset + count;
-      ArrayUtils.shiftIntDown(objects, size, start, end, false);
+      ArrayUtils.shiftDown(objects, size, start, end, false);
       count -= size;
    }
 

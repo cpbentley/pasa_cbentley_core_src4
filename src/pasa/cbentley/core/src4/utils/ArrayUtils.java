@@ -100,13 +100,13 @@ public class ArrayUtils {
     * @param end index value inclusive
     * @param erase pad the hole with 0s
     */
-   public static void shiftInt(Object[] ar, int shiftsize, int start, int end, boolean erase) {
+   public static void shift(Object[] ar, int shiftsize, int start, int end, boolean erase) {
       if (start > end)
          return;
       if (shiftsize < 0)
-         shiftIntDown(ar, 0 - shiftsize, start, end, erase);
+         shiftDown(ar, 0 - shiftsize, start, end, erase);
       else
-         shiftIntUp(ar, shiftsize, start, end, erase);
+         shiftUp(ar, shiftsize, start, end, erase);
    }
 
    /**
@@ -118,7 +118,7 @@ public class ArrayUtils {
     * @param end end index will be the last to be shifted
     * @param erase
     */
-   public static void shiftIntDown(Object[] ar, int shiftsize, int start, int end, boolean erase) {
+   public static void shiftDown(Object[] ar, int shiftsize, int start, int end, boolean erase) {
       for (int i = start; i <= end; i++) {
          if (i - shiftsize >= 0) {
             ar[i - shiftsize] = ar[i];
@@ -141,7 +141,7 @@ public class ArrayUtils {
     * @param erase erase data liberated
     * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
     */
-   public static void shiftIntUp(Object[] ar, int shiftsize, int start, int end, boolean erase) {
+   public static void shiftUp(Object[] ar, int shiftsize, int start, int end, boolean erase) {
       for (int i = end; i >= start; i--) {
          if (i + shiftsize < ar.length) {
             ar[i + shiftsize] = ar[i];
