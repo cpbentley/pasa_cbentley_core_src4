@@ -5,12 +5,9 @@
 package pasa.cbentley.core.src4.structs;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
-import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
-import pasa.cbentley.core.src4.utils.IntUtils;
-import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
  * Double ended buffer. You can append in front or at the end.
@@ -26,8 +23,6 @@ public class BufferObject implements IStringable {
 
    private int      count     = 0;
 
-   private int      offset    = 0;
-
    /**
     * must be 1 or higher
     */
@@ -39,6 +34,8 @@ public class BufferObject implements IStringable {
     * buffer size = ints.length - 1 - int[0]
     */
    private Object[] objects;
+
+   private int      offset    = 0;
 
    private UCtx     uc;
 
@@ -74,21 +71,6 @@ public class BufferObject implements IStringable {
       this.uc = uc;
    }
 
-   public int getObjectIndex(Object o) {
-      int start = this.offset;
-      int end = start + count;
-      for (int j = start; j < end; j++) {
-         if (objects[j] == o) {
-            return j;
-         }
-      }
-      return -1;
-   }
-
-   public boolean hasReference(Object o) {
-      return getObjectIndex(o) != -1;
-   }
-
    /**
     * append String to the {@link BufferObject}
     * @param str
@@ -122,6 +104,11 @@ public class BufferObject implements IStringable {
       count++;
    }
 
+   /**
+    * Copies the references of this {@link BufferObject} into the array starting at offset
+    * @param array
+    * @param offset
+    */
    public void appendBufferToArrayAt(Object[] array, int offset) {
       int start = this.offset;
       int end = start + count;
@@ -176,15 +163,6 @@ public class BufferObject implements IStringable {
    }
 
    /**
-    * 
-    * @param index
-    * @param obj
-    */
-   public void setUnsafe(int index, Object obj) {
-      objects[offset + index] = obj;
-   }
-
-   /**
     * Returns a truncated copy of the int array with only the integer data.
     * <br> 
     * The size header and trailing buffer are removed.
@@ -197,6 +175,20 @@ public class BufferObject implements IStringable {
          ar[i] = objects[i];
       }
       return ar;
+   }
+
+   /**
+    * Returns the last element in the {@link BufferObject}.
+    * <br>
+    * <br>
+    * Does not remove it.
+    * @return null if no elements
+    */
+   public Object getFirst() {
+      if (count > 0) {
+         return objects[offset];
+      }
+      return null;
    }
 
    /**
@@ -225,18 +217,19 @@ public class BufferObject implements IStringable {
       return null;
    }
 
-   /**
-    * Returns the last element in the {@link BufferObject}.
-    * <br>
-    * <br>
-    * Does not remove it.
-    * @return null if no elements
-    */
-   public Object getFirst() {
-      if (count > 0) {
-         return objects[offset];
+   public int getLength() {
+      return count;
+   }
+
+   public int getObjectIndex(Object o) {
+      int start = this.offset;
+      int end = start + count;
+      for (int j = start; j < end; j++) {
+         if (objects[j] == o) {
+            return j;
+         }
       }
-      return null;
+      return -1;
    }
 
    /**
@@ -247,8 +240,20 @@ public class BufferObject implements IStringable {
       return count;
    }
 
-   public int getLength() {
-      return count;
+   public boolean hasReference(Object o) {
+      return getObjectIndex(o) != -1;
+   }
+
+   /**
+    * Remove size elements starting at index
+    * @param index
+    * @param size
+    */
+   public void removeAtIndexFor(int index, int size) {
+      int start = offset + index + size;
+      int end = offset + count;
+      ArrayUtils.shiftDown(objects, size, start, end, false);
+      count -= size;
    }
 
    /**
@@ -284,23 +289,20 @@ public class BufferObject implements IStringable {
    }
 
    /**
-    * Remove size elements starting at index
-    * @param index
-    * @param size
-    */
-   public void removeAtIndexFor(int index, int size) {
-      int start = offset + index + size;
-      int end = offset + count;
-      ArrayUtils.shiftDown(objects, size, start, end, false);
-      count -= size;
-   }
-
-   /**
     * Sets the reference of the buffer.
     * @param ints
     */
    public void set(Object[] objects) {
       this.objects = objects;
+   }
+
+   /**
+    * 
+    * @param index
+    * @param obj
+    */
+   public void setUnsafe(int index, Object obj) {
+      objects[offset + index] = obj;
    }
 
    //#mdebug
