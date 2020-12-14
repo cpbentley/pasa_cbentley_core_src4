@@ -24,5 +24,8 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  */
 public interface ILogConfigurator extends ITechTags,ITechLvl, ITechConfig {
 
+   //#mdebug
    public void apply(IDLogConfig log);
+   
+   //#enddebug
 }

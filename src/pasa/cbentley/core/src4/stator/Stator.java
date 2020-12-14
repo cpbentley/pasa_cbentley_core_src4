@@ -17,9 +17,11 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 
 public class Stator implements IStringable {
 
+   private byte[]         data;
+
    private IPrefs         prefs;
 
-   protected final UCtx   uc;
+   private BADataIS       reader;
 
    /**
     * Holds references of {@link IStatorable} 
@@ -36,26 +38,16 @@ public class Stator implements IStringable {
     */
    private long           timestamp;
 
+   protected final UCtx   uc;
+
    private BADataOS       writer;
-
-   private BADataIS       reader;
-
-   private byte[]         data;
 
    public Stator(UCtx uc) {
       this.uc = uc;
    }
 
-   public long getTimestamp() {
-      return timestamp;
-   }
-
-   public void setTimestamp(long timestamp) {
-      this.timestamp = timestamp;
-   }
-
-   public boolean hasData() {
-      return getData() != null;
+   public byte[] getData() {
+      return data;
    }
 
    public BADataIS getDataReader() {
@@ -83,6 +75,22 @@ public class Stator implements IStringable {
       return prefs;
    }
 
+   public long getTimestamp() {
+      return timestamp;
+   }
+
+   public boolean hasData() {
+      return getData() != null;
+   }
+
+   public void setData(byte[] data) {
+      this.data = data;
+   }
+
+   public void setTimestamp(long timestamp) {
+      this.timestamp = timestamp;
+   }
+
    //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();
@@ -101,10 +109,6 @@ public class Stator implements IStringable {
       return Dctx.toString1Line(this);
    }
 
-   private void toStringPrivate(Dctx dc) {
-
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "State");
       toStringPrivate(dc);
@@ -114,12 +118,8 @@ public class Stator implements IStringable {
       return uc;
    }
 
-   public byte[] getData() {
-      return data;
-   }
+   private void toStringPrivate(Dctx dc) {
 
-   public void setData(byte[] data) {
-      this.data = data;
    }
 
    //#enddebug

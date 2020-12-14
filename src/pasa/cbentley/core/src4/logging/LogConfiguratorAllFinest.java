@@ -4,8 +4,8 @@
  */
 package pasa.cbentley.core.src4.logging;
 
+//#mdebug
 public class LogConfiguratorAllFinest implements ILogConfigurator {
-
 
    public void apply(IDLogConfig log) {
       log.setLevelGlobal(ITechLvl.LVL_03_FINEST);
@@ -13,3 +13,4 @@ public class LogConfiguratorAllFinest implements ILogConfigurator {
    }
 
 }
+//#enddebug
