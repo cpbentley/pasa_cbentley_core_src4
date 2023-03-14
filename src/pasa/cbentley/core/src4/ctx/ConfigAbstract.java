@@ -7,6 +7,15 @@ package pasa.cbentley.core.src4.ctx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 
+/**
+ * Base core implemention class for {@link IConfig}
+ * 
+ * <li> {@link IConfig#isHardcoded()}
+ * <li> {@link IConfig#isIgnoreSettings()}
+ * 
+ * @author Charles Bentley
+ *
+ */
 public abstract class ConfigAbstract implements IConfig {
 
    protected final UCtx uc;
@@ -55,7 +64,7 @@ public abstract class ConfigAbstract implements IConfig {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ConfigAbstract.class,54);
+      dc.root(this, ConfigAbstract.class, 54);
       toStringPrivate(dc);
    }
 
