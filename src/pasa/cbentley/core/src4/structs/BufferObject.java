@@ -203,6 +203,10 @@ public class BufferObject implements IStringable {
       return objects;
    }
 
+   public boolean isEmpty() {
+      return count == 0;
+   }
+
    /**
     * Returns the last element in the {@link BufferObject}.
     * <br>
@@ -257,6 +261,17 @@ public class BufferObject implements IStringable {
    }
 
    /**
+    * Gets object at index and removes it.
+    * @param index
+    * @return
+    */
+   public Object removeAtIndex(int index) {
+      Object v = get(index);
+      removeAtIndex(index);
+      return v;
+   }
+
+   /**
     * 
     * @return null if size is zero
     */
@@ -269,6 +284,13 @@ public class BufferObject implements IStringable {
       } else {
          return null;
       }
+   }
+
+   /**
+    * Shuffle all the content of the buffer
+    */
+   public void shuffle() {
+      uc.getAU().shuffle(objects, offset, count);
    }
 
    /**

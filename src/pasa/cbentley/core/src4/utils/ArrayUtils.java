@@ -4,6 +4,8 @@
  */
 package pasa.cbentley.core.src4.utils;
 
+import java.util.Random;
+
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.IFactoryBase;
 import pasa.cbentley.core.src4.structs.IntToObjects;
@@ -324,6 +326,26 @@ public class ArrayUtils {
          for (int i = start; i >= index; i--) {
             ar[i + 1] = ar[i];
          }
+      }
+   }
+   
+   /**
+    * Shuffle using Random.
+    * 
+    * How do you provide a seed for testing purpose or for repeatability in game engines ?
+    * Set the random object using {@link UCtx#setRandom(Random)}
+    * @param ar
+    * @param offset
+    * @param len the number of elements shuffled will be len-1 starting at offset inclusive
+    */
+   public void shuffle(Object[] ar, int offset, int len) {
+      Random r = uc.getRandom();
+      for (int i = len - 1; i >= offset; i--) {
+         int j = r.nextInt(i + 1);
+         //swap
+         Object temp = ar[j];
+         ar[j] = ar[i];
+         ar[i] = temp;
       }
    }
 }
