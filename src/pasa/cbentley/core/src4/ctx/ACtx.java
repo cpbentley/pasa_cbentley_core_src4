@@ -16,7 +16,9 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * <p>
  * Javadoc of the context provides all the starting information on how to use the module.
  * </p>
- * 
+ * <p>
+ * The most important method is the {@link ACtx#getCtxID()} method. See its javadoc.
+ * </p>
  * @see UCtx
  * @author Charles Bentley
  *
@@ -68,12 +70,31 @@ public abstract class ACtx implements ICtx {
    }
 
    /**
+    * Must be implemented by the subclass of {@link ACtx}.
+   
+    * <p>
+    * Q: <b>What is the purpose</b> ?
+    * It prevents the application developer from loading 2 contexts of the same class in the same {@link CtxManager}.
+    * It also forces the choice of a unique integer relative to other contexts class.
+    * Relative Context Awareness and prevent context dumping.
+    * </p>
+    * <p>
+    * Q: <b>Why is it not Abstract</b> ?
+    * To strike the developer's consciousness at runtime. Its no big deal.. Just a simple static value to define
+    * </p>
+    * <br>
+    * This is the weak link in the architecture. This value is statically defined with no compile checks of collisions. Application fail to start
+    * when the  
     * 
+    * @see ICtx#getCtxID()
     */
    public int getCtxID() {
       return 0;
    }
 
+   /**
+    * An array of 
+    */
    public ICtx[] getCtxSub() {
       return new ICtx[] { uc };
    }
@@ -211,15 +232,15 @@ public abstract class ACtx implements ICtx {
    }
 
    public void toStringCheckNull(Object o) {
-      if(o == null) {
+      if (o == null) {
          throw new NullPointerException();
       }
    }
-   
+
    public void toStringFlagSetOn(int flag, boolean b, Dctx dctx) {
       //we don't do anything by default
    }
-   
+
    /**
     * @param flag
     * @param v
