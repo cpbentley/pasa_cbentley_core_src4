@@ -229,6 +229,7 @@ public class BitUtils {
          return (i / 8) + 1;
    }
 
+
    public static int byteSize(int w) {
       if (w < 0)
          return 4;
