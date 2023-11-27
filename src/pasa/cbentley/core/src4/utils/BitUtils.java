@@ -229,7 +229,6 @@ public class BitUtils {
          return (i / 8) + 1;
    }
 
-
    public static int byteSize(int w) {
       if (w < 0)
          return 4;
@@ -261,23 +260,6 @@ public class BitUtils {
    }
 
    /**
-    * 
-    * @param source
-    * @param target
-    * @param sourceCoord where to copy the first bit
-    * @param targetCoord where to paste the first bit
-    * @param sourceSize the number of bits to copy
-    */
-   public static void copyBits(byte[] source, byte[] target, BitCoordinate sourceCoord, BitCoordinate targetCoord, int sourceSize) {
-      for (int i = 1; i <= sourceSize; i++) {
-         sourceCoord.forwardOne();
-         targetCoord.forwardOne();
-         int bit = sourceCoord.getBit(source);
-         targetCoord.setBit(target, bit);
-      }
-   }
-
-   /**
     * Copy in b at coordinate c, numbits of value starting from least significant
     * 
     * example
@@ -300,6 +282,23 @@ public class BitUtils {
          c.setBit(b, bit);
       }
       return b;
+   }
+
+   /**
+    * 
+    * @param source
+    * @param target
+    * @param sourceCoord where to copy the first bit
+    * @param targetCoord where to paste the first bit
+    * @param sourceSize the number of bits to copy
+    */
+   public static void copyBits(byte[] source, byte[] target, BitCoordinate sourceCoord, BitCoordinate targetCoord, int sourceSize) {
+      for (int i = 1; i <= sourceSize; i++) {
+         sourceCoord.forwardOne();
+         targetCoord.forwardOne();
+         int bit = sourceCoord.getBit(source);
+         targetCoord.setBit(target, bit);
+      }
    }
 
    public static byte[] copyHighBits(byte[] b, BitCoordinate c, int value, int numbit) {
@@ -331,95 +330,6 @@ public class BitUtils {
       x = (x >>> 8 & 0x00ff00ff) + (x & 0x00ff00ff);
       // collapse 2x16 bit counts to 1x32 bit count
       return (x >>> 16) + (x & 0x0000ffff);
-   }
-
-   /**
-    * ddddaXbaXbddd becomes dddaYbaYbddd 
-    * A chunk is aXb. This method expands the bitsize X to Y for each chunks
-    * The first chunk is at Coordinate c.
-    * @param data raw data
-    * @param BitCoordinate c coordinate of first chunk
-    * @param numofchunks the number of chunks
-    * @param aBitSize
-    * @param xBitSize
-    * @param bBitSize
-    * @param yBitSize
-    * @param lastusedbit the last bit of data to be shifted
-    * @return the new array
-    * 
-    * ddddaXbaXbaXbddd
-    * 1)First chunk to be shifted is bddd. shifted up by (Y-X)= diff * numofchunks
-    * 2)then baX is shifted up by diff * (numofChunks -1)
-    * 3)then baX is shifted up by diff * (numofChunks -2)
-    * 4)the last aX is not shifted
-    * The shift erases old data in order to provide clean 0 bits for expanded data
-    * 
-    * PRE: enough free capacity after lastusedbit (diff * numofchunks bits)
-    * otherwise data will be overwritten or exception will be thrown
-    * POST: reference array data is not changed
-    * 
-    *  11010
-    */
-   public void expandBitSize(byte[] data, BitCoordinate c, int numofchunks, int aBitSize, int xBitSize, int bBitSize, int yBitSize, int lastusedbit) {
-      //System.out.println(BitMask.toBinString(data, 4));
-      int diff = yBitSize - xBitSize;
-      int _bitChunkSize = aBitSize + xBitSize + bBitSize;
-      //get to the last one
-      c.forward(_bitChunkSize * (numofchunks - 1));
-      c.forward(aBitSize + xBitSize);
-      //+2 = +1 for bit lost in coordindate c
-      int bitnum = c.unmap() + 1;
-      int lastbit = lastusedbit;
-      //System.out.println(c.unmap() + " bitnum="+bitnum);
-      //System.out.println(BitMask.toBinString(data, 4));
-      //this frees up the memory for the new data.
-      shiftBitsUp(data, diff * numofchunks, bitnum, lastbit, true);
-      //System.out.println(BitMask.toBinString(data, 4));
-      //this loop will shift chunk individually. starting from the last
-      for (int i = 1; i < numofchunks; i++) {
-         //coord is at b, rewind to get to previous b
-         c.rewind(_bitChunkSize);
-         //System.out.println(c);
-         //shift is decreasing with i
-         int bitShift = diff * (numofchunks - i);
-         //first bit is first bit of b
-         bitnum = c.unmap() + 1;
-         lastbit = bitnum + _bitChunkSize - 1;
-         //System.out.println("bitnum="+bitnum + " lastbit="+lastbit);
-         shiftBitsUp(data, bitShift, bitnum, lastbit, true);
-         //System.out.println(BitMask.toBinString(data, 4));
-
-      }
-      //the last aX does not move
-      //System.out.println("END");
-   }
-
-   /**
-    * 
-    * @param data
-    * @param start
-    * @param numofchunks
-    * @param aBitSize
-    * @param xBitSize
-    * @param bBitSize
-    * @param yBitSize
-    * @param lastusedbyte last byte of relevant data
-    */
-   public void expandByteSize(byte[] data, int start, int numofchunks, int aBitSize, int xBitSize, int bBitSize, int yBitSize, int lastusedbyte) {
-      int diff = yBitSize - xBitSize;
-      int _bitChunkSize = aBitSize + xBitSize + bBitSize;
-      //start by shifting the farthest from start
-      start += (_bitChunkSize * (numofchunks - 1));
-      start += (aBitSize + xBitSize);
-      int lastbit = lastusedbyte;
-      if (start <= lastbit)
-         shiftBytesUp(data, diff * numofchunks, start, lastbit);
-      for (int i = 1; i < numofchunks; i++) {
-         start -= (_bitChunkSize);
-         int bitShift = diff * (numofchunks - i);
-         lastbit = start + _bitChunkSize - 1;
-         shiftBytesUp(data, bitShift, start, lastbit);
-      }
    }
 
    public static int getBit(int bitnumber, int value) {
@@ -522,6 +432,10 @@ public class BitUtils {
       return (val & mask) == mask;
    }
 
+   public static boolean isEven(int val) {
+      return (val & 1) == 0;
+   }
+
    /**
     * Tells if the first different bit is 1 (true) or 0 (false)
     * @param base
@@ -535,40 +449,12 @@ public class BitUtils {
       return isBitSet(compare, len + 1);
    }
 
-   public static boolean isSet(int val, int mask) {
-      return (val & mask) == mask;
-   }
-
-   public static boolean isEven(int val) {
-      return (val & 1) == 0;
-   }
-
    public static boolean isOdd(int val) {
       return (val & 1) != 0;
    }
 
-   /**
-    * Burn the value in the first bits of data
-    * @param data
-    * @param value
-    * @return
-    */
-   public static int setByte1(int data, int value) {
-      int shifted = ((value & 0xFF) << 24);
-      int datan = (data & 0x00FFFFFF);
-      return shifted + datan;
-   }
-
-   public static int setByte2(int data, int value) {
-      return ((value & 0xFF) << 16) + (data & 0xFF00FFFF);
-   }
-
-   public static int setByte3(int data, int value) {
-      return ((value & 0xFF) << 8) + (data & 0xFFFF00FF);
-   }
-
-   public static int setByte4(int data, int value) {
-      return ((value & 0xFF) << 0) + (data & 0xFFFFFF00);
+   public static boolean isSet(int val, int mask) {
+      return (val & mask) == mask;
    }
 
    public static int readBit(byte[] b, BitCoordinate c) {
@@ -643,6 +529,30 @@ public class BitUtils {
    }
 
    /**
+    * Burn the value in the first bits of data
+    * @param data
+    * @param value
+    * @return
+    */
+   public static int setByte1(int data, int value) {
+      int shifted = ((value & 0xFF) << 24);
+      int datan = (data & 0x00FFFFFF);
+      return shifted + datan;
+   }
+
+   public static int setByte2(int data, int value) {
+      return ((value & 0xFF) << 16) + (data & 0xFF00FFFF);
+   }
+
+   public static int setByte3(int data, int value) {
+      return ((value & 0xFF) << 8) + (data & 0xFFFF00FF);
+   }
+
+   public static int setByte4(int data, int value) {
+      return ((value & 0xFF) << 0) + (data & 0xFFFFFF00);
+   }
+
+   /**
     * PRE: data cannot be higher than 2^bitwidth
     * @param val recipient for the new data 
     * @param pos bit position of the new data
@@ -665,176 +575,6 @@ public class BitUtils {
       else
          root = root & ~flag;
       return root;
-   }
-
-   /**
-    * Shift shiftsize bits up (if positive, down if negative)
-    * @param b
-    * @param shiftsize negative is shifted down, positive is shifted up
-    * @param offsetbit first bit inclusive to be shifted
-    * @param lastbit last bit inclusive to be shifted
-    * @param erase
-    */
-   public void shiftBits(byte[] b, int shiftsize, int offsetbit, int lastbit, boolean erase) {
-      if (shiftsize > 0) {
-         shiftBitsUp(b, shiftsize, offsetbit, lastbit, erase);
-      }
-      if (shiftsize < 0) {
-         shiftBitsDown(b, 0 - shiftsize, offsetbit, lastbit, erase);
-      }
-   }
-
-   /**
-    * Shift a chunk of bits down
-    * If shiftsize is a multiple of 8, data is shifted exactly this multiple of bytes
-    * @param b
-    * @param shiftsize if shiftsize does too far,offsetbit will have position 0
-    * @param offsetbit
-    * @param lastbit
-    * @param erase
-    */
-   public void shiftBitsDown(byte[] b, int shiftsize, int offsetbit, int lastbit, boolean erase) {
-      int re = shiftsize + 1;
-      int f = shiftsize;
-      if (offsetbit - re < 0) {
-         offsetbit = re;
-      }
-      BitCoordinate workc = new BitCoordinate(uc);
-      workc.map(offsetbit - 1);
-      for (int i = offsetbit; i <= lastbit; i++) {
-         int bit = BitUtils.readBit(b, workc);
-         workc.rewind(re);
-         BitUtils.copyBit(b, workc, bit);
-         workc.forward(f);
-      }
-      if (erase) {
-         BitCoordinate c = new BitCoordinate(uc);
-         c.map(lastbit - shiftsize);
-         for (int i = shiftsize; i >= 1; i--) {
-            BitUtils.copyBit(b, c, 0);
-         }
-      }
-   }
-
-   /**
-    * Most basic shift where shiftsize of bits are shifted shiftsize starting by offsetbit inclusive
-    * @param b
-    * @param shiftsize
-    * @param offsetbit
-    */
-   public void shiftBitsUp(byte[] b, int shiftsize, int offsetbit) {
-      shiftBitsUp(b, shiftsize, offsetbit, offsetbit + shiftsize - 1, false);
-   }
-
-   /**
-    * Shift by numbits bit on the left
-    * offsetbit and lastbit are included in the shift
-    * @param b
-    * @param shiftsize the stride of the shift
-    * @param offsetbit
-    * @param lastbit
-    * reset to zero 
-    */
-   public void shiftBitsUp(byte[] b, int shiftsize, int offsetbit, int lastbit) {
-      shiftBitsUp(b, shiftsize, offsetbit, lastbit, false);
-   }
-
-   /**
-    * xxx offsetbit xxx lastbit
-    * Shift by numbits bit on the left
-    * offsetbit and lastbit are included in the shift
-    * @param data array
-    * @param shiftsize the number of bits to be shifted to the left
-    * @param offsetbit the first bit to be shifted
-    * @param lastbit the last bit included. if lastbit=offset bit (say 1), that bit will be shifted up
-    * @param erase
-    */
-   public void shiftBitsUp(byte[] data, int shiftsize, int offsetbit, int lastbit, boolean erase) {
-      //	if (offsetbit == lastbit)
-      //	   return;
-      int f = shiftsize - 1;
-      int r = 3 + f;
-      //
-      if (lastbit + f > data.length * 8) {
-         lastbit = lastbit - shiftsize;
-      }
-      BitCoordinate workc = new BitCoordinate(uc);
-      workc.map(lastbit - 1);
-      for (int i = lastbit; i >= offsetbit; i--) {
-         int bit = BitUtils.readBit(data, workc);
-         workc.forward(f);
-         BitUtils.copyBit(data, workc, bit);
-         workc.rewind(r);
-      }
-      if (erase) {
-         BitCoordinate c = new BitCoordinate(uc);
-         c.map(offsetbit - 1);
-         for (int i = 1; i <= shiftsize; i++) {
-            BitUtils.copyBit(data, c, 0);
-         }
-      }
-   }
-
-   /**
-    * Shift [firstbyte - lastbyte] down of shiftsize bytes
-    * 
-    * erase up shiftsize bytes starting at lastbyte
-    * @param data
-    * @param shiftsize
-    * @param firstbyte
-    * @param lastbyte if equal to firstbyte, only one byte is shifted down
-    */
-   public void shiftBytesDown(byte[] data, int shiftsize, int firstbyte, int lastbyte) {
-      lastbyte = Math.min(lastbyte, data.length - 1);
-      for (int i = firstbyte; i <= lastbyte; i++) {
-         if (i - shiftsize >= 0)
-            data[i - shiftsize] = data[i];
-      }
-      int end = Math.min(shiftsize + lastbyte, data.length);
-      for (int i = lastbyte; i < end; i++) {
-         data[i] = 0;
-      }
-   }
-
-   /**
-    * Shift bytes up.
-    * erase old
-    * @param data
-    * @param shiftsize
-    * @param firstbyte included in the shift
-    * @param lastbyte included in the shift
-    */
-   public void shiftBytesUp(byte[] data, int shiftsize, int firstbyte, int lastbyte) {
-      if (firstbyte > lastbyte) {
-         throw new RuntimeException("firstbyte " + firstbyte + " > " + " lastybte " + lastbyte);
-      }
-      for (int i = lastbyte; i >= firstbyte; i--) {
-         if (i + shiftsize < data.length)
-            data[i + shiftsize] = data[i];
-      }
-      int end = Math.min(shiftsize + firstbyte, data.length);
-      for (int i = firstbyte; i < end; i++) {
-         data[i] = 0;
-      }
-   }
-
-   /** 
-    * Rotates array so that ith value goes to i+value.
-    */
-   public void rotateArray(byte[] array, int value) {
-      int j = value;
-      int i = value;
-      int num = array.length;
-      while (i != 0) {
-         int m = j;
-         j = (j + value) % num;
-         byte b = array[m];
-         array[m] = array[j];
-         array[j] = b;
-         if (j == i) {
-            j = --i;
-         }
-      }
    }
 
    /**
@@ -1004,65 +744,51 @@ public class BitUtils {
    }
 
    /**
-    * Single line binary string of bytes separated by a ' ' every chunkLen bits.
+    * Do {@link BitUtils#compare(byte[], byte[], int, int)} on the whole array
+    * @param word
     * @param ar
-    * @param offset
-    * @param len
-    * @param chunkLen number of bits before printing a space
     * @return
     */
-   public String toBinStringRightToLeft(byte[] ar, int offset, int len, int chunkLen) {
-      //we need a string builder factory
-      StringBBuilder sb = new StringBBuilder(uc, len * 8 + 1 + len / chunkLen);
-      int count = 0;
-      for (int i = offset; i < offset + len; i++) {
-         int val = ar[i] & 0xFF;
-         for (int j = 1; j <= 8; j++) {
-            int bit = BitUtils.getBit(j, val);
-            sb.append(bit);
-            count++;
-            if (count == chunkLen) {
-               count = 0;
-               sb.append(' ');
-            }
-         }
-      }
-      return sb.toString();
-   }
-
-   public String toStringBytes(byte[] ar, int cols) {
-      return toStringBytes(ar, 0, ar.length, cols);
-   }
-
-   /**
-    * string of the array with columns
-    * @param ar
-    * @param offset
-    * @param len
-    * @param cols
-    * @return
-    */
-   public String toStringBytes(byte[] ar, int offset, int len, int cols) {
-      StringBBuilder sb = new StringBBuilder(uc);
-      int count = 0;
-      for (int i = offset; i < offset + len; i++) {
-         sb.append(ar[i]);
-         count++;
-         if ((count % cols) == 0) {
-            sb.nl();
-         } else {
-            sb.append(' ');
-         }
-      }
-      return sb.toString();
-   }
-
    public int compare(byte[] word, byte[] ar) {
       return compare(word, ar, 0);
    }
 
+   /**
+    * Do {@link BitUtils#compare(byte[], byte[], int, int)} on the array starting at index base
+    * @param word
+    * @param ar
+    * @return
+    */
    public int compare(byte[] word, byte[] ar, int base) {
       return compare(word, ar, base, base + ar.length);
+   }
+
+   /**
+    * Compare bytes as words of 2 bytes
+    * @param word
+    * @param ar
+    * @param base
+    *            the offset of array to begin with
+    * @param end
+    *            the number of bytes that makes the array word
+    * @return
+    */
+   public int compare(byte[] word, byte[] ar, final int base, final int end) {
+      int compare = 0;
+      int wl = word.length;
+      for (int i = 0; i < wl; i = i + 2) {
+         if (i >= end)
+            return 1; // case of xva xv
+         int c = (word[i] << 8) + (word[i + 1] << 0);
+         int car = (ar[base + i] << 8) + (ar[base + i + 1] << 0);
+         if (c > car)
+            return 1;
+         if (c < car)
+            return -1;
+      }
+      if (wl < end - base)
+         return -1; // case of xv xva
+      return compare;
    }
 
    /**
@@ -1089,6 +815,282 @@ public class BitUtils {
       return 0;
    }
 
+   public String debugString(byte[] ar, int offset, String sep) {
+      if (ar == null) {
+         return "null";
+      }
+      StringBBuilder sb = new StringBBuilder(uc);
+      for (int i = offset; i < ar.length; i++) {
+         if (i != 0)
+            sb.append(sep);
+         sb.append(ar[i]);
+      }
+      return sb.toString();
+   }
+
+   public String debugString(byte[] ar, String sep) {
+      return debugString(ar, 0, sep);
+   }
+
+   /**
+    * ddddaXbaXbddd becomes dddaYbaYbddd 
+    * A chunk is aXb. This method expands the bitsize X to Y for each chunks
+    * The first chunk is at Coordinate c.
+    * @param data raw data
+    * @param BitCoordinate c coordinate of first chunk
+    * @param numofchunks the number of chunks
+    * @param aBitSize
+    * @param xBitSize
+    * @param bBitSize
+    * @param yBitSize
+    * @param lastusedbit the last bit of data to be shifted
+    * @return the new array
+    * 
+    * ddddaXbaXbaXbddd
+    * 1)First chunk to be shifted is bddd. shifted up by (Y-X)= diff * numofchunks
+    * 2)then baX is shifted up by diff * (numofChunks -1)
+    * 3)then baX is shifted up by diff * (numofChunks -2)
+    * 4)the last aX is not shifted
+    * The shift erases old data in order to provide clean 0 bits for expanded data
+    * 
+    * PRE: enough free capacity after lastusedbit (diff * numofchunks bits)
+    * otherwise data will be overwritten or exception will be thrown
+    * POST: reference array data is not changed
+    * 
+    *  11010
+    */
+   public void expandBitSize(byte[] data, BitCoordinate c, int numofchunks, int aBitSize, int xBitSize, int bBitSize, int yBitSize, int lastusedbit) {
+      //System.out.println(BitMask.toBinString(data, 4));
+      int diff = yBitSize - xBitSize;
+      int _bitChunkSize = aBitSize + xBitSize + bBitSize;
+      //get to the last one
+      c.forward(_bitChunkSize * (numofchunks - 1));
+      c.forward(aBitSize + xBitSize);
+      //+2 = +1 for bit lost in coordindate c
+      int bitnum = c.unmap() + 1;
+      int lastbit = lastusedbit;
+      //System.out.println(c.unmap() + " bitnum="+bitnum);
+      //System.out.println(BitMask.toBinString(data, 4));
+      //this frees up the memory for the new data.
+      shiftBitsUp(data, diff * numofchunks, bitnum, lastbit, true);
+      //System.out.println(BitMask.toBinString(data, 4));
+      //this loop will shift chunk individually. starting from the last
+      for (int i = 1; i < numofchunks; i++) {
+         //coord is at b, rewind to get to previous b
+         c.rewind(_bitChunkSize);
+         //System.out.println(c);
+         //shift is decreasing with i
+         int bitShift = diff * (numofchunks - i);
+         //first bit is first bit of b
+         bitnum = c.unmap() + 1;
+         lastbit = bitnum + _bitChunkSize - 1;
+         //System.out.println("bitnum="+bitnum + " lastbit="+lastbit);
+         shiftBitsUp(data, bitShift, bitnum, lastbit, true);
+         //System.out.println(BitMask.toBinString(data, 4));
+
+      }
+      //the last aX does not move
+      //System.out.println("END");
+   }
+
+   /**
+    * 
+    * @param data
+    * @param start
+    * @param numofchunks
+    * @param aBitSize
+    * @param xBitSize
+    * @param bBitSize
+    * @param yBitSize
+    * @param lastusedbyte last byte of relevant data
+    */
+   public void expandByteSize(byte[] data, int start, int numofchunks, int aBitSize, int xBitSize, int bBitSize, int yBitSize, int lastusedbyte) {
+      int diff = yBitSize - xBitSize;
+      int _bitChunkSize = aBitSize + xBitSize + bBitSize;
+      //start by shifting the farthest from start
+      start += (_bitChunkSize * (numofchunks - 1));
+      start += (aBitSize + xBitSize);
+      int lastbit = lastusedbyte;
+      if (start <= lastbit)
+         shiftBytesUp(data, diff * numofchunks, start, lastbit);
+      for (int i = 1; i < numofchunks; i++) {
+         start -= (_bitChunkSize);
+         int bitShift = diff * (numofchunks - i);
+         lastbit = start + _bitChunkSize - 1;
+         shiftBytesUp(data, bitShift, start, lastbit);
+      }
+   }
+
+   /** 
+    * Rotates array so that ith value goes to i+value.
+    */
+   public void rotateArray(byte[] array, int value) {
+      int j = value;
+      int i = value;
+      int num = array.length;
+      while (i != 0) {
+         int m = j;
+         j = (j + value) % num;
+         byte b = array[m];
+         array[m] = array[j];
+         array[j] = b;
+         if (j == i) {
+            j = --i;
+         }
+      }
+   }
+
+   /**
+    * Shift shiftsize bits up (if positive, down if negative)
+    * @param b
+    * @param shiftsize negative is shifted down, positive is shifted up
+    * @param offsetbit first bit inclusive to be shifted
+    * @param lastbit last bit inclusive to be shifted
+    * @param erase
+    */
+   public void shiftBits(byte[] b, int shiftsize, int offsetbit, int lastbit, boolean erase) {
+      if (shiftsize > 0) {
+         shiftBitsUp(b, shiftsize, offsetbit, lastbit, erase);
+      }
+      if (shiftsize < 0) {
+         shiftBitsDown(b, 0 - shiftsize, offsetbit, lastbit, erase);
+      }
+   }
+
+   /**
+    * Shift a chunk of bits down
+    * If shiftsize is a multiple of 8, data is shifted exactly this multiple of bytes
+    * @param b
+    * @param shiftsize if shiftsize does too far,offsetbit will have position 0
+    * @param offsetbit
+    * @param lastbit
+    * @param erase
+    */
+   public void shiftBitsDown(byte[] b, int shiftsize, int offsetbit, int lastbit, boolean erase) {
+      int re = shiftsize + 1;
+      int f = shiftsize;
+      if (offsetbit - re < 0) {
+         offsetbit = re;
+      }
+      BitCoordinate workc = new BitCoordinate(uc);
+      workc.map(offsetbit - 1);
+      for (int i = offsetbit; i <= lastbit; i++) {
+         int bit = BitUtils.readBit(b, workc);
+         workc.rewind(re);
+         BitUtils.copyBit(b, workc, bit);
+         workc.forward(f);
+      }
+      if (erase) {
+         BitCoordinate c = new BitCoordinate(uc);
+         c.map(lastbit - shiftsize);
+         for (int i = shiftsize; i >= 1; i--) {
+            BitUtils.copyBit(b, c, 0);
+         }
+      }
+   }
+
+   /**
+    * Most basic shift where shiftsize of bits are shifted shiftsize starting by offsetbit inclusive
+    * @param b
+    * @param shiftsize
+    * @param offsetbit
+    */
+   public void shiftBitsUp(byte[] b, int shiftsize, int offsetbit) {
+      shiftBitsUp(b, shiftsize, offsetbit, offsetbit + shiftsize - 1, false);
+   }
+
+   /**
+    * Shift by numbits bit on the left
+    * offsetbit and lastbit are included in the shift
+    * @param b
+    * @param shiftsize the stride of the shift
+    * @param offsetbit
+    * @param lastbit
+    * reset to zero 
+    */
+   public void shiftBitsUp(byte[] b, int shiftsize, int offsetbit, int lastbit) {
+      shiftBitsUp(b, shiftsize, offsetbit, lastbit, false);
+   }
+
+   /**
+    * xxx offsetbit xxx lastbit
+    * Shift by numbits bit on the left
+    * offsetbit and lastbit are included in the shift
+    * @param data array
+    * @param shiftsize the number of bits to be shifted to the left
+    * @param offsetbit the first bit to be shifted
+    * @param lastbit the last bit included. if lastbit=offset bit (say 1), that bit will be shifted up
+    * @param erase
+    */
+   public void shiftBitsUp(byte[] data, int shiftsize, int offsetbit, int lastbit, boolean erase) {
+      //	if (offsetbit == lastbit)
+      //	   return;
+      int f = shiftsize - 1;
+      int r = 3 + f;
+      //
+      if (lastbit + f > data.length * 8) {
+         lastbit = lastbit - shiftsize;
+      }
+      BitCoordinate workc = new BitCoordinate(uc);
+      workc.map(lastbit - 1);
+      for (int i = lastbit; i >= offsetbit; i--) {
+         int bit = BitUtils.readBit(data, workc);
+         workc.forward(f);
+         BitUtils.copyBit(data, workc, bit);
+         workc.rewind(r);
+      }
+      if (erase) {
+         BitCoordinate c = new BitCoordinate(uc);
+         c.map(offsetbit - 1);
+         for (int i = 1; i <= shiftsize; i++) {
+            BitUtils.copyBit(data, c, 0);
+         }
+      }
+   }
+
+   /**
+    * Shift [firstbyte - lastbyte] down of shiftsize bytes
+    * 
+    * erase up shiftsize bytes starting at lastbyte
+    * @param data
+    * @param shiftsize
+    * @param firstbyte
+    * @param lastbyte if equal to firstbyte, only one byte is shifted down
+    */
+   public void shiftBytesDown(byte[] data, int shiftsize, int firstbyte, int lastbyte) {
+      lastbyte = Math.min(lastbyte, data.length - 1);
+      for (int i = firstbyte; i <= lastbyte; i++) {
+         if (i - shiftsize >= 0)
+            data[i - shiftsize] = data[i];
+      }
+      int end = Math.min(shiftsize + lastbyte, data.length);
+      for (int i = lastbyte; i < end; i++) {
+         data[i] = 0;
+      }
+   }
+
+   /**
+    * Shift bytes up.
+    * erase old
+    * @param data
+    * @param shiftsize
+    * @param firstbyte included in the shift
+    * @param lastbyte included in the shift
+    */
+   public void shiftBytesUp(byte[] data, int shiftsize, int firstbyte, int lastbyte) {
+      if (firstbyte > lastbyte) {
+         throw new RuntimeException("firstbyte " + firstbyte + " > " + " lastybte " + lastbyte);
+      }
+      for (int i = lastbyte; i >= firstbyte; i--) {
+         if (i + shiftsize < data.length)
+            data[i + shiftsize] = data[i];
+      }
+      int end = Math.min(shiftsize + firstbyte, data.length);
+      for (int i = firstbyte; i < end; i++) {
+         data[i] = 0;
+      }
+   }
+
    /**
     * Shrink array source. Removes "size" bytes starting at index
     * @param source
@@ -1106,34 +1108,6 @@ public class BitUtils {
          fi[i] = source[i + size];
       }
       return fi;
-   }
-
-   /**
-    * 
-    * @param word
-    * @param ar
-    * @param base
-    *            the offset of ar to begin with
-    * @param end
-    *            the number of bytes that makes the ar word
-    * @return
-    */
-   public int compare(byte[] word, byte[] ar, final int base, final int end) {
-      int compare = 0;
-      int wl = word.length;
-      for (int i = 0; i < wl; i = i + 2) {
-         if (i >= end)
-            return 1; // case of xva xv
-         int c = (word[i] << 8) + (word[i + 1] << 0);
-         int car = (ar[base + i] << 8) + (ar[base + i + 1] << 0);
-         if (c > car)
-            return 1;
-         if (c < car)
-            return -1;
-      }
-      if (wl < end - base)
-         return -1; // case of xv xva
-      return compare;
    }
 
    /**
@@ -1210,38 +1184,31 @@ public class BitUtils {
       return s;
    }
 
-   public String toStringBytes(byte[] ar, int offset, String sep) {
-      if (ar == null) {
-         return "null";
-      }
-      StringBBuilder sb = new StringBBuilder(uc);
-      for (int i = offset; i < ar.length; i++) {
-         if (i != 0)
-            sb.append(sep);
-         sb.append(ar[i]);
-      }
-      return sb.toString();
-   }
-
-   public String debugString(byte[] ar, String sep) {
-      return debugString(ar, 0, sep);
-   }
-
-   public String debugString(byte[] ar, int offset, String sep) {
-      if (ar == null) {
-         return "null";
-      }
-      StringBBuilder sb = new StringBBuilder(uc);
-      for (int i = offset; i < ar.length; i++) {
-         if (i != 0)
-            sb.append(sep);
-         sb.append(ar[i]);
+   /**
+    * Single line binary string of bytes separated by a ' ' every chunkLen bits.
+    * @param ar
+    * @param offset
+    * @param len
+    * @param chunkLen number of bits before printing a space
+    * @return
+    */
+   public String toBinStringRightToLeft(byte[] ar, int offset, int len, int chunkLen) {
+      //we need a string builder factory
+      StringBBuilder sb = new StringBBuilder(uc, len * 8 + 1 + len / chunkLen);
+      int count = 0;
+      for (int i = offset; i < offset + len; i++) {
+         int val = ar[i] & 0xFF;
+         for (int j = 1; j <= 8; j++) {
+            int bit = BitUtils.getBit(j, val);
+            sb.append(bit);
+            count++;
+            if (count == chunkLen) {
+               count = 0;
+               sb.append(' ');
+            }
+         }
       }
       return sb.toString();
-   }
-
-   public String toStringBytes(byte[] ar, String sep) {
-      return toStringBytes(ar, 0, sep);
    }
 
    /**
@@ -1259,5 +1226,49 @@ public class BitUtils {
          sb.nl();
       }
       return sb.toString();
+   }
+
+   public String toStringBytes(byte[] ar, int cols) {
+      return toStringBytes(ar, 0, ar.length, cols);
+   }
+
+   /**
+    * string of the array with columns
+    * @param ar
+    * @param offset
+    * @param len
+    * @param cols
+    * @return
+    */
+   public String toStringBytes(byte[] ar, int offset, int len, int cols) {
+      StringBBuilder sb = new StringBBuilder(uc);
+      int count = 0;
+      for (int i = offset; i < offset + len; i++) {
+         sb.append(ar[i]);
+         count++;
+         if ((count % cols) == 0) {
+            sb.nl();
+         } else {
+            sb.append(' ');
+         }
+      }
+      return sb.toString();
+   }
+
+   public String toStringBytes(byte[] ar, int offset, String sep) {
+      if (ar == null) {
+         return "null";
+      }
+      StringBBuilder sb = new StringBBuilder(uc);
+      for (int i = offset; i < ar.length; i++) {
+         if (i != 0)
+            sb.append(sep);
+         sb.append(ar[i]);
+      }
+      return sb.toString();
+   }
+
+   public String toStringBytes(byte[] ar, String sep) {
+      return toStringBytes(ar, 0, sep);
    }
 }
