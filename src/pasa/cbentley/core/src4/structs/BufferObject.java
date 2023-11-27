@@ -157,6 +157,7 @@ public class BufferObject implements IStringable {
     * 
     * @param index
     * @return
+    * @throws ArrayIndexOutOfBoundsException
     */
    public Object get(int index) {
       return objects[offset + index];
@@ -237,11 +238,41 @@ public class BufferObject implements IStringable {
    }
 
    /**
+    * Check if index is right
+    * 
+    * O(n) complexity
+    * 
+    * @param index
+    * @param o
+    * @throws IllegalArgumentException
+    */
+   public void insertAt(int index, Object o) {
+      if (index < 0 || index >= count) {
+         throw new IllegalArgumentException("out of bounds " + index);
+      }
+      set(uc.getMem().ensureCapacity(objects, count, increment));
+      ArrayUtils.shiftUp(objects, 1, offset + index, offset + count - 1, false);
+      objects[index] = o;
+      count++;
+   }
+
+   /**
     * Number of elements.
     * @return
     */
    public int getSize() {
       return count;
+   }
+
+   /**
+    * 
+    * @param i
+    * @param j
+    */
+   public void swap(int i, int j) {
+      Object temp = objects[offset + i];
+      objects[offset + i] = objects[offset + j];
+      objects[offset + j] = temp;
    }
 
    public boolean hasReference(Object o) {
@@ -319,9 +350,11 @@ public class BufferObject implements IStringable {
    }
 
    /**
-    * 
+    * Replaces the object/null at index with obj.
+    * No other checks are made relative to the size. if index is out of size or not
     * @param index
     * @param obj
+    * @throws ArrayIndexOutOfBoundsException
     */
    public void setUnsafe(int index, Object obj) {
       objects[offset + index] = obj;
@@ -333,12 +366,15 @@ public class BufferObject implements IStringable {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "BufferString");
-      dc.append(" #" + count);
+      dc.root(this, "BufferObject");
+      dc.append(" offset=" + offset);
+      dc.append(" increment=" + increment);
+      dc.append(" count=" + count);
       dc.append(':');
-      for (int i = 0; i < count; i++) {
-         dc.append("" + objects[i]);
-         dc.append(' ');
+      for (int i = 0; i < objects.length; i++) {
+         dc.nl();
+         dc.append(i);
+         dc.append(":" + objects[i]);
       }
    }
 
@@ -347,7 +383,7 @@ public class BufferObject implements IStringable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BufferString");
+      dc.root1Line(this, "BufferObject");
       dc.append(" #" + count);
       dc.append(':');
       for (int i = 0; i < count; i++) {
