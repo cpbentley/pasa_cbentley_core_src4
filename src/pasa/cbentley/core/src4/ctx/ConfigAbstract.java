@@ -18,37 +18,14 @@ import pasa.cbentley.core.src4.logging.IDLog;
  */
 public abstract class ConfigAbstract implements IConfig {
 
-   protected final UCtx uc;
+   protected boolean    isEraseSettings;
 
    protected boolean    isIgnoreSettings;
 
-   protected boolean    isEraseSettings;
+   protected final UCtx uc;
 
    public ConfigAbstract(UCtx uc) {
       this.uc = uc;
-   }
-
-   /**
-    * Return false by default. Override with true if you want hardcoded
-    */
-   public boolean isHardcoded() {
-      return false;
-   }
-
-   public void setEraseSettings(boolean b) {
-      this.isEraseSettings = b;
-   }
-
-   public void setIgnoreSettings(boolean b) {
-      this.isIgnoreSettings = b;
-   }
-
-   /**
-    * Ignores the saved settings
-    * @return
-    */
-   public boolean isIgnoreSettings() {
-      return isIgnoreSettings;
    }
 
    /**
@@ -60,6 +37,37 @@ public abstract class ConfigAbstract implements IConfig {
     */
    public boolean isEraseSettings() {
       return isEraseSettings;
+   }
+
+   /**
+    * Return false by default. Override with true if you want hardcoded
+    */
+   public boolean isHardcoded() {
+      return false;
+   }
+
+   /**
+    * Ignores the saved settings
+    * @return
+    */
+   public boolean isIgnoreSettings() {
+      return isIgnoreSettings;
+   }
+
+   /**
+    * 
+    * @param b
+    */
+   public void setEraseSettings(boolean b) {
+      this.isEraseSettings = b;
+   }
+
+   /**
+    * 
+    * @param b
+    */
+   public void setIgnoreSettings(boolean b) {
+      this.isIgnoreSettings = b;
    }
 
    //#mdebug
@@ -80,11 +88,6 @@ public abstract class ConfigAbstract implements IConfig {
       return Dctx.toString1Line(this);
    }
 
-   private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("isEraseSettings", isEraseSettings);
-      dc.appendVarWithSpace("isIgnoreSettings", isIgnoreSettings);
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "ConfigAbstract");
       toStringPrivate(dc);
@@ -92,6 +95,11 @@ public abstract class ConfigAbstract implements IConfig {
 
    public UCtx toStringGetUCtx() {
       return uc;
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("isEraseSettings", isEraseSettings);
+      dc.appendVarWithSpace("isIgnoreSettings", isIgnoreSettings);
    }
 
    //#enddebug
