@@ -35,6 +35,14 @@ public abstract class ConfigAbstract implements IConfig {
       return false;
    }
 
+   public void setEraseSettings(boolean b) {
+      this.isEraseSettings = b;
+   }
+
+   public void setIgnoreSettings(boolean b) {
+      this.isIgnoreSettings = b;
+   }
+
    /**
     * Ignores the saved settings
     * @return
