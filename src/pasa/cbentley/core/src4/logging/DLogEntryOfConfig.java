@@ -26,7 +26,7 @@ public class DLogEntryOfConfig implements ITechLvl {
    /**
     * Result of {@link DLogEntry#computeDLogEntryOfConfig(IDLogConfig)}
     */
-   private int configFlags;
+   private int formatFlags;
 
    private DLogEntry entry;
 
@@ -46,24 +46,24 @@ public class DLogEntryOfConfig implements ITechLvl {
       return entry;
    }
 
-   public boolean hasConfigFlag(int flag) {
-      return BitUtils.hasFlag(configFlags, flag);
+   public boolean hasFormatFlag(int flag) {
+      return BitUtils.hasFlag(formatFlags, flag);
    }
 
    public boolean isAccepted() {
-      return BitUtils.hasFlag(configFlags, ITechConfig.CONFIG_FLAG_1_ACCEPTED);
+      return BitUtils.hasFlag(formatFlags, ITechConfig.FORMAT_FLAG_01_ACCEPTED);
    }
 
    public boolean isOneLineConfig() {
-      return BitUtils.hasFlag(configFlags, ITechConfig.CONFIG_FLAG_2_1LINE);
+      return BitUtils.hasFlag(formatFlags, ITechConfig.FORMAT_FLAG_02_1LINE);
    }
 
    public boolean isStackConfig() {
-      return BitUtils.hasFlag(configFlags, ITechConfig.CONFIG_FLAG_3_STACK);
+      return BitUtils.hasFlag(formatFlags, ITechConfig.FORMAT_FLAG_03_STACK);
    }
 
    public void setConfigResFlag(int flag, boolean v) {
-      configFlags = BitUtils.setFlag(configFlags, flag, v);
+      formatFlags = BitUtils.setFlag(formatFlags, flag, v);
    }
 
    //#enddebug

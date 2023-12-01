@@ -61,50 +61,50 @@ public interface ITechTags extends ITech {
     */
    public static final int    FLAG_25_PRINT_NULL      = 1 << 24;
 
-   public static final int    FLAG_ALL      = -1;
+   public static final int    FLAG_ALL                = -1;
 
-   public static final String STRING_ALWAYS           = "Always";
+   public static final String STRING_01_ALWAYS        = "Always";
 
-   public static final String STRING_ANIM             = "Anim  ";
+   public static final String STRING_05_UI            = "Ui    ";
 
-   public static final String STRING_BIP              = "BIP   ";
+   public static final String STRING_06_WORK          = "Work  ";
 
-   public static final String STRING_BRIDGE           = "Bridge";
+   public static final String STRING_07_EVENT         = "Event ";
 
-   public static final String STRING_BUSINESS         = "Busness";
+   public static final String STRING_08_EX            = "Except";
 
-   public static final String STRING_CMD              = "Cmd   ";
+   public static final String STRING_09_FLOW          = "Flow  ";
 
-   public static final String STRING_DATA             = "Data  ";
+   public static final String STRING_10_MODEL         = "Model ";
 
-   public static final String STRING_DRAW             = "Draw  ";
+   public static final String STRING_11_CMD           = "Cmd   ";
 
-   public static final String STRING_EVENT            = "Event ";
+   public static final String STRING_12_BUSINESS      = "Business";
 
-   public static final String STRING_NULL             = "Null";
+   public static final String STRING_13_SOUND         = "Sound ";
 
-   public static final String STRING_EX               = "Except";
+   public static final String STRING_14_TEMP          = "Temp  ";
 
-   public static final String STRING_FLOW             = "Flow  ";
+   public static final String STRING_15_DATA          = "Data  ";
 
-   public static final String STRING_INIT             = "Init  ";
+   public static final String STRING_16_TAG           = "Tag   ";
 
-   public static final String STRING_MEM              = "Mem   ";
+   public static final String STRING_17_TEST          = "Test  ";
 
-   public static final String STRING_MODEL            = "Model ";
+   public static final String STRING_18_MEMORY        = "Mem   ";
 
-   public static final String STRING_SOUND            = "Sound ";
+   public static final String STRING_19_BRIDGE        = "Bridge";
 
-   public static final String STRING_STATE            = "State ";
+   public static final String STRING_20_INIT          = "Init  ";
 
-   public static final String STRING_TAG              = "Tag   ";
+   public static final String STRING_21_BIP           = "BIP   ";
 
-   public static final String STRING_TEMP             = "Temp  ";
+   public static final String STRING_22_STATE         = "State ";
 
-   public static final String STRING_TEST             = "Test  ";
+   public static final String STRING_23_ANIM          = "Anim  ";
 
-   public static final String STRING_UI               = "Ui    ";
+   public static final String STRING_24_DRAW          = "Draw  ";
 
-   public static final String STRING_WORK             = "Work  ";
+   public static final String STRING_25_NULL          = "Null";
 
 }

@@ -37,7 +37,7 @@ public interface IDLogConfig extends IStringable, ITechConfig {
    public String getStackTraceBreak();
 
    /**
-    * <li> {@link ITechConfig#CONFIG_FLAG_04_SHOW_THREAD}
+    * <li> {@link ITechConfig#FORMAT_FLAG_04_THREAD}
     * @param flag
     * @return
     */
@@ -85,25 +85,12 @@ public interface IDLogConfig extends IStringable, ITechConfig {
 
    /**
     * Set Config flags
-    * <li> {@link ITechConfig#CONFIG_FLAG_04_SHOW_THREAD}
+    * <li> {@link ITechConfig#FORMAT_FLAG_04_THREAD}
     * @param flag
     * @param b
     */
    public void setFlagFormat(int flag, boolean b);
 
-   /**
-    * Sets a master flag
-    * 
-    * <li> {@link ITechConfig#MASTER_FLAG_01_BLOCK_ALL_PRINT}
-    * <li> {@link ITechConfig#MASTER_FLAG_02_OPEN_ALL_PRINT}
-    * <li> {@link ITechConfig#MASTER_FLAG_03_ONLY_POSITIVES}
-    * <li> {@link ITechConfig#MASTER_FLAG_04_IGNORE_CLASSES}
-    * <li> {@link ITechConfig#MASTER_FLAG_05_IGNORE_FLAGS}
-    * <li> {@link ITechConfig#MASTER_FLAG_06_CLASS_INSTANCES}
-    * @param flags
-    * @param v
-    */
-   public void setFlagPrint(int[] flags, boolean v);
 
    /**
     * Config flags
@@ -116,7 +103,7 @@ public interface IDLogConfig extends IStringable, ITechConfig {
     * @param flag
     * @param v
     */
-   public void setFlagPrint(int flag, boolean v);
+   public void setFlagMaster(int flag, boolean v);
 
    /**
     * <li> {@link ITechTags#FLAG_05_PRINT_UI}

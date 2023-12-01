@@ -236,6 +236,21 @@ public class Dctx implements IFlagsToString {
    }
 
    /**
+    * Appends the characters of string ignoring the given c
+    * @param string
+    * @param c
+    */
+   public void appendIgnoreChar(String string, char c) {
+      int len = string.length();
+      for (int i = 0; i < len; i++) {
+         char ch = string.charAt(i);
+         if (ch != c) {
+            sb.append(ch);
+         }
+      }
+   }
+
+   /**
     * 
     * @param title
     * @param array

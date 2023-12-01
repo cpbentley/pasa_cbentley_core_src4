@@ -100,9 +100,14 @@ public class CtxManager implements IStringable, IStatorable {
          throw new IllegalArgumentException("Same context reference is already registered");
       }
       int ctxID = ctx.getCtxID();
+      Object stored = intos.findIntObject(ctxID);
       //check validity of ctxid
-      if (intos.hasInt(ctxID)) {
-         throw new IllegalArgumentException(ctx.getClass().getName() +": cannot reference 2 context with the same ID (" + ctxID + "). Use a different CtxManager but this should be an exception where your code truly needs it");
+      if (stored != null) {
+         if (stored.getClass() == ctx.getClass()) {
+            throw new IllegalArgumentException("Same context class " + ctx.getClass().getName() + " is being registered.");
+         } else {
+            throw new IllegalArgumentException(ctx.getClass().getName() + " collides with existing " + stored.getClass().getName() + " with the Context ID (" + ctxID + ").");
+         }
       }
       intos.add(ctx, ctxID);
       return intos.nextempty;
@@ -221,12 +226,12 @@ public class CtxManager implements IStringable, IStatorable {
    }
 
    public ICtx getCtx(int ctxID) {
-     int index = intos.findInt(ctxID);
-     if(index == -1) {
-        return null;
-     } else {
-        return (ICtx) intos.getObjectAtIndex(index);
-     }
+      int index = intos.findInt(ctxID);
+      if (index == -1) {
+         return null;
+      } else {
+         return (ICtx) intos.getObjectAtIndex(index);
+      }
    }
 
    /**
@@ -260,7 +265,7 @@ public class CtxManager implements IStringable, IStatorable {
             toDLog().pInit(data.length + " bytes of data for ctxID" + ctxID, null, CtxManager.class, "settingsWrite");
          } else {
             //#debug
-            toDLog().pInit("No data for ctxID " + ctxID, null, CtxManager.class, "settingsWrite");
+            toDLog().pInit("No data for ctxID " + ctxID , null, CtxManager.class, "settingsWrite");
             dos.writeInt(0);
          }
       }

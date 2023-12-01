@@ -81,11 +81,11 @@ public abstract class RootDLogger implements IDLog {
     * @param method
     */
    public void pAlways(String msg, IStringable str, Class c, String method) {
-      ptPrint(msg, str, c, method, ITechTags.STRING_ALWAYS, ITechTags.FLAG_01_PRINT_ALWAYS, getLevelDefault(), false);
+      ptPrint(msg, str, c, method, ITechTags.STRING_01_ALWAYS, ITechTags.FLAG_01_PRINT_ALWAYS, getLevelDefault(), false);
    }
 
    public void pAlways(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
-      ptPrint(msg, str, c, method, ITechTags.STRING_ALWAYS, ITechTags.FLAG_01_PRINT_ALWAYS, lvl, oneLine);
+      ptPrint(msg, str, c, method, ITechTags.STRING_01_ALWAYS, ITechTags.FLAG_01_PRINT_ALWAYS, lvl, oneLine);
    }
 
    private String methodIndent = null;
@@ -110,7 +110,7 @@ public abstract class RootDLogger implements IDLog {
    protected void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, boolean oneLine) {
       int devFlags = 0;
       if (oneLine) {
-         devFlags = ITechConfig.CONFIG_FLAG_2_1LINE;
+         devFlags = ITechConfig.FORMAT_FLAG_02_1LINE;
       }
       this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, devFlags);
    }

@@ -211,10 +211,10 @@ public class DLogEntry implements ITechLvl {
    public DLogEntryOfConfig computeDLogEntryOfConfig(IDLogConfig config) {
       DLogEntryOfConfig ec = config.getEntryConfig(this);
       //check if this log entry should record the thread name
-      if (threadName == null && ec.hasConfigFlag(ITechConfig.CONFIG_FLAG_04_SHOW_THREAD)) {
+      if (threadName == null && ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
          fillThreadName();
       }
-      if (timeStamp == 0 && ec.hasConfigFlag(ITechConfig.CONFIG_FLAG_05_TIMESTAMP)) {
+      if (timeStamp == 0 && ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_05_TIMESTAMP)) {
          timeStamp = System.currentTimeMillis();
       }
       return ec;

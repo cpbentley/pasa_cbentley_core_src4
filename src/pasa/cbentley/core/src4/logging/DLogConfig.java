@@ -38,7 +38,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
 
    protected int     flagsFormat;
 
-   protected int     flagsPrint;
+   protected int     flagsMaster;
 
    /**
     * <li> {@link ITechTags#FLAG_07_PRINT_EVENT}
@@ -80,7 +80,6 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
 
    public DLogConfig(UCtx uc) {
       this.uc = uc;
-
    }
 
    /**
@@ -94,22 +93,22 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       //first check if accepted
       DLogEntryOfConfig entryOfConf = new DLogEntryOfConfig(uc, this, type);
       int flags = 0;
-      entryOfConf.setConfigResFlag(CONFIG_FLAG_1_ACCEPTED, isAccepted(type));
+      entryOfConf.setConfigResFlag(FORMAT_FLAG_01_ACCEPTED, isAccepted(type));
 
       //dev flags override the config?
       if (type.hasDevFlag(DEV_2_1LINE)) {
-         entryOfConf.setConfigResFlag(CONFIG_FLAG_2_1LINE, true);
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_02_1LINE, true);
       }
       if (type.hasDevFlag(DEV_3_STACK)) {
-         entryOfConf.setConfigResFlag(CONFIG_FLAG_3_STACK, true);
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_03_STACK, true);
       }
 
-      if (hasFlagPrint(MASTER_FLAG_07_THREAD_DATA)) {
-         entryOfConf.setConfigResFlag(CONFIG_FLAG_04_SHOW_THREAD, true);
+      if (hasFlagMaster(MASTER_FLAG_07_THREAD_DATA)) {
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
       }
       //Dev override master flag
       if (type.hasDevFlag(DEV_4_THREAD)) {
-         entryOfConf.setConfigResFlag(CONFIG_FLAG_04_SHOW_THREAD, true);
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
       }
 
       return entryOfConf;
@@ -156,12 +155,18 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
     * @param flag
     * @param b
     */
-   public boolean hasFlagPrint(int flag) {
-      return BitUtils.hasFlag(flagsPrint, flag);
+   public boolean hasFlagMaster(int flag) {
+      return BitUtils.hasFlag(flagsMaster, flag);
    }
 
    /**
+    * <li> {@link ITechTags#FLAG_01_PRINT_ALWAYS}
+    * <li> {@link ITechTags#FLAG_05_PRINT_UI}
+    * <li> {@link ITechTags#FLAG_06_PRINT_WORK}
     * <li> {@link ITechTags#FLAG_07_PRINT_EVENT}
+    * <li> {@link ITechTags#FLAG_08_PRINT_EXCEPTION}
+    * <li> {@link ITechTags#FLAG_09_PRINT_FLOW}
+    * <li> {@link ITechTags#FLAG_19_PRINT_BRIDGE}
     * @param flag
     * @return
     */
@@ -169,6 +174,17 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       return BitUtils.hasFlag(flagsTag, flag);
    }
 
+   /**
+    * <li> {@link ITechTags#FLAG_01_PRINT_ALWAYS}
+    * <li> {@link ITechTags#FLAG_05_PRINT_UI}
+    * <li> {@link ITechTags#FLAG_06_PRINT_WORK}
+    * <li> {@link ITechTags#FLAG_07_PRINT_EVENT}
+    * <li> {@link ITechTags#FLAG_08_PRINT_EXCEPTION}
+    * <li> {@link ITechTags#FLAG_09_PRINT_FLOW}
+    * <li> {@link ITechTags#FLAG_19_PRINT_BRIDGE} 
+    * @param flag
+    * @return
+    */
    public boolean hasFlagTagNeg(int flag) {
       return BitUtils.hasFlag(flagsTagNeg, flag);
    }
@@ -215,7 +231,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
          if (isClassAccepted) {
             return true;
          }
-         if (hasFlagPrint(MASTER_FLAG_09_TREAT_STRINGABLE_CLASS)) {
+         if (hasFlagMaster(MASTER_FLAG_09_TREAT_STRINGABLE_CLASS)) {
             boolean isClassStringableAccepted = isClassAccepted(type.getClassStringable());
             if (isClassStringableAccepted) {
                return true;
@@ -236,19 +252,19 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
    }
 
    public boolean isAcceptedFlags(int flagTag) {
-      if (hasFlagPrint(MASTER_FLAG_02_OPEN_ALL_PRINT)) {
+      if (hasFlagMaster(MASTER_FLAG_02_OPEN_ALL_PRINT)) {
          return true;
       }
-      if (hasFlagPrint(MASTER_FLAG_01_BLOCK_ALL_PRINT)) {
+      if (hasFlagMaster(MASTER_FLAG_01_BLOCK_ALL_PRINT)) {
          return false;
       }
-      if (hasFlagPrint(MASTER_FLAG_05_IGNORE_FLAGS)) {
+      if (hasFlagMaster(MASTER_FLAG_05_IGNORE_FLAGS)) {
          return true;
       } else {
          if (flagTag == FLAG_01_PRINT_ALWAYS) {
             return true;
          }
-         if (hasFlagPrint(MASTER_FLAG_08_OPEN_ALL_BUT_FALSE)) {
+         if (hasFlagMaster(MASTER_FLAG_08_OPEN_ALL_BUT_FALSE)) {
             //accept it unless flag as negative
             boolean hasFlagTagNeg = hasFlagTagNeg(flagTag);
             if (hasFlagTagNeg) {
@@ -276,7 +292,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       if (c == null) {
          return true;
       }
-      if (hasFlagPrint(MASTER_FLAG_04_IGNORE_CLASSES)) {
+      if (hasFlagMaster(MASTER_FLAG_04_IGNORE_CLASSES)) {
          return true;
       }
 
@@ -286,12 +302,12 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       } else {
          if (negatives.containsKey(c)) {
             val = false;
-         } else if (hasFlagPrint(MASTER_FLAG_03_ONLY_POSITIVES)) {
+         } else if (hasFlagMaster(MASTER_FLAG_03_ONLY_POSITIVES)) {
             //val is true for default
             if (positivesClasses.containsKey(c)) {
                val = true;
             } else {
-               if (hasFlagPrint(MASTER_FLAG_06_CLASS_INSTANCES)) {
+               if (hasFlagMaster(MASTER_FLAG_06_CLASS_INSTANCES)) {
                   val = isInsanceOf(positivesClasses, c);
                } else {
                   val = false;
@@ -396,13 +412,13 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       flagsFormat = BitUtils.setFlag(flagsFormat, flag, b);
    }
 
-   public void setFlagPrint(int flag, boolean v) {
-      flagsPrint = BitUtils.setFlag(flagsPrint, flag, v);
+   public void setFlagMaster(int flag, boolean v) {
+      flagsMaster = BitUtils.setFlag(flagsMaster, flag, v);
    }
 
    public void setFlagPrint(int[] flags, boolean v) {
       for (int i = 0; i < flags.length; i++) {
-         setFlagPrint(flags[i], v);
+         setFlagMaster(flags[i], v);
       }
    }
 
@@ -489,33 +505,74 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       dc.root(this, DLogConfig.class, "@line490");
 
       dc.appendVarWithSpace("logLevel", logLevel);
+      dc.appendVarWithSpace("threshold", threshold);
+      dc.appendVarWithSpace("stackPrefix", stackPrefix);
 
-      dc.append("Print Trues = ");
-      toStringFlag(MASTER_FLAG_01_BLOCK_ALL_PRINT, "BlockAll", dc);
-      toStringFlag(MASTER_FLAG_02_OPEN_ALL_PRINT, "AllPrint", dc);
-      toStringFlag(MASTER_FLAG_03_ONLY_POSITIVES, "OnlyPositives", dc);
-      toStringFlag(MASTER_FLAG_04_IGNORE_CLASSES, "IgnoreClasses", dc);
-      toStringFlag(MASTER_FLAG_05_IGNORE_FLAGS, "IgnoreFlags", dc);
-      toStringFlag(MASTER_FLAG_06_CLASS_INSTANCES, "Instances", dc);
+      dc.nl();
+      dc.appendWithSpace("Master Trues  = ");
+      toStringFlagMasterTrue(MASTER_FLAG_01_BLOCK_ALL_PRINT, STRING_M_01_BLOCK_ALL_PRINT, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_02_OPEN_ALL_PRINT, STRING_M_02_OPEN_ALL_PRINT, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_03_ONLY_POSITIVES, STRING_M_03_ONLY_POSITIVES, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_04_IGNORE_CLASSES, STRING_M_04_IGNORE_CLASSES, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_05_IGNORE_FLAGS, STRING_M_05_IGNORE_FLAGS, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_06_CLASS_INSTANCES, STRING_M_06_CLASS_INSTANCES, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_07_THREAD_DATA, STRING_M_07_THREAD_DATA, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_08_OPEN_ALL_BUT_FALSE, STRING_M_08_OPEN_ALL_BUT_FALSE, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_09_TREAT_STRINGABLE_CLASS, STRING_M_09_TREAT_STRINGABLE_CLASS, dc);
 
+      dc.nl();
+      dc.appendWithSpace("Format Trues  = ");
+      toStringFlagFormatTrue(FORMAT_FLAG_01_ACCEPTED, STRING_F_01_ACCEPTED, dc);
+      toStringFlagFormatTrue(FORMAT_FLAG_02_1LINE, STRING_F_02_1LINE, dc);
+      toStringFlagFormatTrue(FORMAT_FLAG_03_STACK, STRING_F_03_STACK, dc);
+      toStringFlagFormatTrue(FORMAT_FLAG_04_THREAD, STRING_F_04_THREAD, dc);
+      toStringFlagFormatTrue(FORMAT_FLAG_05_TIMESTAMP, STRING_F_05_TIMESTAMP, dc);
+
+      dc.nl();
       dc.append("Tags Trues = ");
-      toStringFlag(FLAG_07_PRINT_EVENT, STRING_EVENT, dc);
-      toStringFlag(FLAG_08_PRINT_EXCEPTION, "Exception", dc);
-      toStringFlag(FLAG_09_PRINT_FLOW, STRING_FLOW, dc);
-      toStringFlag(FLAG_10_PRINT_MODEL, STRING_MODEL, dc);
-      toStringFlag(FLAG_11_PRINT_COMMANDS, "Commands", dc);
-      toStringFlag(FLAG_12_PRINT_BUSINESS, STRING_BUSINESS, dc);
-      toStringFlag(FLAG_13_PRINT_SOUND, STRING_SOUND, dc);
-      toStringFlag(FLAG_14_PRINT_TEMP, "Temp", dc);
-      toStringFlag(FLAG_16_PRINT_TAG, "Tag", dc);
-      toStringFlag(FLAG_17_PRINT_TEST, "Test", dc);
-      toStringFlag(FLAG_18_PRINT_MEMORY, "Memory", dc);
-      toStringFlag(FLAG_19_PRINT_BRIDGE, STRING_BRIDGE, dc);
-      toStringFlag(FLAG_20_PRINT_INIT, STRING_INIT, dc);
-      toStringFlag(FLAG_21_PRINT_BIP, "Bip", dc);
-      toStringFlag(FLAG_22_PRINT_STATE, STRING_STATE, dc);
-      toStringFlag(FLAG_23_PRINT_ANIM, STRING_ANIM, dc);
-      toStringFlag(FLAG_24_PRINT_DRAW, STRING_DRAW, dc);
+      toStringFlagTagTrue(FLAG_01_PRINT_ALWAYS, STRING_01_ALWAYS, dc);
+      toStringFlagTagTrue(FLAG_05_PRINT_UI, STRING_05_UI, dc);
+      toStringFlagTagTrue(FLAG_06_PRINT_WORK, STRING_06_WORK, dc);
+      toStringFlagTagTrue(FLAG_07_PRINT_EVENT, STRING_07_EVENT, dc);
+      toStringFlagTagTrue(FLAG_08_PRINT_EXCEPTION, STRING_08_EX, dc);
+      toStringFlagTagTrue(FLAG_09_PRINT_FLOW, STRING_09_FLOW, dc);
+      toStringFlagTagTrue(FLAG_10_PRINT_MODEL, STRING_10_MODEL, dc);
+      toStringFlagTagTrue(FLAG_11_PRINT_COMMANDS, STRING_11_CMD, dc);
+      toStringFlagTagTrue(FLAG_12_PRINT_BUSINESS, STRING_12_BUSINESS, dc);
+      toStringFlagTagTrue(FLAG_13_PRINT_SOUND, STRING_13_SOUND, dc);
+      toStringFlagTagTrue(FLAG_14_PRINT_TEMP, STRING_14_TEMP, dc);
+      toStringFlagTagTrue(FLAG_16_PRINT_TAG, STRING_16_TAG, dc);
+      toStringFlagTagTrue(FLAG_17_PRINT_TEST, STRING_17_TEST, dc);
+      toStringFlagTagTrue(FLAG_18_PRINT_MEMORY, STRING_18_MEMORY, dc);
+      toStringFlagTagTrue(FLAG_19_PRINT_BRIDGE, STRING_19_BRIDGE, dc);
+      toStringFlagTagTrue(FLAG_20_PRINT_INIT, STRING_20_INIT, dc);
+      toStringFlagTagTrue(FLAG_21_PRINT_BIP, STRING_21_BIP, dc);
+      toStringFlagTagTrue(FLAG_22_PRINT_STATE, STRING_22_STATE, dc);
+      toStringFlagTagTrue(FLAG_23_PRINT_ANIM, STRING_23_ANIM, dc);
+      toStringFlagTagTrue(FLAG_24_PRINT_DRAW, STRING_24_DRAW, dc);
+
+      dc.nl();
+      dc.append("TagNegs Trues = ");
+      toStringFlagTagNegTrue(FLAG_01_PRINT_ALWAYS, STRING_01_ALWAYS, dc);
+      toStringFlagTagNegTrue(FLAG_05_PRINT_UI, STRING_05_UI, dc);
+      toStringFlagTagNegTrue(FLAG_06_PRINT_WORK, STRING_06_WORK, dc);
+      toStringFlagTagNegTrue(FLAG_07_PRINT_EVENT, STRING_07_EVENT, dc);
+      toStringFlagTagNegTrue(FLAG_08_PRINT_EXCEPTION, STRING_08_EX, dc);
+      toStringFlagTagNegTrue(FLAG_09_PRINT_FLOW, STRING_09_FLOW, dc);
+      toStringFlagTagNegTrue(FLAG_10_PRINT_MODEL, STRING_10_MODEL, dc);
+      toStringFlagTagNegTrue(FLAG_11_PRINT_COMMANDS, STRING_11_CMD, dc);
+      toStringFlagTagNegTrue(FLAG_12_PRINT_BUSINESS, STRING_12_BUSINESS, dc);
+      toStringFlagTagNegTrue(FLAG_13_PRINT_SOUND, STRING_13_SOUND, dc);
+      toStringFlagTagNegTrue(FLAG_14_PRINT_TEMP, STRING_14_TEMP, dc);
+      toStringFlagTagNegTrue(FLAG_16_PRINT_TAG, STRING_16_TAG, dc);
+      toStringFlagTagNegTrue(FLAG_17_PRINT_TEST, STRING_17_TEST, dc);
+      toStringFlagTagNegTrue(FLAG_18_PRINT_MEMORY, STRING_18_MEMORY, dc);
+      toStringFlagTagNegTrue(FLAG_19_PRINT_BRIDGE, STRING_19_BRIDGE, dc);
+      toStringFlagTagNegTrue(FLAG_20_PRINT_INIT, STRING_20_INIT, dc);
+      toStringFlagTagNegTrue(FLAG_21_PRINT_BIP, STRING_21_BIP, dc);
+      toStringFlagTagNegTrue(FLAG_22_PRINT_STATE, STRING_22_STATE, dc);
+      toStringFlagTagNegTrue(FLAG_23_PRINT_ANIM, STRING_23_ANIM, dc);
+      toStringFlagTagNegTrue(FLAG_24_PRINT_DRAW, STRING_24_DRAW, dc);
 
       toStringHashClass(dc, "Negative Classes", negatives);
       toStringHashClass(dc, "Positive Classes", positivesClasses);
@@ -530,9 +587,33 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       dc.root1Line(this, DLogConfig.class);
    }
 
-   private void toStringFlag(int flag, String msg, Dctx dc) {
-      if (hasFlagPrint(flag)) {
-         dc.append(msg + ";");
+   private String flagToStringSeparator = "-";
+
+   private void toStringFlagTagTrue(int flag, String msg, Dctx dc) {
+      if (hasFlagTag(flag)) {
+         dc.appendIgnoreChar(msg, ' ');
+         dc.append(flagToStringSeparator);
+      }
+   }
+
+   private void toStringFlagFormatTrue(int flag, String msg, Dctx dc) {
+      if (hasFlagFormat(flag)) {
+         dc.appendIgnoreChar(msg, ' ');
+         dc.append(flagToStringSeparator);
+      }
+   }
+
+   private void toStringFlagMasterTrue(int flag, String msg, Dctx dc) {
+      if (hasFlagMaster(flag)) {
+         dc.appendIgnoreChar(msg, ' ');
+         dc.append(flagToStringSeparator);
+      }
+   }
+
+   private void toStringFlagTagNegTrue(int flag, String msg, Dctx dc) {
+      if (hasFlagTagNeg(flag)) {
+         dc.appendIgnoreChar(msg, ' ');
+         dc.append(flagToStringSeparator);
       }
    }
 

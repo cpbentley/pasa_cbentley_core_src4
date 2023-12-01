@@ -48,7 +48,7 @@ public class SystemOutAppender extends BaseAppender {
       //first enter message. format is hard coded
       String tagString = entry.getTagString();
       sb.append(tagString);
-      if (ec.hasConfigFlag(ITechConfig.CONFIG_FLAG_04_SHOW_THREAD)) {
+      if (ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
          sb.append("[" + entry.getThreadName() + "]");
       }
       sb.tab();
