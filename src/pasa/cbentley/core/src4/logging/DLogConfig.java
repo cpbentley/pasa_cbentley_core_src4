@@ -576,6 +576,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
 
       toStringHashClass(dc, "Negative Classes", negatives);
       toStringHashClass(dc, "Positive Classes", positivesClasses);
+      toStringHashClass(dc, "FullPositive Classes", fullPositives);
       toStringHashClass(dc, "Trace Classes", positivesTraceClass);
    }
 

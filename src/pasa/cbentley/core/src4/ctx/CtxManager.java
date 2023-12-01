@@ -82,7 +82,7 @@ public class CtxManager implements IStringable, IStatorable {
    private void rangeOverlap(int modID, int staticID, int first, int last, int firstV, int lastV) {
       String msg = "Overlap staticid=" + staticID + " Incoming [" + first + "," + last + "] with [" + firstV + "," + lastV + "] of moduleid=" + modID;
       //#debug
-      toDLog().pInit(msg, this, CtxManager.class, "rangeOverlap");
+      toDLog().pData(msg, this, CtxManager.class, "rangeOverlap");
       throw new RuntimeException(msg);
    }
 
@@ -203,7 +203,7 @@ public class CtxManager implements IStringable, IStatorable {
             }
          }
          //#debug
-         uc.toDLog().pInit("Count=" + num, this, CtxManager.class, "settingsRead");
+         uc.toDLog().pData("Count=" + num, this, CtxManager.class, "settingsRead");
       } catch (IllegalStateException e) {
          //reset all data
 
@@ -262,15 +262,15 @@ public class CtxManager implements IStringable, IStatorable {
             dos.writeInt(ctxID);
             dos.writeByteArray(data);
             //#debug
-            toDLog().pInit(data.length + " bytes of data for ctxID" + ctxID, null, CtxManager.class, "settingsWrite");
+            toDLog().pData(data.length + " bytes of data for ctxID" + ctxID, null, CtxManager.class, "settingsWrite");
          } else {
             //#debug
-            toDLog().pInit("No data for ctxID " + ctxID , null, CtxManager.class, "settingsWrite");
+            toDLog().pData("No data for ctxID " + ctxID , null, CtxManager.class, "settingsWrite");
             dos.writeInt(0);
          }
       }
       //#debug
-      toDLog().pInit("Count=" + size, this, CtxManager.class, "settingsWrite");
+      toDLog().pData("Count=" + size, this, CtxManager.class, "settingsWrite");
    }
 
    public void stateWriteTo(StatorWriter state) {

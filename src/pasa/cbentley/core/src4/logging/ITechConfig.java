@@ -72,7 +72,14 @@ public interface ITechConfig extends ITech {
    public static final int    MASTER_FLAG_03_ONLY_POSITIVES         = 1 << 2;
 
    /**
-    * When set, class settings of the config are ignored
+    * When set, class settings of the config are ignored when accepting/rejecting a debug statement.
+    * 
+    * All calls
+    * <li> {@link IDLogConfig#setClassFullPositive(Class, boolean)}
+    * <li> {@link IDLogConfig#setClassPositives(Class, boolean)}
+    * <li> {@link IDLogConfig#setClassNegative(Class, boolean)}
+    * 
+    * become irrelevant when this master flag is set to true.
     */
    public static final int    MASTER_FLAG_04_IGNORE_CLASSES         = 1 << 3;
 
