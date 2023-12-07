@@ -1122,11 +1122,21 @@ public class StringUtils {
    }
 
    /**
-    * Appends the offsets and line length to the IntBuffer.
+    * Appends the relative offsets and line length to the IntBuffer.
     * <br>
     * <br>
-    * <li>0: starting offset of line in the string
-    * <li>1: number of chars excluding the line break special characters
+    * <li>0 : number of slots used including this one
+    * <li>1 : starting offset of line in the string
+    * <li>2 : number of chars excluding the line break special characters
+    * <li>3 : extra value for char width but is not computed here
+    * <li>4 : starting offset of line in the string of 2nd line
+    * <li>5 : number of chars excluding the line break special characters of 2nd line
+    * <li>6 : extra value for char width but is not computed here
+    * <li> etc
+    * 
+    * <p>
+    *  Does not write any state flags at the end of the buffer
+    * </p>
     * @param chars
     * @param offset
     * @param len
@@ -1135,41 +1145,56 @@ public class StringUtils {
     */
    public void getBreaksLineNatural(char[] chars, int offset, int len, IntBuffer b) {
       int lineLength = 0;
-      int lineStartOffset = offset; //count from offset
+      int lineStartOffset = 0; //count from 0, because relative offset
       int start = offset + 0;
+      int startRelative = 0;
       int end = offset + len;
       for (int i = start; i < end; i++) {
          char c = chars[i];
          if (c == NEW_LINE) {
             b.addInt(lineStartOffset);
             b.addInt(lineLength);
+            b.addInt(-1);
             //start of the next line
-            lineStartOffset = i + 1;
+            lineStartOffset = startRelative + 1;
             lineLength = 0;
          } else if (c == NEW_LINE_CARRIAGE_RETURN) {
             b.addInt(lineStartOffset);
             b.addInt(lineLength);
+            b.addInt(-1);
             //assume we have a \n afterwards
             //if none, next letter is eaten
-            lineStartOffset = i + 2;
+            lineStartOffset = startRelative + 2;
             lineLength = 0;
             i = i + 1;
          } else {
             lineLength++;
          }
+         startRelative++;
       }
       //at least one line, might it be empty
       b.addInt(lineStartOffset);
       b.addInt(lineLength);
+      b.addInt(-1);
    }
 
    public void getBreaksChar(String str, char breakChar) {
 
    }
 
+   /**
+    * Add <code>breakChar</code> index relative to <code>offset</code> positions to the {@link IntBuffer}
+    * 
+    * For each breakChar, add next index position
+    * @param chars
+    * @param offset
+    * @param len
+    * @param b
+    * @param breakChar
+    */
    public void getBreaksChar(char[] chars, int offset, int len, IntBuffer b, char breakChar) {
       int breakLength = 0;
-      int breakStartOffset = offset; //count from offset
+      int breakStartOffset = 0; //count from offset
       int start = offset + 0;
       int end = offset + len;
       for (int i = start; i < end; i++) {
@@ -1188,6 +1213,12 @@ public class StringUtils {
       b.addInt(breakLength);
    }
 
+   /**
+    * An integer array describing tabs positions
+    * @param str
+    * @return
+    * @see StringUtils#getBreaksChar(char[], int, int, IntBuffer, char)
+    */
    public int[] getBreaksTab(String str) {
       char[] chars = str.toCharArray();
       int length = str.length();
@@ -1215,6 +1246,8 @@ public class StringUtils {
     * @param offset
     * @param len
     * @return breaking indexes relative to offset. null when no break lines were found.
+    * 
+    * @see StringUtils#getBreaksLineNatural(char[], int, int, IntBuffer)
     * 
     */
    public int[] getBreaksLineNatural(char[] chars, int offset, int len) {
