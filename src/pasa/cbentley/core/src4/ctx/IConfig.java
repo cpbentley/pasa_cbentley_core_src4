@@ -27,6 +27,8 @@ public interface IConfig extends IStringable {
     * @return
     */
    public boolean isIgnoreSettings();
+   
+   
    /**
     * When true, clean up settings of the Ctx.
     * <br>

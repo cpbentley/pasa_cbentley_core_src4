@@ -48,8 +48,16 @@ public class CtxManager implements IStringable, IStatorable {
     */
    public static final int STATIC_DEFINED = 10;
 
+   /**
+    * 
+    */
    private IntBuffer       ids;
 
+   /**
+    * {@link ICtx#getCtxID()} and their {@link ICtx} object.
+    * <br>
+    * Index is order of registration
+    */
    private IntToObjects    intos;
 
    private UCtx            uc;
@@ -61,6 +69,7 @@ public class CtxManager implements IStringable, IStatorable {
    }
 
    /**
+    * Return an integer array with triplets
     * 
     */
    public int[] getStaticRanges(int staticID) {
@@ -90,7 +99,7 @@ public class CtxManager implements IStringable, IStatorable {
     * Called by constructor of a {@link ICtx}
     * 
     * @param ctx
-    * @return
+    * @return a value from 1 to [
     */
    public int registerCtx(ICtx ctx) {
       //#debug
@@ -109,13 +118,25 @@ public class CtxManager implements IStringable, IStatorable {
             throw new IllegalArgumentException(ctx.getClass().getName() + " collides with existing " + stored.getClass().getName() + " with the Context ID (" + ctxID + ").");
          }
       }
-      intos.add(ctx, ctxID);
+      intos.add(ctx, ctxID); //add the ctx
       return intos.nextempty;
+   }
+   
+   /**
+    * 
+    * @param registrationID 1 index based ID provided during registration
+    * @return
+    * @throws ArrayIndexOutOfBoundsException
+    */
+   public ICtx getCtxFromRegID(int registrationID) {
+      return (ICtx) intos.objects[registrationID-1];
    }
 
    /**
     * Registers a framework known StaticID slot
     * <br>
+    * Static Id domains are defined at the module level.
+    * 
     * Its the key that is used to register those objects of the given type
     * <br>
     * Examples, key for CMDs, key for DIDs, key for Strings
@@ -136,26 +157,24 @@ public class CtxManager implements IStringable, IStatorable {
    }
 
    /**
-    * Checks for conflicts with established ranges.
+    * Checks for conflicts with established ranges within a staticID domain of values.
     * <br>
-    * Throws a {@link RuntimeException} when a conflict is found. Dev must 
-    * fix the static range manually.
+    * Throws a {@link RuntimeException} when a conflict is found. Dev must fix the static range manually.
     * <br>
     * <br>
     * Register a range of integers for a static class.
     * <br>
     * <br>
-    * For example, String IDs. The module at the top created a static id class
-    * using {@link IStaticObjCtrl#createNewStaticID()}.
+    * For example, String IDs. The module at the top created a static id class using {@link IStaticObjCtrl#createNewStaticID()}.
     * <br>
     * 
-    * @param staticID the class id created with {@link IStaticObjCtrl#createNewStaticID()}
+    * @param staticID static ID can be anything but should not collide with others
     * @param first
     * @param last
     * @throws new {@link RuntimeException} when conflict of range
     */
    public void registerStaticRange(ICtx ctx, int staticID, int first, int last) {
-      int[] r = ids.getIntsRef();
+      int[] r = ids.getIntsRef(); //dangerously get the reference to the array
       int size = ids.getSize();
       //start at 1 because IntBuffer has first element as length
       for (int i = 1; i < size; i += 4) {

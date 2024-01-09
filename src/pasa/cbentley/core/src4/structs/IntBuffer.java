@@ -5,7 +5,6 @@
 package pasa.cbentley.core.src4.structs;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
-
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.IntUtils;
@@ -123,6 +122,14 @@ public class IntBuffer implements IStringable {
       ints[0] += data.length;
    }
 
+   public void appendBufferToArrayAt(int[] array, int offset) {
+      int size = getSize();
+      for (int j = 1; j <= size; j++) {
+         array[offset] = ints[j];
+         offset++;
+      }
+   }
+
    /**
     * O(1)
     */
@@ -170,6 +177,17 @@ public class IntBuffer implements IStringable {
    }
 
    /**
+    * Append fill value for num of times
+    * @param fill
+    * @param num
+    */
+   public void fill(int fill, int num) {
+      for (int i = 0; i < num; i++) {
+         addInt(fill);
+      }
+   }
+
+   /**
     * 0 based index
     * <br>
     * <br>
@@ -179,6 +197,10 @@ public class IntBuffer implements IStringable {
     */
    public int get(int index) {
       return ints[index + 1];
+   }
+
+   public int getFirstIndexOf(int value) {
+      return IntUtils.getFirstIndex(value, ints, 0, getSize());
    }
 
    /**
@@ -217,10 +239,6 @@ public class IntBuffer implements IStringable {
     */
    public int getLast() {
       return ints[ints[0]];
-   }
-
-   public int getFirstIndexOf(int value) {
-      return IntUtils.getFirstIndex(value, ints, 0, getSize());
    }
 
    /**
@@ -262,14 +280,6 @@ public class IntBuffer implements IStringable {
          return v;
       } else {
          return 0;
-      }
-   }
-
-   public void appendBufferToArrayAt(int[] array, int offset) {
-      int size = getSize();
-      for (int j = 1; j <= size; j++) {
-         array[offset] = ints[j];
-         offset++;
       }
    }
 
@@ -317,10 +327,6 @@ public class IntBuffer implements IStringable {
       }
    }
 
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
-
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }
@@ -335,5 +341,9 @@ public class IntBuffer implements IStringable {
       }
    }
    //#enddebug
+
+   public UCtx toStringGetUCtx() {
+      return uc;
+   }
 
 }

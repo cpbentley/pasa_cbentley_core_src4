@@ -9,23 +9,41 @@ import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
+ * Default implementation of {@link IString}
+ * 
+ * It has
+ * <li> A {@link LocaleID} telling which language the string belongs to
+ * <li> {@link IStringProducer} to actually fetch the string when asked with {@link LString#getStr()}
+ * 
  * Return true when events generated a force purge of String cache.
  * <br>
  * <br>
  * 
  * <b>Dynamic String Translation</b>
  * <br>
- * A String cannot be mapped to French. Defaults to english. IString 
- * cache that String cannot be mapped.
+ * If a String Key cannot be mapped to the active {@link LocaleID}, it will default to english instead. 
+ * 
+ * IString cache that String cannot be mapped.
  * <br>
- * User selects {@link IString} through interface. Resets cache.
- * User sets a translation.
+ * <p>
+ * <b>Potential Uses</b>
+ * </p>
+ * <li>User selects {@link IString} through interface. Resets cache.
+ * <li>User sets a translation.
  * <br>
  * 
- * A {@link LString} by default does not registers on the {@link IEventBus}.
+ * <p>
+ * <b>About Events</b>:<br>
+ * 
+ * A {@link LString} does not registers on the {@link IEventBus}.
  * 
  * When a language changes, the application must go through the tree hierarchy of objects
  * and ask them to update their {@link LString}s.
+ * 
+ * it would be too costly on the eventBus for a rare action anyways
+ * </p>
+ * 
+ * What if a {@link LString} is purposely in another language. We do not want updates on language changes
  * 
  * @author Charles Bentley
  *
@@ -49,10 +67,16 @@ public class LString implements IString {
     */
    protected LocaleID              lid;
 
+   /**
+    * When not null, the acutal String that was last built by a call to {@link LString#getStr()}
+    */
    protected String                myString;
 
    protected String                prefix;
 
+   /**
+    * By Default false;
+    */
    private boolean                 reset = false;
 
    protected String                suffix;
@@ -100,9 +124,9 @@ public class LString implements IString {
     */
    public String getStr() {
       //get current string producer 
-      LocaleID cid = stringProducer.getLocaleID();
+      LocaleID currentLocalID = stringProducer.getLocaleID();
       //check if localID has changed
-      if (cid != lid || reset) {
+      if (currentLocalID != lid || reset) {
          reset = false;
          IStringMapper sm = stringProducer.getStringMapper();
          if (sm != null) {
@@ -115,7 +139,7 @@ public class LString implements IString {
             }
             if (str != null) {
                myString = str;
-               lid = cid;
+               lid = currentLocalID;
             } else {
                myString = def;
             }
@@ -127,6 +151,9 @@ public class LString implements IString {
       return myString;
    }
 
+   /**
+    * 
+    */
    public void reset() {
       reset = true;
    }

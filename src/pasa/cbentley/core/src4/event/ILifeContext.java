@@ -8,8 +8,7 @@ public interface ILifeContext {
 
    
    /**
-    * Called when {@link ILifeListener} is enable to successfully complete
-    * a life method.
+    * Called when {@link ILifeListener} is enable to successfully complete a life method.
     * @param lis
     */
    public void addFailure(ILifeListener lis);

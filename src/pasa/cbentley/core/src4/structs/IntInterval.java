@@ -3,9 +3,11 @@ package pasa.cbentley.core.src4.structs;
 import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.text.StringInterval;
 
 /**
- * 
+ * An interval with a length of ZERO is a singularity
+ * An interval with a negative length is illegal
  * @author Charles Bentley
  *
  */
@@ -27,6 +29,25 @@ public class IntInterval extends ObjectU {
       this.len = len;
    }
 
+   public IntInterval(UCtx uc, int offset, int len, Object payload) {
+      super(uc);
+      this.offset = offset;
+      this.len = len;
+      this.payload = payload;
+   }
+
+   public void copyFrom(IntInterval i) {
+      this.len = i.len;
+      this.offset = i.offset;
+      this.payload = i.payload;
+   }
+
+   public void copyTo(IntInterval i) {
+      i.len = this.len;
+      i.offset = this.offset;
+      i.payload = this.payload;
+   }
+
    /**
     * <li>0 if inside
     * <li>1 if bigger
@@ -42,6 +63,114 @@ public class IntInterval extends ObjectU {
          return 0;
       }
       return 1;
+   }
+
+   /**
+    * Create an {@link IntInterval} from the intersection of this instance and offset/len
+    * <p>
+    * 
+    * </p>
+    * @param offset
+    * @param len
+    * @return null if there is no intersection between this interval and [offset-len] interval
+    */
+   public IntInterval getIntersectionWith(int offset, int len) {
+      //if there is an intersection, the offset of that intersect is necessary 
+      //either one of the 2 offsets
+      //then trick is to compute the length
+      int offsetDifference = this.offset - offset;
+
+      int intersectOffset = 0;
+      int intersectLen = 0;
+      if (offsetDifference > 0) {
+         intersectOffset = this.offset;
+         intersectLen = offset + len - this.offset;
+         if (intersectLen > this.len) {
+            intersectLen = this.len;
+         }
+      } else {
+         intersectOffset = offset;
+         intersectLen = this.getOffsetEnd() - offset;
+         if (intersectLen > len) {
+            intersectLen = len;
+         }
+      }
+
+      if (intersectLen > 0) {
+         return new IntInterval(uc, intersectOffset, intersectLen);
+      }
+      return null;
+
+   }
+
+   /**
+    * Create an {@link IntInterval} from the intersection
+    * @param intervalBelowStringLeaves
+    * @return
+    * @see IntInterval#getIntersectionWith(int, int)
+    */
+   public IntInterval getIntersectionWith(IntInterval ii) {
+      return getIntersectionWith(ii.offset, ii.len);
+   }
+
+   /**
+    * The distance between offset (included) and the end of the interval
+    * <li> 10:8 -> [10,17] and offset=15 return 18-15 = 3
+    * <li> 10:8 -> [10,17] and offset=17 return 18-17 = 1
+    * <li> 10:8 -> [10,17] and offset=10 return 18-10 = 8 = len
+    * @param offset
+    * @return 
+    */
+   public int getDistanceToEnd(int offset) {
+      return this.offset + this.len - offset;
+   } 
+   
+   /**
+    * Distance from the startOffset.
+    * <li> 10:8 -> [10,17] and offset=15 return 15-10 = 5
+    * <li> 10:8 -> [10,17] and offset=10 return 10-10 = 0
+    * @param offset
+    * @return
+    */
+   public int getDistanceToStart(int offset) {
+      return offset - this.offset;
+   }
+
+   public int getLen() {
+      return len;
+   }
+
+   /**
+    * The offset in {@link Stringer} at which this {@link StringInterval} starts.
+    * It is included in the interval
+    * @return
+    */
+   public int getOffset() {
+      return offset;
+   }
+
+   /**
+    * The first offset outside this interval
+    * @return
+    */
+   public int getOffsetEnd() {
+      return offset + len;
+   }
+
+   /**
+    * The last offset inside this interval on the right
+    * @return
+    */
+   public int getOffsetEndInside() {
+      return offset + len - 1;
+   }
+
+   /**
+    * The {@link StringFx} for this interval of text
+    * @return
+    */
+   public Object getPayload() {
+      return payload;
    }
 
    /**
@@ -62,38 +191,16 @@ public class IntInterval extends ObjectU {
    }
 
    /**
-    * 
-    * 10:8 and offset=15 return 18-15 = 3
-    * 10:8 and offset=10 return 18-10 = 8 = len
-    * @param offset
+    * {@link IntIntervalRelation} with first interval being this
+    * @param interval
     * @return
     */
-   public int getLeftCenter(int offset) {
-      return this.offset + this.len - offset;
-   }
-
-   public int getLen() {
-      return len;
-   }
-
-   /**
-    * The offset in {@link Stringer} at which this {@link StringInterval} starts.
-    * @return
-    */
-   public int getOffset() {
-      return offset;
-   }
-
-   public int getOffsetEnd() {
-      return offset + len;
-   }
-
-   /**
-    * The {@link StringFx} for this interval of text
-    * @return
-    */
-   public Object getPayload() {
-      return payload;
+   public IntIntervalRelation getRelation(IntInterval interval) {
+      IntIntervalRelation iir = new IntIntervalRelation(uc);
+      iir.setIntervalOne(this);
+      iir.setIntervalTwo(interval);
+      iir.compute();
+      return iir;
    }
 
    public void incrLen(int incr) {
@@ -117,6 +224,7 @@ public class IntInterval extends ObjectU {
     * Could be equal to, returns true
     * @param ii
     * @return
+    * 
     */
    public boolean isContainedBy(IntInterval ii) {
       return isContainedBy(ii.offset, ii.len);
@@ -135,6 +243,14 @@ public class IntInterval extends ObjectU {
       return false;
    }
 
+   /**
+    * Return true when this fully contains given {@link IntInterval}.
+    * <p>
+    * For collision detection, use {@link IntInterval#isIntersect(IntInterval)}
+    * </p>
+    * @param ii
+    * @return
+    */
    public boolean isContaining(IntInterval ii) {
       return isContaining(ii.offset, ii.len);
    }
@@ -145,7 +261,7 @@ public class IntInterval extends ObjectU {
     * @return
     */
    public boolean isInside(int index) {
-      return offset <= index && (offset + len) < index;
+      return offset <= index && (offset + len) > index;
    }
 
    /**
@@ -155,9 +271,9 @@ public class IntInterval extends ObjectU {
     * @return
     */
    public boolean isIntersect(int offset, int len) {
-      if (this.offset > offset + len) {
+      if (this.offset >= offset + len) {
          return false;
-      } else if (this.offset + this.len < offset) {
+      } else if (this.offset + this.len <= offset) {
          return false;
       } else {
          return true;
@@ -184,6 +300,15 @@ public class IntInterval extends ObjectU {
 
    public boolean isIntervalEqual(IntInterval ii) {
       return isIntervalEqual(ii.offset, ii.len);
+   }
+
+   /**
+    * True when index is not inside the interval
+    * @param index
+    * @return
+    */
+   public boolean isOutside(int index) {
+      return offset > index || (offset + len) <= index;
    }
 
    /**
@@ -233,18 +358,25 @@ public class IntInterval extends ObjectU {
       this.offset = offset;
    }
 
+   public void setOffsets(int offsetStart, int offsetEnd) {
+      this.offset = offsetStart;
+      this.len = offsetEnd - offsetStart;
+      if (len < 0) {
+         throw new IllegalArgumentException();
+      }
+   }
+
    public void setPayload(Object payload) {
       this.payload = payload;
    }
 
    /**
-    * Reduce its value.
-    * what if in middle, cuts the interval at offset
+    * Reduce this interval so that it will not intersect si anymore.
+    * When si is contained by this, cuts the interval at offset
+    * NOTE: When len is brought back to zero? offset stays the same.
     * @param si
-    * @return the value that parameter si substracted to this instance
-    * 0 meaning no substraction
+    * @return the length that was removed. 0 meaning no substraction
     * 
-    * When len is brought back to zero? offset stays the same.
     */
    public int substract(IntInterval si) {
       if (si.offset <= this.offset) {
@@ -273,10 +405,10 @@ public class IntInterval extends ObjectU {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, IntInterval.class, "@line5");
+      dc.root(this, IntInterval.class, "@line330");
       toStringPrivate(dc);
       super.toString(dc.sup());
-      dc.nlLvlO(payload, "payload");
+      dc.nlLvlOWithTitle(payload, "payload", uc);
    }
 
    public void toString1Line(Dctx dc) {
@@ -285,47 +417,18 @@ public class IntInterval extends ObjectU {
       super.toString1Line(dc.sup1Line());
    }
 
+   public String toStringOffsets() {
+      return offset + "," + (offset + len);
+   }
+
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("offset", offset);
       dc.appendVarWithSpace("len", len);
-   }
-
-   /**
-    * Create an {@link IntInterval} from the intersection of this instance and offset/len
-    * 
-    * @param offset
-    * @param len
-    * @return null if no intersection
-    */
-   public IntInterval createFromIntersectionWith(int offset, int len) {
-      int myend = offset + len;
-      int thisend = this.getOffsetEnd();
-      if (offset < this.offset) {
-         int newlen = myend - this.offset;
-         if (newlen > 0) {
-            return new IntInterval(uc, this.offset, newlen);
-         }
-         return null;
-      }
-      //we have an intersection
-      int flen = thisend - offset;
-      if (flen > 0) {
-         if (myend < thisend) {
-            //we are inside
-            flen = len;
-         }
-         return new IntInterval(uc, offset, flen);
-      }
-      return null;
-   }
-
-   /**
-    * Create an {@link IntInterval} from the intersection
-    * @param intervalBelowStringLeaves
-    * @return
-    */
-   public IntInterval createFromIntersectionWith(IntInterval ii) {
-      return createFromIntersectionWith(ii.offset, ii.len);
+      dc.append(" -> [");
+      dc.append(offset);
+      dc.append(",");
+      dc.append((offset + len-1));
+      dc.append("]");
    }
 
    //#enddebug

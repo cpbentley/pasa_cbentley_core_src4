@@ -6,6 +6,20 @@ package pasa.cbentley.core.src4.utils;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 
+
+/**
+ * Escape Sequence  Description
+ * <li> \t  Insert a tab in the text at this point.
+ * <li> \b  Insert a backspace in the text at this point.
+ * <li> \n  Insert a newline in the text at this point.
+ * <li> \r  Insert a carriage return in the text at this point.
+ * <li> \f  Insert a form feed in the text at this point.
+ * <li> \'  Insert a single quote character in the text at this point.
+ * <li> \"  Insert a double quote character in the text at this point.
+ * <li> \\  Insert a backslash character in the text at this point.
+ * @author Charles Bentley
+ *
+ */
 public class CharUtils {
 
    public static final int PLANE_0_EN = 0;

@@ -8,6 +8,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.structs.IntBuffer;
+import pasa.cbentley.core.src4.structs.IntIntervals;
 
 /**
  * 
@@ -18,22 +19,150 @@ public class StringUtils {
 
    public static final int    EN_PAD                   = 0;
 
-   public static char         NEW_LINE                 = '\n';
+   /**
+    * 
+    */
+   public static final char   ENGLISH_SPACE            = ' ';
+
+   public static final char   NULL_CHAR                = '\u0000';
+
+   public static final char   START_HEADING            = '\u0001';
+
+   public static final char   START_TEXT               = '\u0002';
+
+   public static final char   END_TEXT                 = '\u0003';
+
+   public static final char   END_TRANSMISSION         = '\u0004';
+
+   public static final char   NO_BREAKING_SPACE        = '\u00A0';
+
+   public static final char   NEW_LINE                 = '\n';
 
    /**
-    * Windows puts a \r in front of new lines
+    * Windows puts a \r in front of new lines so we have to handle \r\n
     */
-   public static char         NEW_LINE_CARRIAGE_RETURN = '\r';
+   public static final char   NEW_LINE_CARRIAGE_RETURN = '\r';
+
+   public static final char   FORM_FEED                = '\u000C';
+
+   public static final char   FORM_FEED_F              = '\f';
+
+   public static final char   BACKSPACE                = '\u0008';
+
+   public static final char   EM_QUAD                  = '\u2001';
+
+   public static final char   EN_QUAD                  = '\u2000';
+
+   public static final char   EM_SPACE                 = '\u2003';
+
+   public static final char   EN_SPACE                 = '\u2002';
+
+   public static final char   THREE_PER_EM_SPACE       = '\u2004';
+
+   public static final char   FOUR_PER_EM_SPACE        = '\u2005';
+
+   public static final char   SIX_PER_EM_SPACE         = '\u2006';
+
+   /**
+    * [█]
+    */
+   public static final char   BLOCK_FULL               = '\u2588';
+
+   /**
+    * sadasd ▉ ▁
+    */
+   public static final char   BLOCK_7_OF_8               = '\u2589';
+   /**
+    * u2581 = [ ▁
+    */
+   public static final char   BLOCK_BOT_1_OF_8               = '\u2581';
+
+   /**
+    * [■] alt+254 ▉
+    */
+   public static final char   BLACK_SQUARE             = '\u25A0';
+
+   /**
+    * Size of a digit
+    */
+   public static final char   FIGURE_SPACE             = '\u2007';
+
+   public static final char   LINE_SEPARATOR           = '\u2028';
 
    /**
     * Byte for russian characters in UTF-8
     */
    public static final int    RU_PAD                   = 4;
 
+   public static final char   RU_SPACE                 = ' ';
+
+   public static final char   TAB                      = '\t';
+
+   /**
+    * vertical tabulation Alt+011  
+    */
+   public static final char   TAB_LINE                 = '\u000B';
+
+   /**
+    * '\u000A' is illegal because compiler interprets it as a \n
+    */
+   public static final char   LINE_FEED                 = '\n';
+
+   /**
+    * «—» [—][-][+]
+    * Le tiret long ou « tiret cadratin 
+    * <p>
+    * Il est utilisé en français et dans plusieurs autres langues européennes pour introduire les répliques des dialogues.
+    * — Bonjour, monsieur.
+    * </p>
+    */
+   public static final char   EM_DASH                  = '\u2014';
+
+   /**
+    * «–» [–][-][+]
+    * Le tiret moyen ou « tiret demi‑cadratin » ou « tiret semi‑cadratin » ou « demi‑tiret »
+    * 
+    */
+   public static final char   EN_DASH                  = '\u2013';
+
+   /**
+    * «‐» [‐]     asdsad 
+    */
+   public static final char   SHORT_DASH               = '\u2010';
+
+   /**
+    * [-] 
+    */
+   public static final char   SIGN_MINUS               = '\u2212';
+
+   public static final char   TAB_CHAR                 = '\u0009';
+
+   /**
+    * 
+    */
+   public static final char   INTER_PUNCT              = '\u00B7';
+
+   public static final char   BOTTOM_SQUARE_BRACKET    = '\u23B5';
+
+   public static final char   SYMBOL_RETURN            = '\u23CE';
+
+   public static final char   ESCAPE_CHAR              = '\\';
+
+   public static final char   ARROW_RIGHT              = '\u2192';
+
+   public static final char   SYMBOL_FOR_SPACE         = '\u2420';
+
+   /**
+    * Chars that usually seperates words in usual latin text
+    */
+   public static final char[] CHARS_SEPARATORS_PUNC    = { ' ', ',', ':', ';' };
+
    /**
     * 
     */
    public static final String UTF8_BOM                 = "\uFEFF";
+
+   public static char         UTF8_BOM_CHAR            = '\uFEFF';
 
    /**
     * Append the byte values to the string builder
@@ -484,6 +613,42 @@ public class StringUtils {
 
    public static String getUpperCaseFirstLetter(String s) {
       return StringUtils.getUpperCase(s.charAt(0)) + s.substring(1, s.length());
+   }
+
+   /**
+    * Gets the relative index of word starting from startOffset.
+    * -1 if word is not found.
+    * @param ar
+    * @param offset
+    * @param len
+    * @param word
+    * @param startOffset relative to offset, not absolute to the array
+    * @return relative index of word from offset.
+    */
+   public static int indexOf(char[] ar, int offset, int len, String word, int startOffset) {
+      if (word == null || word.length() == 0) {
+         return -1;
+      }
+      int end = offset + len;
+      int start = offset + startOffset;
+      char first = word.charAt(0);
+      for (int i = start; i < end; i++) {
+         if (ar[i] == first) {
+            //
+            int endj = i + word.length();
+            int startj = i + 1;
+            int wordOffset = 1;
+            for (int j = startj; j < endj; j++) {
+               char c = word.charAt(wordOffset++);
+               if (ar[j] != c) {
+                  break;
+               }
+            }
+            return i - offset;
+         }
+      }
+
+      return -1;
    }
 
    public static boolean isEqualIgnoreCap(char c, char c2) {
@@ -1122,67 +1287,6 @@ public class StringUtils {
    }
 
    /**
-    * Appends the relative offsets and line length to the IntBuffer.
-    * <br>
-    * <br>
-    * <li>0 : number of slots used including this one
-    * <li>1 : starting offset of line in the string
-    * <li>2 : number of chars excluding the line break special characters
-    * <li>3 : extra value for char width but is not computed here
-    * <li>4 : starting offset of line in the string of 2nd line
-    * <li>5 : number of chars excluding the line break special characters of 2nd line
-    * <li>6 : extra value for char width but is not computed here
-    * <li> etc
-    * 
-    * <p>
-    *  Does not write any state flags at the end of the buffer
-    * </p>
-    * @param chars
-    * @param offset
-    * @param len
-    * @param b
-    * 
-    */
-   public void getBreaksLineNatural(char[] chars, int offset, int len, IntBuffer b) {
-      int lineLength = 0;
-      int lineStartOffset = 0; //count from 0, because relative offset
-      int start = offset + 0;
-      int startRelative = 0;
-      int end = offset + len;
-      for (int i = start; i < end; i++) {
-         char c = chars[i];
-         if (c == NEW_LINE) {
-            b.addInt(lineStartOffset);
-            b.addInt(lineLength);
-            b.addInt(-1);
-            //start of the next line
-            lineStartOffset = startRelative + 1;
-            lineLength = 0;
-         } else if (c == NEW_LINE_CARRIAGE_RETURN) {
-            b.addInt(lineStartOffset);
-            b.addInt(lineLength);
-            b.addInt(-1);
-            //assume we have a \n afterwards
-            //if none, next letter is eaten
-            lineStartOffset = startRelative + 2;
-            lineLength = 0;
-            i = i + 1;
-         } else {
-            lineLength++;
-         }
-         startRelative++;
-      }
-      //at least one line, might it be empty
-      b.addInt(lineStartOffset);
-      b.addInt(lineLength);
-      b.addInt(-1);
-   }
-
-   public void getBreaksChar(String str, char breakChar) {
-
-   }
-
-   /**
     * Add <code>breakChar</code> index relative to <code>offset</code> positions to the {@link IntBuffer}
     * 
     * For each breakChar, add next index position
@@ -1213,22 +1317,8 @@ public class StringUtils {
       b.addInt(breakLength);
    }
 
-   /**
-    * An integer array describing tabs positions
-    * @param str
-    * @return
-    * @see StringUtils#getBreaksChar(char[], int, int, IntBuffer, char)
-    */
-   public int[] getBreaksTab(String str) {
-      char[] chars = str.toCharArray();
-      int length = str.length();
-      IntBuffer b = new IntBuffer(uc, 5); //count index position of \n special char
-      getBreaksChar(chars, 0, length, b, '\t');
-      return b.getIntsClonedTrimmed();
-   }
-
-   public void getBreaksTab(char[] chars, int offset, int len, IntBuffer b) {
-      getBreaksChar(chars, offset, len, b, '\t');
+   public void getBreaksChar(String str, IntBuffer b, char breakChar) {
+      getBreaksChar(str.toCharArray(), 0, str.length(), b, breakChar);
    }
 
    /**
@@ -1257,6 +1347,96 @@ public class StringUtils {
    }
 
    /**
+    * Appends the relative offsets and line length to the IntBuffer.
+    * <br>
+    * <br>
+    * <li>0 : number of slots used including this one
+    * <li>1 : starting offset of line in the string
+    * <li>2 : number of chars excluding the line break special characters
+    * <li>3 : extra value for char width but is not computed here
+    * <li>4 : starting offset of line in the string of 2nd line
+    * <li>5 : number of chars excluding the line break special characters of 2nd line
+    * <li>6 : extra value for char width but is not computed here
+    * <li> etc
+    * 
+    * <p>
+    *  Does not write any state flags at the end of the buffer
+    * </p>
+    * @param chars
+    * @param offset
+    * @param len
+    * @param b
+    * 
+    */
+   public void getBreaksLineNatural(char[] chars, int offset, int len, IntBuffer b) {
+      getBreaksLineNatural(chars, offset, len, b, 1, -1);
+   }
+
+   public void getBreaksLineNatural(char[] chars, int offset, int len, IntBuffer b, int num, int fill) {
+      int lineLength = 0;
+      int lineStartOffset = 0; //count from 0, because relative offset
+      int start = offset + 0;
+      int startRelative = 0;
+      int end = offset + len;
+      for (int i = start; i < end; i++) {
+         char c = chars[i];
+         if (c == NEW_LINE) {
+            b.addInt(lineStartOffset);
+            b.addInt(lineLength);
+            b.fill(fill, num);
+            //start of the next line
+            lineStartOffset = startRelative + 1;
+            lineLength = 0;
+         } else if (c == NEW_LINE_CARRIAGE_RETURN) {
+            b.addInt(lineStartOffset);
+            b.addInt(lineLength);
+            b.fill(fill, num);
+            //assume we have a \n afterwards
+            //if none, next letter is eaten
+            lineStartOffset = startRelative + 2;
+            lineLength = 0;
+            i = i + 1;
+         } else {
+            lineLength++;
+         }
+         startRelative++;
+      }
+      //at least one line, might it be empty
+      b.addInt(lineStartOffset);
+      b.addInt(lineLength);
+      b.fill(fill, num);
+   }
+
+   public void getBreaksLineNatural(char[] chars, int offset, int len, IntIntervals ii) {
+      int lineLength = 0;
+      int lineStartOffset = 0; //count from 0, because relative offset
+      int start = offset + 0;
+      int startRelative = 0;
+      int end = offset + len;
+      for (int i = start; i < end; i++) {
+         char c = chars[i];
+         if (c == NEW_LINE) {
+            ii.addInterval(lineStartOffset, lineLength);
+            //start of the next line
+            lineStartOffset = startRelative + 1;
+            lineLength = 0;
+         } else if (c == NEW_LINE_CARRIAGE_RETURN) {
+            ii.addInterval(lineStartOffset, lineLength);
+            //assume we have a \n afterwards
+            //if none, next letter is eaten
+            lineStartOffset = startRelative + 2;
+            lineLength = 0;
+            i = i + 1;
+         } else {
+            lineLength++;
+         }
+         startRelative++;
+      }
+      //at least one line, might it be empty
+      ii.addInterval(lineStartOffset, lineLength);
+   }
+
+   /**
     * Null if  no line breaks.
     * 
     * @param str
@@ -1281,10 +1461,22 @@ public class StringUtils {
       getBreaksLineNatural(charArray, 0, length, b);
    }
 
-   public int[] getBreaksWord(String str) {
+   public void getBreaksTab(char[] chars, int offset, int len, IntBuffer b) {
+      getBreaksChar(chars, offset, len, b, '\t');
+   }
+
+   /**
+    * An integer array describing tabs positions
+    * @param str
+    * @return
+    * @see StringUtils#getBreaksChar(char[], int, int, IntBuffer, char)
+    */
+   public int[] getBreaksTab(String str) {
       char[] chars = str.toCharArray();
       int length = str.length();
-      return getBreaksWord(chars, 0, length, false);
+      IntBuffer b = new IntBuffer(uc, 5); //count index position of \n special char
+      getBreaksChar(chars, 0, length, b, '\t');
+      return b.getIntsClonedTrimmed();
    }
 
    /**
@@ -1331,7 +1523,12 @@ public class StringUtils {
 
    /**
     * Appends the {@link IntBuffer} with words offsets and lengths
+    * <p>
+    * When invisibleOnly is false, removed characters like .,?! from words
     * 
+    * <li> {@link StringUtils#isWordDelimiter(char)}
+    * <li> {@link StringUtils#isWordDelimiterInvisible(char)}
+    * </p>
     * @param chars
     * @param offset
     * @param len
@@ -1374,6 +1571,12 @@ public class StringUtils {
          b.addInt(wordStartOffset);
          b.addInt(wordLetterCount);
       }
+   }
+
+   public int[] getBreaksWord(String str) {
+      char[] chars = str.toCharArray();
+      int length = str.length();
+      return getBreaksWord(chars, 0, length, false);
    }
 
    /**

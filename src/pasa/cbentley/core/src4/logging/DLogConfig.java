@@ -550,6 +550,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       toStringFlagTagTrue(FLAG_22_PRINT_STATE, STRING_22_STATE, dc);
       toStringFlagTagTrue(FLAG_23_PRINT_ANIM, STRING_23_ANIM, dc);
       toStringFlagTagTrue(FLAG_24_PRINT_DRAW, STRING_24_DRAW, dc);
+      toStringFlagTagTrue(FLAG_25_PRINT_NULL, STRING_25_NULL, dc);
 
       dc.nl();
       dc.append("TagNegs Trues = ");
@@ -573,6 +574,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       toStringFlagTagNegTrue(FLAG_22_PRINT_STATE, STRING_22_STATE, dc);
       toStringFlagTagNegTrue(FLAG_23_PRINT_ANIM, STRING_23_ANIM, dc);
       toStringFlagTagNegTrue(FLAG_24_PRINT_DRAW, STRING_24_DRAW, dc);
+      toStringFlagTagNegTrue(FLAG_25_PRINT_NULL, STRING_25_NULL, dc);
 
       toStringHashClass(dc, "Negative Classes", negatives);
       toStringHashClass(dc, "Positive Classes", positivesClasses);

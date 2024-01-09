@@ -11,6 +11,9 @@ import pasa.cbentley.core.src4.logging.IStringable;
 /**
  * Encapsulates a Local, simple name "English" and its suffix id "en"
  * 
+ * <p>
+ * Suffix ID is appended to the txt file containing the words in that language
+ * </p>
  * @author Charles Bentley
  *
  */

@@ -6,7 +6,6 @@ package pasa.cbentley.core.src4.helpers;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.utils.CharUtils;
-import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
  * 
@@ -73,33 +72,6 @@ public class StringBBuilder {
       return this;
    }
 
-   /**
-    * 
-    * @param str
-    * @param offset
-    * @param len
-    * @param ignore
-    * @return
-    */
-   public StringBBuilder appendIgnore(char str[], int offset, int len, char ignore) {
-      checkForPotentialNewChars(len);
-      int end = offset + len;
-      for (int i = offset; i < end; i++) {
-         char c = str[i];
-         if (c != ignore) {
-            charValues[count++] = c;
-         }
-      }
-      return this;
-   }
-
-   private void checkForPotentialNewChars(int len) {
-      int newCount = count + len;
-      if (newCount > charValues.length) {
-         expandCapacity(newCount);
-      }
-   }
-
    public void append(double amount) {
       this.append(String.valueOf(amount));
    }
@@ -114,6 +86,27 @@ public class StringBBuilder {
 
    public void append(long amount) {
       this.append(String.valueOf(amount));
+   }
+
+   /**
+    * When null, appends "null"
+    * @param str
+    * @return
+    */
+   public StringBBuilder append(String str) {
+      if (str == null) {
+         str = "null";
+      }
+      int len = str.length();
+      if (len == 0)
+         return this;
+      int newCount = count + len;
+
+      ensureCapacity(newCount);
+
+      str.getChars(0, len, charValues, count);
+      count = newCount;
+      return this;
    }
 
    public void append(String str, int num) {
@@ -139,24 +132,28 @@ public class StringBBuilder {
    }
 
    /**
-    * When null, appends "null"
+    * 
     * @param str
+    * @param offset
+    * @param len
+    * @param ignore
     * @return
     */
-   public StringBBuilder append(String str) {
-      if (str == null) {
-         str = "null";
+   public StringBBuilder appendIgnore(char str[], int offset, int len, char ignore) {
+      checkForPotentialNewChars(len);
+      int end = offset + len;
+      for (int i = offset; i < end; i++) {
+         char c = str[i];
+         if (c != ignore) {
+            charValues[count++] = c;
+         }
       }
-      int len = str.length();
-      if (len == 0)
-         return this;
-      int newCount = count + len;
-
-      ensureCapacity(newCount);
-
-      str.getChars(0, len, charValues, count);
-      count = newCount;
       return this;
+   }
+
+   public void appendPretty(float value, int numDecimals) {
+      String str = uc.getStrU().prettyFloat(value, numDecimals);
+      append(str);
    }
 
    public void appendPretty(int value, int numChars, char c, boolean isBack) {
@@ -199,11 +196,6 @@ public class StringBBuilder {
     */
    public void appendPrettyBack(int value, int numChars, char c) {
       appendPretty(value, numChars, c, true);
-   }
-
-   public void appendPretty(float value, int numDecimals) {
-      String str = uc.getStrU().prettyFloat(value, numDecimals);
-      append(str);
    }
 
    /**
@@ -263,6 +255,13 @@ public class StringBBuilder {
       return charValues[index];
    }
 
+   private void checkForPotentialNewChars(int len) {
+      int newCount = count + len;
+      if (newCount > charValues.length) {
+         expandCapacity(newCount);
+      }
+   }
+
    public void decrementCount(int v) {
       count -= v;
    }
@@ -291,55 +290,16 @@ public class StringBBuilder {
       charValues = newValue;
    }
 
-   public int getCount() {
-      return count;
-   }
-
    /**
-    * Replaces all instances of strOld by strNew
-    * @param strOld
-    * @param strNew
-    */
-   public void replaceAll(String strOld, String strNew) {
-      int index = 0;
-      int indexIncrement = Math.max(0, strNew.length());
-      while (index != -1 && index < count) {
-         index = replaceFirst(strOld, strNew, index);
-         if (index != -1) {
-            //we don't want the strNew to interfere whatsover
-            index += indexIncrement;
-         }
-      }
-   }
-
-   /**
-    * Returns the index of the replace
-    * @param strOld
-    * @param strNew
-    * @param offset
+    * Return the underlying char array
     * @return
     */
-   public int replaceFirst(String strOld, String strNew, int offset) {
-      int index = CharUtils.getFirstIndex(strOld, charValues, offset, count);
-      int numCharsOld = strOld.length();
-      int numCharsNew = strNew.length();
-      int shiftsize = numCharsNew - numCharsOld;
-      ensureCapacity(count + numCharsNew);
-
-      if (index != -1) {
-         int start = index + numCharsOld;
-         int end = count - 1;
-         CharUtils.shiftChar(charValues, shiftsize, start, end);
-         for (int i = 0; i < numCharsNew; i++) {
-            charValues[index + i] = strNew.charAt(i);
-         }
-         count += shiftsize;
-      }
-      return index;
+   public char[] getArrayRef() {
+      return charValues;
    }
 
-   public void replaceFirst(String strOld, String strNew) {
-      replaceFirst(strOld, strNew, 0);
+   public int getCount() {
+      return count;
    }
 
    /**
@@ -379,6 +339,53 @@ public class StringBBuilder {
       append('\n');
    }
 
+   /**
+    * Replaces all instances of strOld by strNew
+    * @param strOld
+    * @param strNew
+    */
+   public void replaceAll(String strOld, String strNew) {
+      int index = 0;
+      int indexIncrement = Math.max(0, strNew.length());
+      while (index != -1 && index < count) {
+         index = replaceFirst(strOld, strNew, index);
+         if (index != -1) {
+            //we don't want the strNew to interfere whatsover
+            index += indexIncrement;
+         }
+      }
+   }
+
+   public void replaceFirst(String strOld, String strNew) {
+      replaceFirst(strOld, strNew, 0);
+   }
+
+   /**
+    * Returns the index of the replace
+    * @param strOld
+    * @param strNew
+    * @param offset
+    * @return
+    */
+   public int replaceFirst(String strOld, String strNew, int offset) {
+      int index = CharUtils.getFirstIndex(strOld, charValues, offset, count);
+      int numCharsOld = strOld.length();
+      int numCharsNew = strNew.length();
+      int shiftsize = numCharsNew - numCharsOld;
+      ensureCapacity(count + numCharsNew);
+
+      if (index != -1) {
+         int start = index + numCharsOld;
+         int end = count - 1;
+         CharUtils.shiftChar(charValues, shiftsize, start, end);
+         for (int i = 0; i < numCharsNew; i++) {
+            charValues[index + i] = strNew.charAt(i);
+         }
+         count += shiftsize;
+      }
+      return index;
+   }
+
    public void reset() {
       count = 0;
    }
@@ -412,11 +419,10 @@ public class StringBBuilder {
       String s = new String(charValues, 0, count);
       return s;
    }
-   
-   public char[] getArrayRef() {
-      return charValues;
-   }
 
+   /**
+    * Creates a new array that fits exactly the number of characters
+    */
    public void trimToSize() {
       if (count < charValues.length) {
          char[] newValue = new char[count];

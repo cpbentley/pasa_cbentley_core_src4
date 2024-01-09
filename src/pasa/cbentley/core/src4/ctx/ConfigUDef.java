@@ -5,6 +5,8 @@
 package pasa.cbentley.core.src4.ctx;
 
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.ILogConfigurator;
+import pasa.cbentley.core.src4.logging.LogConfiguratorAllFinest;
 
 public class ConfigUDef extends ConfigAbstract implements IConfigU {
 
@@ -29,6 +31,7 @@ public class ConfigUDef extends ConfigAbstract implements IConfigU {
    public boolean isIgnoreSettingsAll() {
       return false;
    }
+   
 
    //#mdebug
    public void toString(Dctx dc) {
@@ -56,9 +59,6 @@ public class ConfigUDef extends ConfigAbstract implements IConfigU {
       dc.appendVarWithSpace("isEraseSettingsAll", isEraseSettingsAll());
    }
 
-   public void toStringSetDebugUCtx(UCtx uc) {
-      //no need to set it here since it already done in constructor
-   }
 
    //#enddebug
 

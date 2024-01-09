@@ -564,6 +564,47 @@ public class ColorUtils implements IColors, IStringable {
    }
    //#enddebug
 
+   public String getName(int rgb) {
+      switch (rgb) {
+         case FULLY_OPAQUE_BEIGE:
+            return "Beige";
+         case FULLY_OPAQUE_BLACK:
+            return "Black";
+         case FULLY_OPAQUE_BLUE:
+            return "Blue";
+         case FULLY_OPAQUE_CYAN:
+            return "Cyan";
+         case FULLY_OPAQUE_GREEN:
+            return "Green";
+         case FULLY_OPAQUE_GREY:
+            return "Grey";
+         case FULLY_OPAQUE_ORANGE:
+            return "Orange";
+         case FULLY_OPAQUE_PINK:
+            return "Pink";
+         case FULLY_OPAQUE_PURPLE:
+            return "Purple";
+         case FULLY_OPAQUE_RED:
+            return "Red";
+         case FULLY_OPAQUE_SKY_BLUE:
+            return "SkyBlue";
+         case FULLY_OPAQUE_SKY_GREEN:
+            return "SkyGreen";
+         case FULLY_OPAQUE_WHITE:
+            return "White";
+         case FULLY_OPAQUE_YELLOW:
+            return "Yellow";
+         default:
+            return "name:"+rgb;
+      }
+   }
+   
+   public void toStringColorWithName(int color, Dctx dc) {
+      toStringColor(dc, color);
+      dc.append('[');
+      dc.append(getName(color));
+      dc.append(']');
+   }
    /**
     * Returns a String such as (a,r,g,b)
     * @param c

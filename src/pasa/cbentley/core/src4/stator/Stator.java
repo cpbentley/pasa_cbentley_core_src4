@@ -15,6 +15,11 @@ import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntToInts;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 
+/**
+ * 
+ * @author Charles Bentley
+ *
+ */
 public class Stator implements IStringable {
 
    private byte[]         data;

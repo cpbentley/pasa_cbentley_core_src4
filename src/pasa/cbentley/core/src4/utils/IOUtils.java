@@ -101,8 +101,26 @@ public class IOUtils implements IStringable {
 
    }
 
+   public InputStream getInputStream(Object caller, String fileName) {
+      Class c = getClass(caller);
+      InputStream is = c.getResourceAsStream(fileName);
+      return is;
+   }
+
    public IKernelHost getKernelHost() {
       return kernelHost;
+   }
+
+   /**
+    * TODO UConfig tells us if / is required for path names
+    * @param name
+    * @return
+    */
+   public String getResourcePath(String name) {
+      String m = name;
+      if (name.charAt(0) != '/')
+         m = '/' + name;
+      return m;
    }
 
    /**
@@ -112,6 +130,8 @@ public class IOUtils implements IStringable {
     * @return
     */
    public InputStream getStream(Object o, String fileName) {
+      //TODO
+      fileName = getResourcePath(fileName);
       Class c = getClass(o);
       InputStream is = null;
       if (kernelHost == null) {
@@ -311,12 +331,6 @@ public class IOUtils implements IStringable {
       readFile(cb, is, encod, maxLineLength);
    }
 
-   public InputStream getInputStream(Object caller, String fileName) {
-      Class c = getClass(caller);
-      InputStream is = c.getResourceAsStream(fileName);
-      return is;
-   }
-
    /**
     * 
     * @param ui
@@ -403,6 +417,18 @@ public class IOUtils implements IStringable {
     */
    public StringBBuilder readFileAsBuilderWindows(String fileName, String encod) {
       return readFileAsBuilder(fileName, encod, true, StringUtils.NEW_LINE_CARRIAGE_RETURN);
+   }
+
+   /**
+    * 
+    * @param fileName
+    * @param encod
+    * @return
+    */
+   public char[] readFileAsChars(String fileName, String encod) {
+      StringBBuilder sb = readFileAsBuilderWindows(fileName, encod);
+      sb.trimToSize();
+      return sb.getArrayRef();
    }
 
    /**

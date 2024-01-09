@@ -1661,6 +1661,33 @@ public class IntUtils implements IStringable {
       return sb.toString();
    }
 
+   /**
+    * 1,2,3,4 returns 1sepA2
+    * 
+    *
+    * @param ar
+    * @param sep
+    * @param sep2
+    * @return
+    */
+   public String debugString(int[] ar, String sepA, int modA, String sepB, int modB) {
+      if (ar == null) {
+         return "null";
+      }
+      StringBBuilder sb = new StringBBuilder(uc);
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            if (i % modB == 0) {
+               sb.append(sepB);
+            } else if (i % modA == 0) {
+               sb.append(sepA);
+            }
+         }
+         sb.append(ar[i]);
+      }
+      return sb.toString();
+   }
+
    public String debugString(int[] ar) {
       if (ar == null) {
          return "null";

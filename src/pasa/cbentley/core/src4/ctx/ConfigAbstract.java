@@ -6,6 +6,8 @@ package pasa.cbentley.core.src4.ctx;
 
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.logging.ILogConfigurator;
+import pasa.cbentley.core.src4.logging.LogConfiguratorAllFinest;
 
 /**
  * Base core implemention class for {@link IConfig}
@@ -18,11 +20,13 @@ import pasa.cbentley.core.src4.logging.IDLog;
  */
 public abstract class ConfigAbstract implements IConfig {
 
-   protected boolean    isEraseSettings;
+   protected boolean        isEraseSettings;
 
-   protected boolean    isIgnoreSettings;
+   protected boolean        isIgnoreSettings;
 
-   protected final UCtx uc;
+   protected UCtx           uc;
+
+   private ILogConfigurator logConfigurator;
 
    public ConfigAbstract(UCtx uc) {
       this.uc = uc;
@@ -91,6 +95,22 @@ public abstract class ConfigAbstract implements IConfig {
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "ConfigAbstract");
       toStringPrivate(dc);
+   }
+
+   public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {
+      if (logConfigurator == null) {
+         logConfigurator = new LogConfiguratorAllFinest();
+      }
+      return logConfigurator;
+   }
+
+   public void toStringSetDebugUCtx(UCtx uc) {
+      //no need to set it here since it already done in constructor
+      this.uc = uc;
+   }
+
+   public void toStringSetLogConfigurator(ILogConfigurator logConfigurator) {
+      this.logConfigurator = logConfigurator;
    }
 
    public UCtx toStringGetUCtx() {

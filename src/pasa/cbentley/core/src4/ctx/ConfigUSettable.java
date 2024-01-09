@@ -6,37 +6,36 @@ package pasa.cbentley.core.src4.ctx;
 
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.logging.ILogConfigurator;
+import pasa.cbentley.core.src4.logging.LogConfiguratorAllFinest;
 
 public class ConfigUSettable implements IConfigU {
 
-   private boolean isEraseSettings;
+   private String           encoding;
 
-   private boolean isEraseSettingsAll;
+   private boolean          isEraseSettings;
 
-   private boolean isForceExceptions;
+   private boolean          isEraseSettingsAll;
 
-   private boolean isHardcoded;
+   private boolean          isForceExceptions;
 
-   private boolean isIgnoreSettings;
+   private boolean          isHardcoded;
 
-   private boolean isIgnoreSettingsAll;
+   private boolean          isIgnoreSettings;
 
-   private boolean toStringIsUsingClassLinks;
+   private boolean          isIgnoreSettingsAll;
 
-   protected UCtx  uc;
+   private ILogConfigurator logConfigurator;
 
-   private String  encoding;
+   private boolean          toStringIsUsingClassLinks;
+
+   protected UCtx           uc;
 
    public ConfigUSettable() {
       encoding = "UTF-8";
    }
-
    public String getDefaultEncoding() {
       return encoding;
-   }
-
-   public void setDefaultEncoding(String encoding) {
-      this.encoding = encoding;
    }
 
    public boolean isEraseSettings() {
@@ -63,6 +62,10 @@ public class ConfigUSettable implements IConfigU {
       return isIgnoreSettingsAll;
    }
 
+   public void setDefaultEncoding(String encoding) {
+      this.encoding = encoding;
+   }
+
    public void setEraseSettings(boolean isEraseSettings) {
       this.isEraseSettings = isEraseSettings;
    }
@@ -87,6 +90,10 @@ public class ConfigUSettable implements IConfigU {
       this.isIgnoreSettingsAll = isIgnoreSettingsAll;
    }
 
+   public void setLogConfigurator(ILogConfigurator logConfigurator) {
+      this.logConfigurator = logConfigurator;
+   }
+   
    //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();
@@ -117,6 +124,13 @@ public class ConfigUSettable implements IConfigU {
       toStringPrivate(dc);
    }
 
+   public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {
+      if (logConfigurator == null) {
+         logConfigurator = new LogConfiguratorAllFinest();
+      }
+      return logConfigurator;
+   }
+
    public UCtx toStringGetUCtx() {
       return uc;
    }
@@ -124,8 +138,6 @@ public class ConfigUSettable implements IConfigU {
    public boolean toStringIsUsingClassLinks() {
       return toStringIsUsingClassLinks;
    }
-
-   //#enddebug
 
    private void toStringPrivate(Dctx dc) {
 
@@ -135,8 +147,12 @@ public class ConfigUSettable implements IConfigU {
       this.uc = uc;
    }
 
+   public void toStringSetLogConfigurator(ILogConfigurator logConfigurator) {
+      this.logConfigurator = logConfigurator;
+   }
+
    public void ToStringSetUsingClassLinks(boolean toStringIsUsingClassLinks) {
       this.toStringIsUsingClassLinks = toStringIsUsingClassLinks;
    }
-
+   //#enddebug
 }

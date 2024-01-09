@@ -7,6 +7,7 @@ package pasa.cbentley.core.src4.i8n;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IEventsCore;
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.event.IEventProducer;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -65,7 +66,11 @@ public interface IStringProducer extends IStringable {
    public IString getIString(String key, String def, String suffix);
 
    /**
+    * Returns the {@link IString} for the integer key and current {@link LocaleID}. 
     * 
+    * <p>
+    * If the key is not found, the {@link IString} is loaded with def String
+    * </p>
     * @param key
     * @param def
     * @return
@@ -73,20 +78,20 @@ public interface IStringProducer extends IStringable {
    public IString getIStringKey(int key, String def);
 
    /**
-    * 
+    * The {@link LocaleID} associated with the given suffix. null if suffix is not found
     * @param suf
     * @return
     */
    public LocaleID getLocale(String suf);
 
    /**
-    * Returns the current LocalID
+    * Returns the current {@link LocaleID} as decided by saved settings or currently by the user
     * @return
     */
    public LocaleID getLocaleID();
 
    /**
-    * 
+    * The default {@link LocaleID}
     * @return
     */
    public LocaleID getLocaleIDRoot();
@@ -98,7 +103,8 @@ public interface IStringProducer extends IStringable {
    public LocaleID[] getLocaleIDs();
 
    /**
-    * ID to register String events like Changes
+    * As defined in {@link IEventProducer#getProducerID()}
+    * The {@link IStringProducer} can generate events and needs its ID to register String events like Changes
     * @return
     */
    public int getProducerID();
@@ -140,7 +146,7 @@ public interface IStringProducer extends IStringable {
     * <br>
     * <br>
     * @param lid
-    * @param key
+    * @param key 1based index
     * @param string
     */
    public void setValue(ICtx cl, LocaleID lid, int key, String string);

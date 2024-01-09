@@ -24,6 +24,8 @@ import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.BaseDLogger;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.logging.IDLogConfig;
+import pasa.cbentley.core.src4.logging.ILogConfigurator;
 import pasa.cbentley.core.src4.logging.ILogEntryAppender;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.logging.IUserLog;
@@ -305,6 +307,10 @@ public class UCtx implements ICtx, IEventsCore {
    public UCtx(IConfigU config) {
       if (config == null) {
          config = new ConfigUDef(this);
+      } else {
+         //it cannot have been created with us
+         //#debug
+         config.toStringSetDebugUCtx(this);
       }
       this.config = config;
       setCtxManager(new CtxManager(this));
@@ -312,6 +318,7 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    private void aInit() {
+
       mem = new MemorySimpleCreator(this);
       stru = new StringUtils(this);
       cu = new CharUtils(this);
@@ -324,10 +331,22 @@ public class UCtx implements ICtx, IEventsCore {
       au = new ArrayUtils(this);
       iou = new IOUtils(this);
 
-      this.userLog = new UserLogSystemOut(this);
-
       //#debug
       dlog = new BaseDLogger(this);
+      ILogConfigurator logConfigurator = config.toStringGetLogConfigurator(this);
+      //TODO there might be different appenders with different configurations
+      //Files etc etc Here we deal with default appender
+      ILogEntryAppender logAppender = dlog.getDefault();
+      IDLogConfig configOfAppender = logAppender.getConfig();
+      logConfigurator.apply(configOfAppender); //apply config
+
+      String message = "Very First Log Message; Using LogConfigurator:" + logConfigurator.getClass().getName();
+      dlog.pAlways(message, null, UCtx.class, "constructor");
+      dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor");
+      dlog.pAlways("IUConfig", config, UCtx.class, "constructor");
+
+      //this is not for debug purposes. its the application log for the application user.
+      this.userLog = new UserLogSystemOut(this);
 
       eventBusRoot = new EventBusArray(this, this, getEventBaseTopology());
       registrationID = ctxManager.registerCtx(this);
@@ -336,8 +355,12 @@ public class UCtx implements ICtx, IEventsCore {
       ctxManager.registerStaticID(this, IEventsCore.SID_EVENTS_2);
 
       encoding = config.getDefaultEncoding();
+
       //#debug
       config.toStringSetDebugUCtx(this);
+
+      //#debug
+      toDLog().pInit("Created", this, UCtx.class, "aInit", LVL_05_FINE, true);
    }
 
    public void bip(Exception e, long bip) {
@@ -663,6 +686,12 @@ public class UCtx implements ICtx, IEventsCore {
     * @param title
     */
    public boolean toString(Dctx dctx, Object o, String title) {
+      if(o instanceof String) {
+         dctx.append(title);
+         dctx.append(" = ");
+         dctx.append((String)o);
+         return true;
+      } 
       return false;
    }
 

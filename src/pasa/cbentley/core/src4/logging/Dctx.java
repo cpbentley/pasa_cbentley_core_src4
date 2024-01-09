@@ -16,6 +16,8 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.BitUtils;
+import pasa.cbentley.core.src4.utils.ColorUtils;
+import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
  * Bastard context (lowercase C letter), so not a code context. 
@@ -303,6 +305,17 @@ public class Dctx implements IFlagsToString {
       sb.append(uc.getColorU().toStringColor(rgb));
    }
 
+   public void appendColorWithName(int rgb) {
+      this.appendColorWithName("color", rgb);
+   }
+
+   public void appendColorWithName(String color, int rgb) {
+      sb.append(color);
+      sb.append('=');
+      ColorUtils colorU = uc.getColorU();
+      colorU.toStringColorWithName(rgb, this);
+   }
+
    public void line() {
       this.nl();
    }
@@ -357,6 +370,13 @@ public class Dctx implements IFlagsToString {
       sb.append(s);
       sb.append('=');
       sb.append(v);
+   }
+
+   public void appendVarWithNewLine(String s, boolean v) {
+      nl();
+      sb.append(s);
+      sb.append('=');
+      sb.append(String.valueOf(v));
    }
 
    public void appendVarWithNewLine(String s, String v) {
@@ -585,7 +605,9 @@ public class Dctx implements IFlagsToString {
    }
 
    private String getClassSimpleName(Class cl) {
-      String str = uc.getStrU().getStringAfterLastIndex(cl.getName(), '.');
+      StringUtils strU = uc.getStrU();
+      String name = cl.getName();
+      String str = strU.getStringAfterLastIndex(name, '.');
       return str;
    }
 
@@ -1301,6 +1323,22 @@ public class Dctx implements IFlagsToString {
          if (o instanceof IStringable) {
             nlLvlTitleIfNull((IStringable) o, title);
          } else {
+            uc.toString(this, o, title);
+         }
+      }
+   }
+
+   public void nlLvlOWithTitle(Object o, String title, ICtx ctx) {
+      if (o == null) {
+         nlLvl((IStringable) null, title);
+      } else {
+         if (o instanceof IStringable) {
+            boolean showTitleWhenNotNull = true;
+            boolean listNulls = true;
+            boolean isTitleSuffix = false;
+            nlLvl(title, (IStringable) o, 0, isTitleSuffix, listNulls, showTitleWhenNotNull);
+         } else {
+            this.nl();
             uc.toString(this, o, title);
          }
       }

@@ -15,7 +15,7 @@ import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 
 /**
- * 
+ * What is this ?
  * @author Charles Bentley
  *
  */
@@ -129,7 +129,7 @@ public class CtxStator implements IStatorable {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "CtxStator");
+      dc.root(this, CtxStator.class, "132");
       toStringPrivate(dc);
    }
 

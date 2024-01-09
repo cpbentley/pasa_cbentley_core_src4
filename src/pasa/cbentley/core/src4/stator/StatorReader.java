@@ -14,6 +14,23 @@ import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
+/**
+ * Read bytes from a store and transform it into application state.
+ * 
+ * <p>
+ * {@link IStatorFactory} is the interface through which object instances are created
+ * When creating a {@link StatorReader}, application must register enough {@link IStatorFactory} instances
+ * with {@link StatorReader#addFactory(IStatorFactory)} for all its classes stored
+ * 
+ * {@link IStatorable} is the interface
+ * </p>
+ * <p>
+ * To write application state, use {@link StatorWriter}
+ * </p>
+ * 
+ * @author Charles Bentley
+ *
+ */
 public class StatorReader implements IStringable, ITechStator {
 
    /**
@@ -41,6 +58,10 @@ public class StatorReader implements IStringable, ITechStator {
 
    protected final UCtx   uc;
 
+   /**
+    * Basic constructor
+    * @param uc
+    */
    public StatorReader(UCtx uc) {
       this.uc = uc;
       factories = new IntToObjects(uc);
@@ -51,6 +72,11 @@ public class StatorReader implements IStringable, ITechStator {
       factories.addUnique(factory);
    }
 
+   /**
+    * Create object of given class without giving a current instance
+    * @param type
+    * @return
+    */
    public Object createObject(Class type) {
       return createObject(type, null);
    }
@@ -146,8 +172,10 @@ public class StatorReader implements IStringable, ITechStator {
    }
 
    /**
+    * Import the objects inside the stator serialized byte array.
     * equivalent of {@link StatorWriter#serialize()}
     * @param data
+    * @throws IllegalArgumentException when data does not start with MAGIC 4 bytes
     */
    public void importFrom(byte[] data) {
       this.data = data;
@@ -189,7 +217,7 @@ public class StatorReader implements IStringable, ITechStator {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "State");
+      dc.root(this, "StatorReader");
       toStringPrivate(dc);
    }
 
@@ -198,7 +226,7 @@ public class StatorReader implements IStringable, ITechStator {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "State");
+      dc.root1Line(this, "StatorReader");
       toStringPrivate(dc);
    }
 

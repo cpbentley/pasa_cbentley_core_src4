@@ -2,6 +2,7 @@ package pasa.cbentley.core.src4.io;
 
 import java.io.InputStream;
 
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 
 /**
@@ -21,10 +22,15 @@ public class FileLineReader {
 
    private UCtx        uc;
 
+
    public FileLineReader(UCtx uc, ILineReader reader, String file) {
       this.uc = uc;
       this.reader = reader;
       this.file = file;
+   }
+
+   public FileLineReader(UCtx uc,ILineReader reader) {
+      this(uc, reader, null);
    }
 
    public String getEncoding() {

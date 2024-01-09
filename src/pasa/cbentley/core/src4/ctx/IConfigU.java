@@ -4,19 +4,29 @@
  */
 package pasa.cbentley.core.src4.ctx;
 
+import pasa.cbentley.core.src4.i8n.LocaleID;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.ILogConfigurator;
 
+/**
+ * Configures this {@link UCtx} module.
+ * 
+ * <li> Default encoding,
+ * <li> How to use saved settings. i.e. configuration values modified and saved by the user
+ * <ol>Force their erasur reset them
+ * <ol>ignore them.. for debug purposes usually
+ * <li> Local -> {@link LocaleID}
+ * 
+ * <p>
+ * 
+ * </p>
+ * @author Charles Bentley
+ *
+ */
 public interface IConfigU extends IConfig {
 
-   /**
-    * Master control flag for all sub code contexts.
-    * <br>
-    * When true, system assumes all configuration return true for {@link IConfig#isIgnoreSettings()}
-    * 
-    * 
-    * @return
-    */
-   public boolean isIgnoreSettingsAll();
+   public String getDefaultEncoding();
+
    /**
     * When true, clean up everything upon start
     * @return
@@ -28,17 +38,45 @@ public interface IConfigU extends IConfig {
     * @return
     */
    public boolean isForceExceptions();
-   
-   public String getDefaultEncoding();
-   
+
+   /**
+    * Master control flag for all sub code contexts.
+    * <br>
+    * When true, system assumes all configuration return true for {@link IConfig#isIgnoreSettings()}
+    * 
+    * 
+    * @return
+    */
+   public boolean isIgnoreSettingsAll();
+
    //#mdebug
-   public void toStringSetDebugUCtx(UCtx uc);
-   
+   /**
+    * A non null {@link ILogConfigurator}.
+    * Create a default one if necessary
+    * @param uc
+    * @return
+    */
+   public ILogConfigurator toStringGetLogConfigurator(UCtx uc);
+
    /**
     * is {@link Dctx} using class links instead of #
     * @param uc
     */
    public boolean toStringIsUsingClassLinks();
+
+   /**
+    * Sets the {@link UCtx} on the config for debug purposes.
+    * The config needs a reference to {@link UCtx} to acces toString methods and the logger.
+    * @param uc
+    */
+   public void toStringSetDebugUCtx(UCtx uc);
+
+   /**
+    * Sets the {@link ILogConfigurator} to be retrieved with {@link IConfigU#toStringGetLogConfigurator(UCtx)}
+    * @param logConfigurator
+    * @return
+    */
+   public void toStringSetLogConfigurator(ILogConfigurator logConfigurator);
 
    //#enddebug
 }

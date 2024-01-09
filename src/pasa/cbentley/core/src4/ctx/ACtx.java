@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.ctx;
 
+import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.utils.BitUtils;
@@ -100,32 +101,32 @@ public abstract class ACtx implements ICtx {
    }
 
    /**
-    * Domain: TODO starts at 0 or 1?
+    * @return 1 index based ID that was provided by the {@link CtxManager}
     */
    public int getRegistrationID() {
       return id;
    }
 
    /**
-    * Global method all ctxs
-    */
-   public void implementationProblem() {
-      throw new RuntimeException();
-   }
-
-   /**
-    * Context manager
+    * Returns the data that was read from the store by the {@link CtxManager}.
+    * and set using {@link ACtx#setSettings(byte[])}
+    * 
+    * <p>
+    * It is then used by the implementation to read its settings
+    * </p>
     */
    public byte[] getSettings() {
       return data;
    }
 
    /**
+    * Context implementation returns the 0 based value from key based on the type of static domains.
     * 
+    * @param type.. for example {@link IStringsKernel#SID_STRINGS_1}
+    * @param key.. a key
     */
    public int getStaticKeyRegistrationID(int type, int key) {
-      // TODO Auto-generated method stub
-      return 0;
+      throw new RuntimeException("cannot be called here. must implemented");
    }
 
    /**
@@ -142,6 +143,13 @@ public abstract class ACtx implements ICtx {
     */
    public boolean hasCtxData() {
       return data != null;
+   }
+
+   /**
+    * Global method all ctxs
+    */
+   public void implementationProblem() {
+      throw new RuntimeException();
    }
 
    public void setSettings(byte[] data) {
@@ -191,8 +199,18 @@ public abstract class ACtx implements ICtx {
       }
    }
 
+   public void toStringCheckNull(Object o) {
+      if (o == null) {
+         throw new NullPointerException();
+      }
+   }
+
    public String toStringEventID(int pid, int eid) {
       return null;
+   }
+
+   public void toStringFlagSetOn(int flag, boolean b, Dctx dctx) {
+      //we don't do anything by default
    }
 
    /**
@@ -229,16 +247,6 @@ public abstract class ACtx implements ICtx {
 
    public void toStringSetToStringFlag(int flags) {
       toStringFlags = flags;
-   }
-
-   public void toStringCheckNull(Object o) {
-      if (o == null) {
-         throw new NullPointerException();
-      }
-   }
-
-   public void toStringFlagSetOn(int flag, boolean b, Dctx dctx) {
-      //we don't do anything by default
    }
 
    /**
