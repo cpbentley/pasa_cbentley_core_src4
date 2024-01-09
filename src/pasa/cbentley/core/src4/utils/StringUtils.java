@@ -69,13 +69,26 @@ public class StringUtils {
    public static final char   BLOCK_FULL               = '\u2588';
 
    /**
-    * sadasd ▉ ▁
+    * [▉]
     */
    public static final char   BLOCK_7_OF_8               = '\u2589';
    /**
-    * u2581 = [ ▁
+    * u2581 = [▁]
     */
    public static final char   BLOCK_BOT_1_OF_8               = '\u2581';
+
+   /**
+    * u2594 = [▔]
+    */
+   public static final char   BLOCK_TOP_1_OF_8               = '\u2594';
+   /**
+    * u258F = [▏] [▏▔▏]
+    */
+   public static final char   BLOCK_LEFT_1_OF_8               = '\u2594';
+   /**
+    * u2595 = [▕] [▕▔]
+    */
+   public static final char   BLOCK_RIGHT_1_OF_8               = '\u2595';
 
    /**
     * [■] alt+254 ▉
