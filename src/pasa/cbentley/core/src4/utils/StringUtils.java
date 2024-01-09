@@ -11,7 +11,7 @@ import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.core.src4.structs.IntIntervals;
 
 /**
- * 
+ * More comment
  * @author Charles Bentley
  *
  */
