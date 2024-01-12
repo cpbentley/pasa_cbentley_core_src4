@@ -102,11 +102,30 @@ public class IntIntervals extends ObjectU {
       return this.addInterval(offsetStart, offsetEnd - offsetStart, payload);
    }
 
-   private int getInsertionIndex(int offset) {
+
+   /**
+    * Return insertion index
+    * @param intervalToBeAdded
+    * @return -1 if interval was not addded because existing range is alreayd there
+    */
+   private int addIntervalInternal(IntInterval intervalToBeAdded) {
+      //
+      int offset = intervalToBeAdded.getOffset();
       int insertionIndex = 0;
       for (int i = 0; i < numIntervals; i++) {
          IntInterval intervalFromArray = intervals[i]; //interval to check. 
-         if (offset <= intervalFromArray.getOffset()) {
+         if (offset < intervalFromArray.getOffset()) {
+            break;
+         } else if (offset == intervalFromArray.getOffset()) {
+            if (intervalFromArray.getLen() == intervalToBeAdded.getLen()) {
+               if (isPayLoadCheck) {
+                  if (intervalToBeAdded.getPayload() != intervalFromArray.getPayload()) {
+                     intervals[i] = intervalToBeAdded;
+                     return i;
+                  }
+               }
+            }
+            //stop here after dealing with the exception of equality
             break;
          }
          insertionIndex++;
@@ -118,19 +137,7 @@ public class IntIntervals extends ObjectU {
             insertionIndex = insertionIndex - 1;
          }
       }
-      return insertionIndex;
-   }
-
-   /**
-    * Return insertion index
-    * @param intervalToBeAdded
-    * @return -1 if interval was not addded because existing range is alreayd there
-    */
-   private int addIntervalInternal(IntInterval intervalToBeAdded) {
-      //
-      int offsetAdded = intervalToBeAdded.getOffset();
-      int index = getInsertionIndex(offsetAdded);
-      int count = 0;
+      int index = insertionIndex;
       int removedStartIndex = -1; //removed intervals due to merges are always contiguous
       int numRemoved = 0;
       int finalInsertionIndex = -1;
@@ -155,22 +162,38 @@ public class IntIntervals extends ObjectU {
                   //we create intervals from complements
 
                   if (intervalToBeAdded.getPayload() != intervalFromArray.getPayload()) {
-
-                     //harder case since we have to create new intervals based on complements of intersect
-                     IntInterval intersectComplementLeft = irr.getIntersectComplementLeft();
-                     if (intersectComplementLeft != null) {
-                        intersectComplementLeft.setPayload(intervalFromArray.getPayload());
-                        intervals[i] = intersectComplementLeft;
-                        addAt(i + 1, intervalToBeAdded);
-                        finalInsertionIndex = i + 1;
+                     if (finalInsertionIndex != -1) {
+                        //intersect add here is impossible by construction
+                        //was already add because it is right adjacent. 
+                        //so we only have to do the right complement here
+                        //by taking intervalFromArray and reducing it
+                        int offsetStart = intervalToBeAdded.getOffsetEnd();
+                        int len = intervalFromArray.getLen() - intervalToBeAdded.getLen();
+                        intervalFromArray.setOffset(offsetStart);
+                        intervalFromArray.setLen(len);
                      } else {
-                        intervals[i] = intervalToBeAdded;
-                        finalInsertionIndex = i;
+                        //harder case since we have to create new intervals based on complements of intersect
+                        IntInterval intersectComplementLeft = irr.getIntersectComplementLeft();
+                        if (intersectComplementLeft != null) {
+                           intersectComplementLeft.setPayload(intervalFromArray.getPayload());
+                           intervals[i] = intersectComplementLeft;
+                           addAt(i + 1, intervalToBeAdded);
+                           finalInsertionIndex = i + 1;
+                        } else {
+                           intervals[i] = intervalToBeAdded;
+                           finalInsertionIndex = i;
+                        }
+                        IntInterval intersectComplementRight = irr.getIntersectComplementRight();
+                        if (intersectComplementRight != null) {
+                           intersectComplementRight.setPayload(intervalFromArray.getPayload());
+                           addAt(finalInsertionIndex + 1, intersectComplementRight);
+                        }
                      }
-                     IntInterval intersectComplementRight = irr.getIntersectComplementRight();
-                     if (intersectComplementRight != null) {
-                        intersectComplementRight.setPayload(intervalFromArray.getPayload());
-                        addAt(finalInsertionIndex + 1, intersectComplementRight);
+                  } else {
+                     if (finalInsertionIndex != -1) {
+                        //remove what we just added ;) because it is inside
+                        removedStartIndex = finalInsertionIndex;
+                        numRemoved++;
                      }
                   }
                }
@@ -240,6 +263,7 @@ public class IntIntervals extends ObjectU {
                if (isPayLoadCheck && intervalToBeAdded.getPayload() != intervalFromArray.getPayload()) {
                   if (finalInsertionIndex == -1) {
                      finalInsertionIndex = i;
+                     //TODO adjacent but might merge with next interval
                      if (irr.isTwoFirst()) {
                         //when it is adjacent on the right.. add on the next index
                         finalInsertionIndex++;

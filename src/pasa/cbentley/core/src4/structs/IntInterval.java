@@ -123,8 +123,8 @@ public class IntInterval extends ObjectU {
     */
    public int getDistanceToEnd(int offset) {
       return this.offset + this.len - offset;
-   } 
-   
+   }
+
    /**
     * Distance from the startOffset.
     * <li> 10:8 -> [10,17] and offset=15 return 15-10 = 5
@@ -417,6 +417,10 @@ public class IntInterval extends ObjectU {
       super.toString1Line(dc.sup1Line());
    }
 
+   public String toStringOffsetsBracket() {
+      return "[" + offset + "," + (offset + len - 1) + "]";
+   }
+
    public String toStringOffsets() {
       return offset + "," + (offset + len);
    }
@@ -427,7 +431,7 @@ public class IntInterval extends ObjectU {
       dc.append(" -> [");
       dc.append(offset);
       dc.append(",");
-      dc.append((offset + len-1));
+      dc.append((offset + len - 1));
       dc.append("]");
    }
 
