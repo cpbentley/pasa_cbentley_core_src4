@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import pasa.cbentley.core.src4.ctx.ICtx;
-import pasa.cbentley.core.src4.ctx.IFlagsToString;
+import pasa.cbentley.core.src4.ctx.IToStringFlags;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.CounterInt;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
@@ -36,7 +36,7 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * @author Charles Bentley
  *
  */
-public class Dctx implements IFlagsToString {
+public class Dctx implements IToStringFlags {
    //#mdebug
 
    /**
@@ -628,7 +628,7 @@ public class Dctx implements IFlagsToString {
    }
 
    /**
-    * Flag from a marked prefixed interface {@link IFlagsToString}
+    * Flag from a marked prefixed interface {@link IToStringFlags}
     * 
     * @param ctx
     * @param flag

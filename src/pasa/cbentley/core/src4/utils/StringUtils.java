@@ -36,10 +36,16 @@ public class StringUtils {
 
    public static final char   NO_BREAKING_SPACE        = '\u00A0';
 
+   /**
+    * Zero width in Swing
+    */
    public static final char   NEW_LINE                 = '\n';
 
    /**
     * Windows puts a \r in front of new lines so we have to handle \r\n
+    * <p>
+    * Zero width in Swing
+    * </p>
     */
    public static final char   NEW_LINE_CARRIAGE_RETURN = '\r';
 
@@ -64,6 +70,31 @@ public class StringUtils {
    public static final char   SIX_PER_EM_SPACE         = '\u2006';
 
    /**
+    * 2640 = ♀
+    */
+   public static final char   GENDER_FEMALE            = '\u2640';
+
+   /**
+    * 2642 = ♂
+    */
+   public static final char   GENDER_MALE              = '\u2642';
+
+   /**
+    * 2641 = ♁ 
+    */
+   public static final char   GENDER_EARTH             = '\u2641';
+
+   /**
+    * 263C = ☼ 
+    */
+   public static final char   GENDER_SUN               = '\u263C';
+
+   /**
+    * 263A = ☺
+    */
+   public static final char   GENDER_WHITE_SMILEY      = '\u263A';
+
+   /**
     * [█]
     */
    public static final char   BLOCK_FULL               = '\u2588';
@@ -71,24 +102,27 @@ public class StringUtils {
    /**
     * [▉]
     */
-   public static final char   BLOCK_7_OF_8               = '\u2589';
+   public static final char   BLOCK_7_OF_8             = '\u2589';
+
    /**
     * u2581 = [▁]
     */
-   public static final char   BLOCK_BOT_1_OF_8               = '\u2581';
+   public static final char   BLOCK_BOT_1_OF_8         = '\u2581';
 
    /**
     * u2594 = [▔]
     */
-   public static final char   BLOCK_TOP_1_OF_8               = '\u2594';
+   public static final char   BLOCK_TOP_1_OF_8         = '\u2594';
+
    /**
     * u258F = [▏] [▏▔▏]
     */
-   public static final char   BLOCK_LEFT_1_OF_8               = '\u2594';
+   public static final char   BLOCK_LEFT_1_OF_8        = '\u2594';
+
    /**
     * u2595 = [▕] [▕▔]
     */
-   public static final char   BLOCK_RIGHT_1_OF_8               = '\u2595';
+   public static final char   BLOCK_RIGHT_1_OF_8       = '\u2595';
 
    /**
     * [■] alt+254 ▉
@@ -119,7 +153,7 @@ public class StringUtils {
    /**
     * '\u000A' is illegal because compiler interprets it as a \n
     */
-   public static final char   LINE_FEED                 = '\n';
+   public static final char   LINE_FEED                = '\n';
 
    /**
     * «—» [—][-][+]
@@ -151,17 +185,37 @@ public class StringUtils {
    public static final char   TAB_CHAR                 = '\u0009';
 
    /**
-    * 
+    *  00B7 = ·
     */
    public static final char   INTER_PUNCT              = '\u00B7';
 
    public static final char   BOTTOM_SQUARE_BRACKET    = '\u23B5';
 
+   /**
+    *    23CE = ⏎ 
+    *    
+    */
    public static final char   SYMBOL_RETURN            = '\u23CE';
+
+   /**
+    *  21B5 = ↵
+    */
+   public static final char   LINE_BREAK_RETURN        = '\u21B5';
 
    public static final char   ESCAPE_CHAR              = '\\';
 
+   /**
+    * sad →
+    */
    public static final char   ARROW_RIGHT              = '\u2192';
+
+   /**
+    * [°] 
+    * <p>
+    * DEGREE SIGN, representing a non-breaking space (NBSP) character
+    * </p>
+    */
+   public static final char   DEGREE                   = '\u00B0';
 
    public static final char   SYMBOL_FOR_SPACE         = '\u2420';
 

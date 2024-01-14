@@ -25,14 +25,6 @@ import pasa.cbentley.core.src4.logging.IStringable;
  */
 public interface ICtx extends IStringable {
 
-   public static final int STATIC_ID_01_STRINGS = IStringsKernel.SID_STRINGS_1;
-
-   /**
-    * ID used to register events
-    * <li>{@link CtxManager#registerStaticID(ICtx, int)}
-    * <li>{@link CtxManager#registerStaticRange(ICtx, int, int, int)}
-    */
-   public static final int STATIC_ID_02_EVENTS  = IEventsCore.SID_EVENTS_2;
 
    /**
     * Unique id 1 to 255. Used to create unique integer IDs.

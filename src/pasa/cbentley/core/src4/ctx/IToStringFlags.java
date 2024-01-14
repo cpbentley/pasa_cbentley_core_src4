@@ -12,7 +12,9 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * ToString flags are set directly on {@link UCtx#toStringSetToStringFlag(int, boolean)} or
  * {@link ACtx#toStringSetToStringFlag(int, boolean)}
  * 
- * Tagging interface
+ * <p>
+ * Tagging interface for all prefixed IFlagsToString 
+ * </p>
  * 
  * Flags set on a module context instance, 
  * 
@@ -24,7 +26,7 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * @author Charles Bentley
  *
  */
-public interface IFlagsToString extends IFlags {
+public interface IToStringFlags extends IFlags {
 
    //#mdebug
    public static final int D_FLAG_31_IGNORE_SERIALIZE = 0;

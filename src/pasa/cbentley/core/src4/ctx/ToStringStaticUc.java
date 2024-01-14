@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.ctx;
 
+import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.ITechTransform;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 
@@ -52,6 +53,21 @@ public class ToStringStaticUc extends ToStringStaticBase {
             return "Mirror_Rotation90";
          default:
             return "Unknown Transform " + trans;
+      }
+   }
+
+   public static String toStringDiagDir(int type) {
+      switch (type) {
+         case C.DIAG_DIR_0_TOP_LEFT:
+            return "TopLeft";
+         case C.DIAG_DIR_1_TOP_RIGHT:
+            return "TopRight";
+         case C.DIAG_DIR_2_BOT_LEFT:
+            return "BotLeft";
+         case C.DIAG_DIR_3_BOT_RIGHT:
+            return "BotRight";
+         default:
+            return "UnknownDiagDir";
       }
    }
 }

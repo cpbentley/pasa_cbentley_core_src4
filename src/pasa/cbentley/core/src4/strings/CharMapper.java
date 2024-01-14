@@ -76,6 +76,11 @@ public class CharMapper extends ObjectU {
     * Build the char array to be used for the line
     */
    public void build() {
+      
+      if(charsSrc == null) {
+         throw new IllegalStateException("must set source char");
+      }
+      
       int totalSizeCharArray = lengthSrc;
       int size = buff.getSize();
       for (int i = 0; i < size;) {
@@ -180,10 +185,26 @@ public class CharMapper extends ObjectU {
       return sb.toString();
    }
 
+   /**
+    * Reference to the array of mapped characters 
+    * @return
+    */
+   public char[] getCharsMapped() {
+      return chars;
+   }
+
+   /**
+    * The String of the map
+    * @return
+    */
    public String getStringMapped() {
       return new String(chars);
    }
 
+   /**
+    * The String of the source
+    * @return
+    */
    public String getStringSrc() {
       return new String(charsSrc, offsetSrc, lengthSrc);
    }

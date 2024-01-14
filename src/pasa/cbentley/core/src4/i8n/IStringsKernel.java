@@ -25,8 +25,6 @@ import pasa.cbentley.core.src4.ctx.ICtx;
  */
 public interface IStringsKernel {
 
-   public static final int SID_STRINGS_1    = 1;
-
    /**
     * Lower bound of the range. We use 1based index to match line numbers in a file
     * which is easier for human to think about.

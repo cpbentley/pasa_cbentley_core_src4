@@ -19,9 +19,9 @@ public interface IFeaturable extends IStringable {
    public int getFeatureInt(int featureID);
 
    /**
-    * 
+    * Returns the object associated with the given feature, identfied by its ID.
     * @param featureID
-    * @return
+    * @return null if that feature has no object for this {@link IFeaturable}
     */
    public Object getFeatureObject(int featureID);
 

@@ -128,6 +128,6 @@ public interface IEventsCore extends IEvents {
    /**
     * Static ID for events. Registered in {@link CtxManager#registerStaticID(ICtx, int)}
     */
-   public static final int SID_EVENTS_2                       = 2;
+   public static final int SID_EVENTS_2                       = IStaticIDs.SID_EVENTS;
 
 }

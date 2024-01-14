@@ -122,7 +122,7 @@ public abstract class ACtx implements ICtx {
    /**
     * Context implementation returns the 0 based value from key based on the type of static domains.
     * 
-    * @param type.. for example {@link IStringsKernel#SID_STRINGS_1}
+    * @param type.. for example {@link IStringsKernel#SID_STRINGS}
     * @param key.. a key
     */
    public int getStaticKeyRegistrationID(int type, int key) {
@@ -247,6 +247,10 @@ public abstract class ACtx implements ICtx {
 
    public void toStringSetToStringFlag(int flags) {
       toStringFlags = flags;
+   }
+
+   public String toStringGetDIDString(int did, int value) {
+      return uc.toStringGetDIDManager().toStringGetDIDString(did, value);
    }
 
    /**

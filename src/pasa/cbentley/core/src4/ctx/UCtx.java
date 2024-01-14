@@ -22,6 +22,7 @@ import pasa.cbentley.core.src4.io.BAByteOS;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.BaseDLogger;
+import pasa.cbentley.core.src4.logging.DIDManager;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IDLogConfig;
@@ -119,7 +120,7 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  * <ul>
  * <li> {@link IConfig} and possibly a default Java implementation of it.
  * <li>IEvents prefixed interfaces such as {@link IEventsCore} are located in ctx package.
- * <li>{@link IFlagsToString} prefixed interfaces used to dynamically configure a {@link Dctx}
+ * <li>{@link IToStringFlags} prefixed interfaces used to dynamically configure a {@link Dctx}
  * <li>{@link ToStringStaticUc} for debugging integer constant object of the code context
  * <li> The <code>.ctx</code> contains an IEvents interface and IStrings and any interface defining
  * 
@@ -278,6 +279,8 @@ public class UCtx implements ICtx, IEventsCore {
 
    private String          encoding;
 
+   private DIDManager      didManager;
+
    /**
     * Assume a simple Java Host 
     */
@@ -351,11 +354,17 @@ public class UCtx implements ICtx, IEventsCore {
       eventBusRoot = new EventBusArray(this, this, getEventBaseTopology());
       registrationID = ctxManager.registerCtx(this);
 
-      ctxManager.registerStaticID(this, IStringsKernel.SID_STRINGS_1);
-      ctxManager.registerStaticID(this, IEventsCore.SID_EVENTS_2);
+      ctxManager.registerStaticID(this, IStaticIDs.SID_STRINGS);
+      ctxManager.registerStaticID(this, IStaticIDs.SID_EVENTS);
+      //#debug
+      ctxManager.registerStaticID(this, IStaticIDs.SID_DIDS);
+      //#debug
+      ctxManager.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringDIDs.A_DID_OFFSET_A_UC, IToStringDIDs.A_DID_OFFSET_Z_UC);
 
       encoding = config.getDefaultEncoding();
 
+      //#debug
+      didManager = new DIDManager(this);
       //#debug
       config.toStringSetDebugUCtx(this);
 
@@ -657,6 +666,10 @@ public class UCtx implements ICtx, IEventsCore {
       }
    }
 
+   public DIDManager toStringGetDIDManager() {
+      return didManager;
+   }
+
    public String toString() {
       return Dctx.toString(this);
    }
@@ -686,12 +699,12 @@ public class UCtx implements ICtx, IEventsCore {
     * @param title
     */
    public boolean toString(Dctx dctx, Object o, String title) {
-      if(o instanceof String) {
+      if (o instanceof String) {
          dctx.append(title);
          dctx.append(" = ");
-         dctx.append((String)o);
+         dctx.append((String) o);
          return true;
-      } 
+      }
       return false;
    }
 
