@@ -43,6 +43,10 @@ public class IntIntervalRelation extends ObjectU {
 
    private boolean     isTwoFirst;
 
+   private boolean     isOneLast;
+
+   private boolean     isTwoLast;
+
    /**
     * Length between extremities. negative when there is an intersect
     */
@@ -65,6 +69,8 @@ public class IntIntervalRelation extends ObjectU {
       isTwoContainedInOne = false;
       isOneFirst = false;
       isTwoFirst = false;
+      isTwoLast = false;
+      isOneLast = false;
       isSameOffsetStart = false;
       isSameOffsetEnd = false;
       isSameLength = false;
@@ -72,71 +78,59 @@ public class IntIntervalRelation extends ObjectU {
       intersectComplementLeft = null;
       intersectComplementRight = null;
       intervalIntersect = null;
-      int offsetDifference = intervalOne.getOffset() - intervalTwo.getOffset();
-      int lenDifference = intervalOne.getLen() - intervalTwo.getLen();
+      int offset1 = intervalOne.getOffset();
+      int offset2 = intervalTwo.getOffset();
+      int offsetDifference = offset1 - offset2;
+      int len1 = intervalOne.getLen();
+      int len2 = intervalTwo.getLen();
+      int lenDifference = len1 - len2;
+      int offsetEnd1 = intervalOne.getOffsetEnd();
+      int offsetEnd2 = intervalTwo.getOffsetEnd();
+      int offsetEndDifference = offsetEnd1 - offsetEnd2;
       if (lenDifference == 0) {
          isSameLength = true;
       }
-      if (intervalOne.getOffsetEnd() == intervalTwo.getOffsetEnd()) {
+      if (offsetEndDifference == 0) {
          isSameOffsetEnd = true;
+      } else if (offsetEndDifference > 0) {
+         isOneLast = true;
+      } else {
+         isTwoLast = true;
       }
+
       if (offsetDifference == 0) {
          isSameOffsetStart = true;
+      } else if (offsetDifference > 0) {
+         isTwoFirst = true;
+      } else {
+         isOneFirst = true;
       }
+
       int intersectOffset = 0;
       int intersectLen = 0;
+
       if (offsetDifference > 0) {
          //two is strictly lower than one
-         isTwoFirst = true;
-         intersectOffset = intervalOne.getOffset();
-         intersectLen = intervalTwo.getOffset() + intervalTwo.getLen() - intervalOne.getOffset();
-         int complementLeftLen = intervalOne.getOffset() - intervalTwo.getOffset();
-         intersectComplementLeft = new IntInterval(uc, intervalTwo.getOffset(), complementLeftLen);
-
-         if (intersectLen > intervalOne.getLen()) {
-            intersectLen = intervalOne.getLen();
-
-            //we have a right complement
-            int complementRightLen = intervalTwo.getOffsetEnd() - intervalOne.getOffsetEnd();
-            intersectComplementRight = new IntInterval(uc, intervalOne.getOffsetEnd(), complementRightLen);
-
+         intersectOffset = offset1;
+         intersectLen = offset2 + len2 - offset1;
+         if (intersectLen > len1) {
+            intersectLen = len1;
          }
-         distance = intervalOne.getOffset() - intervalTwo.getOffsetEnd();
+         distance = offset1 - offsetEnd2;
          if (distance == 0) {
             isAdjacent = true;
          }
 
       } else {
          //two is higher or equal than one
-         intersectOffset = intervalTwo.getOffset();
+         intersectOffset = offset2;
          //usual case when one is not full contained in the other
-         intersectLen = intervalOne.getOffsetEnd() - intervalTwo.getOffset(); 
-         if (offsetDifference < 0) {
-            //we have a left complement
-            isOneFirst = true;
-            int complementLeftLen = intervalTwo.getOffset() - intervalOne.getOffset();
-            intersectComplementLeft = new IntInterval(uc, intervalOne.getOffset(), complementLeftLen);
-         } else {
-            //no left complement
-         
-         }
-            
-         if (isSameOffsetEnd) {
-         
-            //no complement since we have the same end
-         } else if (intersectLen > intervalTwo.getLen()) {
+         intersectLen = offsetEnd1 - offset2;
+         if (intersectLen > len2) {
             //assumed length of intersect is too big.. cap it at smaller sized interval
-            intersectLen = intervalTwo.getLen();
-
-            //another complement when fully contained
-            //we have a right complement
-            int complementRightLen = intervalOne.getOffsetEnd() - intervalTwo.getOffsetEnd();
-            intersectComplementRight = new IntInterval(uc, intervalTwo.getOffsetEnd(), complementRightLen);
-
-         } else {
-            
+            intersectLen = len2;
          }
-         distance = intervalTwo.getOffset() - intervalOne.getOffsetEnd();
+         distance = offset2 - offsetEnd1;
          if (distance == 0) {
             isAdjacent = true;
          }
@@ -145,8 +139,30 @@ public class IntIntervalRelation extends ObjectU {
       isOneContainedInTwo = intervalOne.isContainedBy(intervalTwo);
       if (intersectLen > 0) {
          intervalIntersect = new IntInterval(uc, intersectOffset, intersectLen);
-      }
 
+         ///LEFT complement
+         //when intersection compute complements
+         if (!isSameOffsetStart) {
+            if (isOneFirst) {
+               int complementLeftLen = offset2 - offset1;
+               intersectComplementLeft = new IntInterval(uc, offset1, complementLeftLen);
+            } else {
+               int complementLeftLen = offsetDifference;
+               intersectComplementLeft = new IntInterval(uc, offset2, complementLeftLen);
+            }
+         }
+         //RIGHT
+         if (!isSameOffsetEnd) {
+            //sometimes none is first
+            if (isOneLast) {
+               int complementRightLen = offsetEndDifference;
+               intersectComplementRight = new IntInterval(uc, offsetEnd2, complementRightLen);
+            } else {
+               int complementRightLen = offsetEnd2 - offsetEnd1;
+               intersectComplementRight = new IntInterval(uc, offsetEnd1, complementRightLen);
+            }
+         }
+      }
    }
 
    /**
@@ -294,6 +310,14 @@ public class IntIntervalRelation extends ObjectU {
       dc.root1Line(this, IntIntervalRelation.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
+   }
+
+   public boolean isTwoLast() {
+      return isTwoLast;
+   }
+
+   public boolean isOneLast() {
+      return isOneLast;
    }
 
    //#enddebug
