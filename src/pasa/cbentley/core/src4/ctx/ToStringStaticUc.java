@@ -5,6 +5,7 @@
 package pasa.cbentley.core.src4.ctx;
 
 import pasa.cbentley.core.src4.interfaces.C;
+import pasa.cbentley.core.src4.interfaces.ITechThread;
 import pasa.cbentley.core.src4.interfaces.ITechTransform;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 
@@ -68,6 +69,38 @@ public class ToStringStaticUc extends ToStringStaticBase {
             return "BotRight";
          default:
             return "UnknownDiagDir";
+      }
+   }
+
+   public static String toStringThreadMode(int mode) {
+      switch (mode) {
+         case ITechThread.THREAD_MODE_0_POST_NOW:
+            return "PostNow";
+         case ITechThread.THREAD_MODE_1_MAIN_NOW:
+            return "MainNow";
+         case ITechThread.THREAD_MODE_2_MAIN_LATER:
+            return "MainLater";
+         case ITechThread.THREAD_MODE_3_WORKER:
+            return "Worker";
+         default:
+            return "Unknown " + mode;
+      }
+   }
+
+   public static String toStringThreadState(int state) {
+      switch (state) {
+         case ITechThread.STATE_0_ON:
+            return "On";
+         case ITechThread.STATE_1_OFF:
+            return "Off";
+         case ITechThread.STATE_2_SHUT_DOWN:
+            return "Shutdown";
+         case ITechThread.STATE_3_PAUSED:
+            return "Paused";
+         case ITechThread.STATE_4_KEEP_ON:
+            return "KeepOn";
+         default:
+            return "Unknown " + state;
       }
    }
 }

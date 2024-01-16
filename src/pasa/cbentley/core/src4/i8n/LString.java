@@ -90,7 +90,7 @@ public class LString implements IString {
     * @param key
     */
    public LString(IStringProducer dd, int key) {
-      this(dd,key,null);
+      this(dd, key, null);
    }
 
    /**
@@ -117,6 +117,10 @@ public class LString implements IString {
       this.id = id;
       this.def = def;
       myString = def;
+   }
+
+   public String getPrefix() {
+      return prefix;
    }
 
    /**

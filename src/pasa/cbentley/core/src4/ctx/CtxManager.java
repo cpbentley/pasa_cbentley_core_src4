@@ -121,7 +121,7 @@ public class CtxManager implements IStringable, IStatorable {
       intos.add(ctx, ctxID); //add the ctx
       return intos.nextempty;
    }
-   
+
    /**
     * 
     * @param registrationID 1 index based ID provided during registration
@@ -129,7 +129,7 @@ public class CtxManager implements IStringable, IStatorable {
     * @throws ArrayIndexOutOfBoundsException
     */
    public ICtx getCtxFromRegID(int registrationID) {
-      return (ICtx) intos.objects[registrationID-1];
+      return (ICtx) intos.objects[registrationID - 1];
    }
 
    /**
@@ -231,7 +231,7 @@ public class CtxManager implements IStringable, IStatorable {
       }
    }
 
-   public void unRegisterCtx(ICtx ctx) {
+   public void registerRemoveCtx(ICtx ctx) {
       intos.removeRef(ctx);
    }
 
@@ -284,7 +284,7 @@ public class CtxManager implements IStringable, IStatorable {
             toDLog().pData(data.length + " bytes of data for ctxID" + ctxID, null, CtxManager.class, "settingsWrite");
          } else {
             //#debug
-            toDLog().pData("No data for ctxID " + ctxID , null, CtxManager.class, "settingsWrite");
+            toDLog().pData("No data for ctxID " + ctxID, null, CtxManager.class, "settingsWrite");
             dos.writeInt(0);
          }
       }
@@ -365,6 +365,36 @@ public class CtxManager implements IStringable, IStatorable {
 
    public UCtx toStringGetUCtx() {
       return uc;
+   }
+
+   public String toStringProducerID(int producerID) {
+      int size = intos.nextempty;
+      for (int i = 0; i < size; i++) {
+         Object o = intos.objects[i];
+         if (o instanceof ICtx) {
+            ICtx module = (ICtx) o;
+            String producer = module.toStringProducerID(producerID);
+            if (producer != null) {
+               return producer;
+            }
+         }
+      }
+      return null;
+   }
+
+   public String toStringEventID(int producerID, int eventID) {
+      int size = intos.nextempty;
+      for (int i = 0; i < size; i++) {
+         Object o = intos.objects[i];
+         if (o instanceof ICtx) {
+            ICtx module = (ICtx) o;
+            String producer = module.toStringEventID(producerID, eventID);
+            if (producer != null) {
+               return producer;
+            }
+         }
+      }
+      return null;
    }
    //#enddebug
 

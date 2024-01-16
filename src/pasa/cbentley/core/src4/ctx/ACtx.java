@@ -152,6 +152,10 @@ public abstract class ACtx implements ICtx {
       throw new RuntimeException();
    }
 
+   public void registerRemove() {
+      uc.getCtxManager().registerRemoveCtx(this);
+   }
+
    public void setSettings(byte[] data) {
       this.data = data;
    }
@@ -213,6 +217,10 @@ public abstract class ACtx implements ICtx {
       //we don't do anything by default
    }
 
+   public String toStringGetDIDString(int did, int value) {
+      return uc.toStringGetDIDManager().toStringGetDIDString(did, value);
+   }
+
    /**
     * Return all flags
     * @return
@@ -249,20 +257,12 @@ public abstract class ACtx implements ICtx {
       toStringFlags = flags;
    }
 
-   public String toStringGetDIDString(int did, int value) {
-      return uc.toStringGetDIDManager().toStringGetDIDString(did, value);
-   }
-
    /**
     * @param flag
     * @param v
     */
    public void toStringSetToStringFlag(int flag, boolean v) {
       toStringFlags = BitUtils.setFlag(toStringFlags, flag, v);
-   }
-
-   public void unregister() {
-      uc.getCtxManager().unRegisterCtx(this);
    }
 
    //#enddebug

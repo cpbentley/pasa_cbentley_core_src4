@@ -25,7 +25,6 @@ import pasa.cbentley.core.src4.logging.IStringable;
  */
 public interface ICtx extends IStringable {
 
-
    /**
     * Unique id 1 to 255. Used to create unique integer IDs.
     * <br>
@@ -114,6 +113,11 @@ public interface ICtx extends IStringable {
 
    public int toStringGetToStringFlags();
 
+   /**
+    * 
+    * @param pid
+    * @return
+    */
    public String toStringProducerID(int pid);
 
    public void toStringSetToStringFlag(int flag, boolean v);
@@ -128,7 +132,5 @@ public interface ICtx extends IStringable {
     */
    public void toStringFlagSetOn(int flag, boolean b, Dctx dctx);
    //#enddebug
-
-
 
 }

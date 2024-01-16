@@ -1811,5 +1811,12 @@ public class Dctx implements IToStringFlags {
       this.appendFlags(flags, title, data, true);
    }
 
+   public void appendBracketedWithSpace(String str) {
+      this.append(' ');
+      this.append('[');
+      this.append(str);
+      this.append(']');
+   }
+
    //#enddebug
 }

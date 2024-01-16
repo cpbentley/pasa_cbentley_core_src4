@@ -743,7 +743,12 @@ public class UCtx implements ICtx, IEventsCore {
                   return "UnknownEID" + eid;
             }
          case PID_2_HOST:
-            return "Host";
+            switch (eid) {
+               case PID_2_HOST_0_ANY:
+                  return "Any";
+               default:
+                  return "UnknownEID" + eid;
+            }
          case PID_3_MEMORY:
             switch (eid) {
                case PID_3_MEMORY_0_ANY:
@@ -757,8 +762,36 @@ public class UCtx implements ICtx, IEventsCore {
                default:
                   return "UnknownEID" + eid;
             }
+         case PID_4_LIFE:
+            switch (eid) {
+               case PID_4_LIFE_0_ANY:
+                  return "Any";
+               case PID_4_LIFE_1_STARTED:
+                  return "Started";
+               case PID_4_LIFE_2_PAUSED:
+                  return "Paused";
+               case PID_4_LIFE_3_RESUMED:
+                  return "Resumed";
+               case PID_4_LIFE_4_STOPPED:
+                  return "Stopped";
+               case PID_4_LIFE_5_DESTROYED:
+                  return "Destroyed";
+               default:
+                  return "UnknownEID" + eid;
+            }
+         case PID_5_THREAD:
+            switch (eid) {
+               case PID_5_THREAD_0_ANY:
+                  return "Any";
+               case PID_5_THREAD_1_PULSE_ON:
+                  return "PulseOn";
+               case PID_5_THREAD_2_PULSE_OFF:
+                  return "PulseOff";
+               default:
+                  return "UnknownEID" + eid;
+            }
          default:
-            return "UnknownPID" + pid;
+            return null;
       }
    }
 
@@ -793,6 +826,10 @@ public class UCtx implements ICtx, IEventsCore {
             return "Host";
          case PID_3_MEMORY:
             return "Memory";
+         case PID_4_LIFE:
+            return "Life";
+         case PID_5_THREAD:
+            return "Thread";
          default:
             return null;
       }

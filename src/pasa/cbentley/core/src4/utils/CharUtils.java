@@ -503,6 +503,7 @@ public class CharUtils {
       return cyrChar;
    }
 
+
    /**
     * Returns a non accentuated char.
     * <li> Latin é,è ê becomes e

@@ -25,4 +25,26 @@ public interface ITechThread extends ITech {
     * create a new thread from a pool just
     */
    public static final int THREAD_MODE_3_WORKER     = 3;
+
+   public static final int STATE_0_ON               = 0;
+
+   public static final int STATE_1_OFF              = 1;
+
+   public static final int STATE_2_SHUT_DOWN        = 2;
+
+   /**
+    * TODO when a nav key is pressed or, reset caret back to ON. i.e. it stops waiting 
+    * When a thread wants to pause Pulse thread in a given mode
+    * <br>
+    * Synchronize caret blinking with GUI event thread.
+    * <br>
+    * Caret thread is paused and caretOn is true when an GUI event modifies the String.
+    * 
+    */
+   public static final int STATE_3_PAUSED           = 3;
+
+   /**
+    * 
+    */
+   public static final int STATE_4_KEEP_ON          = 4;
 }

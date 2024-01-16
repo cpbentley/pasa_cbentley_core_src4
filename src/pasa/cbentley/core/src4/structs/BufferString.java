@@ -323,7 +323,7 @@ public class BufferString implements IStringable {
             countRemoved++;
          }
       }
-      this.count = countNotRemoved - 1;
+      this.count = countNotRemoved;
       this.strings = ar;
       return countRemoved;
    }

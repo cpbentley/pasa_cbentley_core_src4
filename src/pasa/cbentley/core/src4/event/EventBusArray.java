@@ -10,6 +10,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.ex.UCtxException;
 import pasa.cbentley.core.src4.interfaces.IExecutor;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
@@ -112,7 +113,8 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       } else {
          producerID = offsetNull;
       }
-      IntToObjects producer = new IntToObjects(uc, topoloyNumEvents);
+      boolean isEmtpyFill = true;
+      IntToObjects producer = new IntToObjects(uc, topoloyNumEvents, isEmtpyFill);
       producerIDToConsumerArray[producerID] = producer;
       return producerID;
    }
@@ -334,12 +336,15 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       //look up event consumer for the couple 
       int eventID = be.getEventID();
       if (eventID >= allConsumersForPID.nextempty) {
+         String msg = "eventID " + eventID + " is not valid for the number of registered event types for producerID " + producerID;
          //#debug
-         uc.toDLog().pFlow(eventID + ">=" + allConsumersForPID.nextempty + ". Invalid eventID" + be.toString1Line(), this, EventBusArray.class, "putOnBus", ITechLvl.LVL_04_FINER, false);
-         throw new IllegalArgumentException();
+         uc.toDLog().pAlways("Exception with BusEvent", be, EventBusArray.class, "putOnBus", ITechLvl.LVL_04_FINER, false);
+         //#debug
+         uc.toDLog().pAlways(eventID + ">=" + allConsumersForPID.nextempty + ". Invalid eventID", this, EventBusArray.class, "putOnBus", ITechLvl.LVL_04_FINER, false);
+         throw new IllegalArgumentException(msg);
       }
       if (eventID == 0) {
-         throw new IllegalArgumentException("Cannot Put on Bus Any EventID " + eventID);
+         throw new IllegalArgumentException("Cannot Put on Bus a reserved \"Any\" EventID " + eventID);
       }
       //
       Object consumersSpecificEvent = allConsumersForPID.getObjectAtIndex(eventID);
@@ -398,7 +403,7 @@ public class EventBusArray implements IEventBus, IEventConsumer {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, EventBusArray.class,397);
+      dc.root(this, EventBusArray.class, 397);
       dc.nlLvl1Line(contextOwner);
       dc.nl();
       dc.append("Listeners To All Events");
@@ -406,20 +411,19 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       dc.append(listenersToAllEvents.nextempty);
       dc.append(" ");
       for (int pid = 0; pid < listenersToAllEvents.nextempty; pid++) {
-         dc.append("Producer " + pid + " = " + contextOwner.toStringProducerID(pid));
+         dc.appendVarWithSpace("Producer", pid);
+         dc.appendBracketedWithSpace(uc.getCtxManager().toStringProducerID(pid));
          IntToObjects ito = producerIDToConsumerArray[pid];
          //iterate over events
          for (int eid = 0; eid < ito.nextempty; eid++) {
-            dc.append("Listeners for Event " + eid + " = " + contextOwner.toStringEventID(pid, eid));
+            dc.appendVarWithSpace("Listeners for Event", eid);
+            dc.appendBracketedWithSpace(uc.getCtxManager().toStringEventID(pid, eid));
             Object o = ito.objects[eid];
             if (o instanceof IEventConsumer) {
                //we only have one
                dc.nlLvl1Line((IEventConsumer) o);
             } else {
-               IntToObjects listeners = (IntToObjects) o;
-               for (int i = 0; i < listeners.nextempty; i++) {
-                  dc.nlLvl1Line((IEventConsumer) listeners.getObjectAtIndex(i));
-               }
+               dc.nlLvlO(o, "listeners");
             }
          }
       }
@@ -428,14 +432,16 @@ public class EventBusArray implements IEventBus, IEventConsumer {
       dc.appendVarWithSpace("#", producerIDToConsumerArray.length);
       for (int pid = 0; pid < producerIDToConsumerArray.length; pid++) {
          dc.nl();
-         dc.append("Producer " + pid + " = " + contextOwner.toStringProducerID(pid));
+         dc.appendVarWithSpace("Producer", pid);
+         dc.appendBracketedWithSpace(uc.getCtxManager().toStringProducerID(pid));
          IntToObjects ito = producerIDToConsumerArray[pid];
          dc.append("-> # of events =" + ito.getLength());
          //iterate over events
          dc.tab();
          for (int eid = 0; eid < ito.nextempty; eid++) {
             dc.nl();
-            dc.append("Listeners for Event " + eid + " = " + contextOwner.toStringEventID(pid, eid));
+            dc.appendVarWithSpace("Listeners for Event", eid);
+            dc.appendBracketedWithSpace(uc.getCtxManager().toStringEventID(pid, eid));
             Object o = ito.objects[eid];
             if (o instanceof IEventConsumer) {
                //we only have one
@@ -447,7 +453,8 @@ public class EventBusArray implements IEventBus, IEventConsumer {
                      dc.nlLvl1Line((IEventConsumer) listeners.getObjectAtIndex(i));
                   }
                } else {
-                  dc.append("null... no consumers for eid = " + eid);
+                  dc.append(' ');
+                  dc.append("There are no consumers for eid = " + eid);
                }
             }
          }

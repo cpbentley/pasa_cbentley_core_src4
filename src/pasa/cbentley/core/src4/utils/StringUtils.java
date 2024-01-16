@@ -37,7 +37,10 @@ public class StringUtils {
    public static final char   NO_BREAKING_SPACE        = '\u00A0';
 
    /**
-    * Zero width in Swing
+    * Zero width in Swing.
+    * 
+    * A soft break creates a new line without breaking the paragraph or the list preceding it.
+    * A hard break create a new line within a new paragraph
     */
    public static final char   NEW_LINE                 = '\n';
 
@@ -52,6 +55,11 @@ public class StringUtils {
    public static final char   FORM_FEED                = '\u000C';
 
    public static final char   FORM_FEED_F              = '\f';
+
+   /**
+    * Newline that might not be recognized by some editor
+    */
+   public static final char   BREAK_PARAGRAPH          = '\u2029';
 
    public static final char   BACKSPACE                = '\u0008';
 
@@ -134,6 +142,10 @@ public class StringUtils {
     */
    public static final char   FIGURE_SPACE             = '\u2007';
 
+   /**
+    * Might not be supported.. act like a line break
+    * Similar to \u2029
+    */
    public static final char   LINE_SEPARATOR           = '\u2028';
 
    /**
@@ -208,6 +220,12 @@ public class StringUtils {
     * sad →
     */
    public static final char   ARROW_RIGHT              = '\u2192';
+
+   public static final char   PUA_START                = '\uE000';
+
+   public static final char   PUA_END                  = '\uF8FF';
+
+   public static final String mushroom                 = "\uD83C\uDF44";
 
    /**
     * [°] 

@@ -277,8 +277,12 @@ public class BusEvent implements IStringable, ITechThread {
    }
 
    private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("PID", getProducerID() + ":" + busOwner.getCtxOwner().toStringProducerID(producerID));
-      dc.appendVarWithSpace("EID", getEventID() + ":" + busOwner.getCtxOwner().toStringEventID(producerID, getEventID()));
+      dc.appendVarWithSpace("ProducerID", getProducerID());
+      dc.append(":");
+      dc.append(uc.getCtxManager().toStringProducerID(producerID));
+      dc.appendVarWithSpace("EventID", getEventID());
+      dc.append(":");
+      dc.append(uc.getCtxManager().toStringEventID(producerID, getEventID()));
       dc.appendVarWithSpace("acted", hasFlag(FLAG_1_ACTED));
       dc.appendVarWithSpace("user", hasFlag(FLAG_3_USER_EVENT));
       dc.appendVarWithSpace("param1", getParam1());

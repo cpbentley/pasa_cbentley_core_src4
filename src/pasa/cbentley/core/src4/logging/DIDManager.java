@@ -36,10 +36,16 @@ public class DIDManager extends ObjectU implements IDebugStringable, IToStringDI
       }
       //check the dids of its own module.. no need for registration
       switch (did) {
+         case DID_09_IMAGE_TRANSFORM:
+            return ToStringStaticUc.toStringTransform(value);
          case DID_10_TRANSFORMATION:
             return ToStringStaticUc.toStringTransform(value);
          case DID_11_DIAG_TOP_DIR:
             return ToStringStaticUc.toStringDiagDir(value);
+         case DID_15_THREAD_STATE:
+            return ToStringStaticUc.toStringThreadState(value);
+         case DID_16_THREAD_MODE:
+            return ToStringStaticUc.toStringThreadMode(value);
       }
       for (int i = 0; i < diders.length; i++) {
          String idString = diders[i].toStringGetDIDString(did, value);

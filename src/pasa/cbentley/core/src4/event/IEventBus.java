@@ -100,8 +100,6 @@ public interface IEventBus extends IStringable, ITechThread {
     */
    public static final int PID_0_ANY = 0;
 
-   
-   
    /**
     * Registers 
     * This method allows a Consumer to register to events without having
@@ -113,15 +111,21 @@ public interface IEventBus extends IStringable, ITechThread {
     * @param eventID
     */
    public void addConsumer(IEventConsumer con, int prodID, int eventID);
-   
+
    /**
     * 
     * @param pid
     * @throws IllegalArgumentException if pid is not a registered
     */
    public void unregisterDynamicProducerID(int pid);
-   
+
+   /**
+    * Gets the next PID.
+    * @param topoloyNumEvents the number of event families for that producer
+    * @return
+    */
    public int createNewProducerID(int topoloyNumEvents);
+
    /**
     * 
     * Thread modes available if {@link IExecutor} is available

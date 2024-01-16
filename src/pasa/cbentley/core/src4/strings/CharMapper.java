@@ -72,15 +72,39 @@ public class CharMapper extends ObjectU {
       buff = new IntBuffer(uc);
    }
 
+   public void appendStringSrc(StringBBuilder sb, int offsetStart, int offsetEnd) {
+      int offsetSrc = 0;
+      int len = offsetEnd - offsetStart + 1;
+      if (offsetStart == 0) {
+         offsetSrc = 0;
+      } else {
+         offsetSrc = map[offsetStart];
+      }
+      int lenSrc = 0;
+      if (offsetStart + len == chars.length) {
+         //take everything until end of src
+         lenSrc = this.lengthSrc - offsetSrc;
+      } else {
+         int offsetInSource = map[offset + len - 1]; //
+         if (offsetSrc == offsetInSource) {
+            lenSrc = 1;
+         } else {
+            lenSrc = len;
+         }
+      }
+      int aOffset = this.offsetSrc + offsetSrc;
+      sb.append(charsSrc, aOffset, lenSrc);
+   }
+
    /**
     * Build the char array to be used for the line
     */
    public void build() {
-      
-      if(charsSrc == null) {
+
+      if (charsSrc == null) {
          throw new IllegalStateException("must set source char");
       }
-      
+
       int totalSizeCharArray = lengthSrc;
       int size = buff.getSize();
       for (int i = 0; i < size;) {
@@ -168,6 +192,19 @@ public class CharMapper extends ObjectU {
    }
 
    /**
+    * Reference to the array of mapped characters 
+    * @return
+    */
+   public char[] getCharsMapped() {
+      return chars;
+   }
+
+   public char getModelChar(int offset) {
+      int mapOffset = map[offset];
+      return charsSrc[this.offsetSrc + mapOffset];
+   }
+
+   /**
     * Removes 
     * @return
     */
@@ -186,14 +223,6 @@ public class CharMapper extends ObjectU {
    }
 
    /**
-    * Reference to the array of mapped characters 
-    * @return
-    */
-   public char[] getCharsMapped() {
-      return chars;
-   }
-
-   /**
     * The String of the map
     * @return
     */
@@ -207,11 +236,6 @@ public class CharMapper extends ObjectU {
     */
    public String getStringSrc() {
       return new String(charsSrc, offsetSrc, lengthSrc);
-   }
-
-   public char getModelChar(int offset) {
-      int mapOffset = map[offset];
-      return charsSrc[this.offsetSrc + mapOffset];
    }
 
    /**

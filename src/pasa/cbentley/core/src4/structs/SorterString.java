@@ -14,7 +14,7 @@ import pasa.cbentley.core.src4.interfaces.IStrComparator;
  */
 public class SorterString {
 
-   private boolean asc;
+   private boolean        asc;
 
    private IStrComparator comparator;
 
@@ -27,6 +27,10 @@ public class SorterString {
 
    public IStrComparator getComparator() {
       return comparator;
+   }
+
+   public boolean isAscending() {
+      return asc;
    }
 
    public void setAscending() {
