@@ -10,9 +10,9 @@ package pasa.cbentley.core.src4.utils.interfaces;
  * @author Charles Bentley
  *
  */
-public interface IColorsStatic extends IColors {
+public interface IColorsStatic extends IColors, IColorsWeb {
 
-   public final static int[] z_128         = new int[] { FZ128_BLUE, FZ128_GREEN, FZ128_GREEN_BLUE, FZ128_RED, FZ128_RED_BLUE, FZ128_RED_GREEN, };
+   public final static int[] z_128         = new int[] { ITechColor.FZ128_BLUE, ITechColor.FZ128_GREEN, ITechColor.FZ128_GREEN_BLUE, ITechColor.FZ128_RED, ITechColor.FZ128_RED_BLUE, ITechColor.FZ128_RED_GREEN, };
 
    public final static int[] z_EXTREME     = new int[] { FULLY_OPAQUE_BLACK, FULLY_OPAQUE_WHITE, FULLY_OPAQUE_CYAN, FULLY_OPAQUE_PURPLE, FULLY_OPAQUE_YELLOW, FULLY_OPAQUE_GREEN, FULLY_OPAQUE_RED, FULLY_OPAQUE_BLUE };
 
@@ -62,11 +62,11 @@ public interface IColorsStatic extends IColors {
 
    public static final int[] z_WEB         = new int[] { WEB_aliceblue, WEB_antiquewhite, WEB_aqua, WEB_aquamarine, WEB_azure, WEB_beige, WEB_bisque, WEB_black, WEB_blanchedalmond, WEB_blue, WEB_blueviolet, WEB_brown, WEB_burlywood, WEB_cadetblue, WEB_chartreuse, WEB_chocolate, WEB_coral,
          WEB_cornflowerblue, WEB_cornsilk, WEB_crimson, WEB_cyan, WEB_darkblue, WEB_darkcyan, WEB_darkgoldenrod, WEB_darkgray, WEB_darkgreen, WEB_darkkhaki, WEB_darkmagenta, WEB_darkolivegreen, WEB_darkorange, WEB_darkorchid, WEB_darkred, WEB_darksalmon, WEB_darkseagreen, WEB_darkslateblue,
-         WEB_darkslategrey, WEB_darkturquoise, WEB_darkviolet, WEB_deeppink, WEB_deepskyblue, WEB_dimgrey, WEB_dodgerblue, WEB_firebrick, WEB_floralwhite, WEB_forestgreen, WEB_fuchsia, WEB_gainsboro, WEB_ghostwhite, WEB_gold, WEB_goldenrod, WEB_green, WEB_greenyellow, WEB_grey, WEB_honeydew,
-         WEB_hotpink, WEB_indianred, WEB_indigo, WEB_ivory, WEB_khaki, WEB_lavender, WEB_lavenderblush, WEB_lawngreen, WEB_lemonchiffon, WEB_lightblue, WEB_lightblue, WEB_lightcoral, WEB_lightcyan, WEB_lightgoldenrodyellow, WEB_lightgray, WEB_lightgreen, WEB_lightpink, WEB_lightsalmon,
-         WEB_lightseagreen, WEB_lightskyblue, WEB_lightslategray, WEB_lightsteelblue, WEB_lightyellow, WEB_lime, WEB_limegreen, WEB_linen, WEB_magenta, WEB_maroon, WEB_mediumaquamarine, WEB_mediumblue, WEB_mediumorchid, WEB_mediumpurple, WEB_mediumseagreen, WEB_mediumslateblue,
-         WEB_mediumspringgreen, WEB_mediumturquoise, WEB_mediumvioletred, WEB_midnightblue, WEB_mintcream, WEB_mistyrose, WEB_moccasin, WEB_navajowhite, WEB_navy, WEB_oldlace, WEB_olive, WEB_olivedrab, WEB_orange, WEB_orangered, WEB_orchid, WEB_palegoldenrod, WEB_palegreen, WEB_paleturquoise,
-         WEB_palevioletred, WEB_papayawhip, WEB_peachpuff, WEB_peru, WEB_pink, WEB_plum, WEB_powderblue, WEB_purple, WEB_red, WEB_rosybrown, WEB_royalblue, WEB_saddlebrown, WEB_salmon, WEB_sandybrown, WEB_seagreen, WEB_seashell, WEB_sienna, WEB_silver, WEB_skyblue, WEB_slateblue, WEB_slategray,
-         WEB_snow, WEB_springgreen, WEB_steelblue, WEB_tan, WEB_teal, WEB_thistle, WEB_tomato, WEB_tomato, WEB_turquoise, WEB_violet, WEB_wheat, WEB_white, WEB_whitesmoke, WEB_yellow, WEB_yellowgreen };
+         WEB_darkslategrey, WEB_darkturquoise, WEB_darkviolet, WEB_deeppink, WEB_deepskyblue, WEB_dimgrey, WEB_dodgerblue, WEB_firebrick, WEB_floralwhite, WEB_forestgreen, WEB_gainsboro, WEB_ghostwhite, WEB_gold, WEB_goldenrod, WEB_green, WEB_greenyellow, WEB_grey, WEB_honeydew, WEB_hotpink,
+         WEB_indianred, WEB_indigo, WEB_ivory, WEB_khaki, WEB_lavender, WEB_lavenderblush, WEB_lawngreen, WEB_lemonchiffon, WEB_lightblue, WEB_lightblue, WEB_lightcoral, WEB_lightcyan, WEB_lightgoldenrodyellow, WEB_lightgray, WEB_lightgreen, WEB_lightpink, WEB_lightsalmon, WEB_lightseagreen,
+         WEB_lightskyblue, WEB_lightsteelblue, WEB_lightyellow, WEB_lime, WEB_limegreen, WEB_linen, WEB_magenta, WEB_maroon, WEB_mediumaquamarine, WEB_mediumblue, WEB_mediumorchid, WEB_mediumpurple, WEB_mediumseagreen, WEB_mediumslateblue, WEB_mediumspringgreen, WEB_mediumturquoise,
+         WEB_mediumvioletred, WEB_midnightblue, WEB_mintcream, WEB_mistyrose, WEB_moccasin, WEB_navajowhite, WEB_navy, WEB_oldlace, WEB_olive, WEB_olivedrab, WEB_orange, WEB_orangered, WEB_orchid, WEB_palegoldenrod, WEB_palegreen, WEB_paleturquoise, WEB_palevioletred, WEB_papayawhip, WEB_peachpuff,
+         WEB_peru, WEB_pink, WEB_plum, WEB_powderblue, WEB_purple, WEB_red, WEB_rosybrown, WEB_royalblue, WEB_saddlebrown, WEB_salmon, WEB_sandybrown, WEB_seagreen, WEB_seashell, WEB_sienna, WEB_silver, WEB_skyblue, WEB_slateblue, WEB_snow, WEB_springgreen, WEB_steelblue, WEB_tan, WEB_teal,
+         WEB_thistle, WEB_tomato, WEB_tomato, WEB_turquoise, WEB_violet, WEB_wheat, WEB_white, WEB_whitesmoke, WEB_yellow, WEB_yellowgreen };
 
 }

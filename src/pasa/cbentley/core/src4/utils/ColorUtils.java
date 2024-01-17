@@ -9,6 +9,7 @@ import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.interfaces.IColors;
+import pasa.cbentley.core.src4.utils.interfaces.ITechColor;
 
 /**
  * Helper class for dealing with colors.
@@ -81,7 +82,7 @@ public class ColorUtils implements IColors, IStringable {
    public static int getComplementaryColor(int[] rgb) {
       return (0xFF000000) | ((255 - rgb[0]) << 16) | ((255 - (rgb[1]) << 8) | (255 - rgb[2]));
    }
-   
+
    public static int getDarker(int rgb, int percent) {
       int r = ((rgb >> 16) & 0xFF);
       int g = ((rgb >> 8) & 0xFF);
@@ -422,9 +423,9 @@ public class ColorUtils implements IColors, IStringable {
 
    public static int pixelToGrayScale(int pixel) {
 
-      int fixR = (int) (((pixel >> 16) & 0xFF) * TO_GRAY_RED_DESATURATOR_FIX);
-      int fixG = (int) (((pixel >> 8) & 0xFF) * TO_GRAY_GREEN_DESATURATOR_FIX);
-      int fixB = (int) ((pixel & 0xFF) * TO_GRAY_BLUE_DESATURATOR_FIX);
+      int fixR = (int) (((pixel >> 16) & 0xFF) * ITechColor.TO_GRAY_RED_DESATURATOR_FIX);
+      int fixG = (int) (((pixel >> 8) & 0xFF) * ITechColor.TO_GRAY_GREEN_DESATURATOR_FIX);
+      int fixB = (int) ((pixel & 0xFF) * ITechColor.TO_GRAY_BLUE_DESATURATOR_FIX);
 
       int sum = fixR + fixG + fixB;
 
@@ -564,47 +565,39 @@ public class ColorUtils implements IColors, IStringable {
    }
    //#enddebug
 
-   public String getName(int rgb) {
-      switch (rgb) {
-         case FULLY_OPAQUE_BEIGE:
-            return "Beige";
-         case FULLY_OPAQUE_BLACK:
-            return "Black";
-         case FULLY_OPAQUE_BLUE:
-            return "Blue";
-         case FULLY_OPAQUE_CYAN:
-            return "Cyan";
-         case FULLY_OPAQUE_GREEN:
-            return "Green";
-         case FULLY_OPAQUE_GREY:
-            return "Grey";
-         case FULLY_OPAQUE_ORANGE:
-            return "Orange";
-         case FULLY_OPAQUE_PINK:
-            return "Pink";
-         case FULLY_OPAQUE_PURPLE:
-            return "Purple";
-         case FULLY_OPAQUE_RED:
-            return "Red";
-         case FULLY_OPAQUE_SKY_BLUE:
-            return "SkyBlue";
-         case FULLY_OPAQUE_SKY_GREEN:
-            return "SkyGreen";
-         case FULLY_OPAQUE_WHITE:
-            return "White";
-         case FULLY_OPAQUE_YELLOW:
-            return "Yellow";
-         default:
-            return "name:"+rgb;
+   /**
+    * Alpha is removed..
+    * @param rgb
+    * @return
+    */
+   public String toStringColorName(int rgb) {
+      int alpha = getAlpha(rgb);
+      rgb = setAlpha(rgb, 0);
+
+      String str = ColorStringBase.getName(rgb);
+      if (str == null) {
+         str = ColorStringBase.getNameWeb(rgb);
+      }
+      if (str == null) {
+         str = "(" + ((rgb >> 16) & 0xFF) + "," + ((rgb >> 8) & 0xFF) + "," + (rgb & 0xFF) + ")";
+      }
+
+      if (alpha == 255) {
+         return str + "[Opaque]";
+      } else if (alpha == 0) {
+         return str + "[Transparent]";
+      } else {
+         return str + "[Translucent:" + alpha + "]";
       }
    }
-   
+
    public void toStringColorWithName(int color, Dctx dc) {
       toStringColor(dc, color);
       dc.append('[');
-      dc.append(getName(color));
+      dc.append(toStringColorName(color));
       dc.append(']');
    }
+
    /**
     * Returns a String such as (a,r,g,b)
     * @param c
