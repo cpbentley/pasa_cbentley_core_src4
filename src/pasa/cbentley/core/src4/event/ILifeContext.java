@@ -4,9 +4,13 @@
  */
 package pasa.cbentley.core.src4.event;
 
+/**
+ * 
+ * @author Charles Bentley
+ *
+ */
 public interface ILifeContext {
 
-   
    /**
     * Called when {@link ILifeListener} is enable to successfully complete a life method.
     * @param lis

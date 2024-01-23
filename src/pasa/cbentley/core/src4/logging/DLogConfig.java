@@ -7,6 +7,7 @@ package pasa.cbentley.core.src4.logging;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.CounterInt;
 import pasa.cbentley.core.src4.utils.BitUtils;
@@ -28,7 +29,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
+public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITechConfig {
 
    //#mdebug
 
@@ -76,10 +77,8 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
 
    private int       threshold;
 
-   private UCtx      uc;
-
    public DLogConfig(UCtx uc) {
-      this.uc = uc;
+      super(uc);
    }
 
    /**
@@ -497,9 +496,6 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       positivesTraceClass.put(c, Boolean.TRUE);
    }
 
-   public String toString() {
-      return Dctx.toString(this);
-   }
 
    public void toString(Dctx dc) {
       dc.root(this, DLogConfig.class, "@line490");
@@ -541,6 +537,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       toStringFlagTagTrue(FLAG_12_PRINT_BUSINESS, STRING_12_BUSINESS, dc);
       toStringFlagTagTrue(FLAG_13_PRINT_SOUND, STRING_13_SOUND, dc);
       toStringFlagTagTrue(FLAG_14_PRINT_TEMP, STRING_14_TEMP, dc);
+      toStringFlagTagTrue(FLAG_15_PRINT_DATA, STRING_15_DATA, dc);
       toStringFlagTagTrue(FLAG_16_PRINT_TAG, STRING_16_TAG, dc);
       toStringFlagTagTrue(FLAG_17_PRINT_TEST, STRING_17_TEST, dc);
       toStringFlagTagTrue(FLAG_18_PRINT_MEMORY, STRING_18_MEMORY, dc);
@@ -565,6 +562,7 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       toStringFlagTagNegTrue(FLAG_12_PRINT_BUSINESS, STRING_12_BUSINESS, dc);
       toStringFlagTagNegTrue(FLAG_13_PRINT_SOUND, STRING_13_SOUND, dc);
       toStringFlagTagNegTrue(FLAG_14_PRINT_TEMP, STRING_14_TEMP, dc);
+      toStringFlagTagNegTrue(FLAG_15_PRINT_DATA, STRING_15_DATA, dc);
       toStringFlagTagNegTrue(FLAG_16_PRINT_TAG, STRING_16_TAG, dc);
       toStringFlagTagNegTrue(FLAG_17_PRINT_TEST, STRING_17_TEST, dc);
       toStringFlagTagNegTrue(FLAG_18_PRINT_MEMORY, STRING_18_MEMORY, dc);
@@ -582,9 +580,6 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       toStringHashClass(dc, "Trace Classes", positivesTraceClass);
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, DLogConfig.class);
@@ -620,9 +615,6 @@ public class DLogConfig implements IDLogConfig, ITechTags, ITechConfig {
       }
    }
 
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
 
    private void toStringHashClass(Dctx dc, String title, Hashtable ht) {
       dc.nl();

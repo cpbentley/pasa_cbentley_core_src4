@@ -21,7 +21,7 @@ public class ConfigUDef extends ConfigAbstract implements IConfigU {
    }
 
    public boolean isEraseSettingsAll() {
-      return false;
+      return isEraseSettings;
    }
 
    public boolean isForceExceptions() {
@@ -29,7 +29,7 @@ public class ConfigUDef extends ConfigAbstract implements IConfigU {
    }
 
    public boolean isIgnoreSettingsAll() {
-      return false;
+      return isIgnoreSettings;
    }
    
 

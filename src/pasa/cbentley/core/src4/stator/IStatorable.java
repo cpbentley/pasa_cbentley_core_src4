@@ -4,24 +4,38 @@
  */
 package pasa.cbentley.core.src4.stator;
 
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
- * we cannot use the android way with parcellable in the constructor, because we have to give
- * the a code context when creating any object
- * <br>
- * <br>
- * It could be delegated to a Factory
+ * An {@link IStatorable} is a class that wants to write its state and read previous saved state.
+ * <li> {@link IStatorable#stateReadFrom(StatorReader)}
+ * <li> {@link IStatorable#stateWriteTo(StatorWriter)}
  * 
- * When re creating a tree of objects, the {@link IStatorable}{@link #stateReadFrom(Stator)} is responsible
+ * <br>
+ * <br>
+ * 
+ * <p>
+ * Android Note:
+ * We cannot use the android way with parcellable in the constructor. The parcellable model does not
+ * allow a code context as constructor parameter when creating an object from the byte array.
+ * </p>
+ * 
+ * <p>
+ * 
+ * When re creating a tree of objects, the {@link IStatorable}{@link #stateReadFrom(StatorReader)} is responsible
  * to create it based on the flags and data inside the stator
  * 
- * The order of reading values is critical inside a method.
+ * </p>
+ * <p>
+ * The order of reading values is critical inside a method. It must follow the same routine as the writing method.
+ * 
+ * <br>
  * 
  * Every {@link IStatorable} may gets assigned an ID along with its byte position.
  * This allow for reading and writing in any order.
+ * </p>
  * 
- *  When calling another 
  * 
  * @author Charles Bentley
  *
@@ -29,21 +43,38 @@ import pasa.cbentley.core.src4.logging.IStringable;
 public interface IStatorable extends IStringable {
 
    /**
-    * Write currently state.
+    * This method should only be called by a {@link StatorWriter}.
     * 
-    * Method takes the current state of the object and writes it to the {@link Stator}
+    * Implementation called on {@link StatorWriter} all the elements that needs to be written to {@link StatorWriter}.
     * 
-    * Children of this object that are not {@link IStatorable} and are not one of the supported objects are not save.
-    * Children that are {@link IStatorable} may get written by value or by reference
-    * If the {@link IStatorable} is known to be shared by several objects, the Stator keeps track of them
-    * and is able to write a reference.
+    * Inverse method of {@link IStatorable#stateReadFrom(StatorReader)}
     * 
-    * @param boState
+    * @param state {@link StatorWriter} cannot be null
     */
    public void stateWriteTo(StatorWriter state);
 
    /**
-    * @param boState
+    * 
+    * This method should only be called by a {@link StatorReader}.
+    * 
+    * Use Stator
+    * 
+    * Read the data from {@link StatorReader} and extract the state.
+    * 
+    * <p>
+    * Use {@link IStatorFactory} for creating objects instances
+    * </p>
+    * 
+    * @param state {@link StatorReader}
     */
    public void stateReadFrom(StatorReader state);
+
+   /**
+    * Class ID uniquely identifying this class in its factory. 
+    * @return
+    */
+   public int getStatorableClassID();
+
+   public ICtx getCtxOwner();
+
 }

@@ -6,6 +6,7 @@ package pasa.cbentley.core.src4.utils;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
+import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
  * Pure utility methods are static.
@@ -1230,6 +1231,19 @@ public class BitUtils {
 
    public String toStringBytes(byte[] ar, int cols) {
       return toStringBytes(ar, 0, ar.length, cols);
+   }
+
+   public void toStringBytes(Dctx sb, byte[] ar, int offset, int len, int cols) {
+      int count = 0;
+      for (int i = offset; i < offset + len; i++) {
+         sb.append(ar[i]);
+         count++;
+         if ((count % cols) == 0) {
+            sb.nl();
+         } else {
+            sb.append('\t');
+         }
+      }
    }
 
    /**

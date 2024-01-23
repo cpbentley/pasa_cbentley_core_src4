@@ -7,6 +7,7 @@ package pasa.cbentley.core.src4.ctx;
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
@@ -47,12 +48,18 @@ public abstract class ACtx implements ICtx {
     */
    protected final UCtx       uc;
 
+   protected IConfig          config;
+
    /**
     * Uses the default {@link CtxManager} from {@link UCtx}
     * @param uc
     */
    public ACtx(UCtx uc) {
-      this(uc, uc.getCtxManager());
+      this(null, uc, uc.getCtxManager());
+   }
+
+   public ACtx(IConfig config, UCtx uc) {
+      this(config, uc, uc.getCtxManager());
    }
 
    /**
@@ -61,13 +68,19 @@ public abstract class ACtx implements ICtx {
     * @param cm
     */
    public ACtx(UCtx uc, CtxManager cm) {
+      this(null, uc, cm);
+   }
+
+   public ACtx(IConfig config, UCtx uc, CtxManager cm) {
+      this.config = config;
       this.uc = uc;
       this.cm = cm;
+
       id = cm.registerCtx(this);
    }
 
    public IConfig getConfig() {
-      return null;
+      return config;
    }
 
    /**
@@ -130,6 +143,17 @@ public abstract class ACtx implements ICtx {
    }
 
    /**
+    * By default no factory for Ctx
+    */
+   public IStatorFactory getStatorFactory() {
+      return null;
+   }
+
+   public UCtx getUC() {
+      return uc;
+   }
+
+   /**
     * 
     * @return
     */
@@ -170,10 +194,11 @@ public abstract class ACtx implements ICtx {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "ACtx");
+      dc.root(this, ACtx.class, 200);
       toStringPrivate(dc);
       dc.appendVarWithSpace("toStringFlags", toStringFlags);
-      dc.nlLvl(uc, UCtx.class);
+      dc.nlLvlArrayBytes("data", data);
+      dc.nlLvl(config, "config");
    }
 
    public boolean toString(Dctx dctx, Object o) {
@@ -193,7 +218,7 @@ public abstract class ACtx implements ICtx {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "ACtx");
+      dc.root1Line(this, ACtx.class);
       toStringPrivate(dc);
    }
 
@@ -263,6 +288,10 @@ public abstract class ACtx implements ICtx {
     */
    public void toStringSetToStringFlag(int flag, boolean v) {
       toStringFlags = BitUtils.setFlag(toStringFlags, flag, v);
+   }
+
+   public String toStringStaticID(int staticID) {
+      return null;
    }
 
    //#enddebug

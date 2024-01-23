@@ -4,21 +4,24 @@
  */
 package pasa.cbentley.core.src4.stator;
 
+import pasa.cbentley.core.src4.ctx.ICtx;
+
 public interface IStatorFactory {
 
-   /**
-    * Creates object from {@link StatorReader}
-    * @param state
-    * @return null if none
-    */
-   public Object createObject(StatorReader state, Class type);
+   public Object[] createArray(int classID, int size);
+
+   public boolean isSupported(int classID);
 
    /**
-    * True if Factory can create objects of this class
-    * @param cl
+    * The Context to which belongs the Factory;
+    * @return never null
+    */
+   public ICtx getCtx();
+
+   /**
+    * Returns null if class ID is not know
+    * @param classID
     * @return
     */
-   public boolean isTypeSupported(Class cl);
-
-   public Object[] createArray(Class cl, int size);
+   public Object createObject(int classID);
 }

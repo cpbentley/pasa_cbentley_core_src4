@@ -247,14 +247,11 @@ public class BAByteIS extends InputStream implements IStringable {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "BAInputS");
+      dc.root(this, BAByteIS.class, 250);
       toStringPrivate(dc);
       dc.nl();
-      String strPos = new String(buf, 0, pos);
-      dc.appendWithSpace(strPos);
-      dc.nl();
-      String str = new String(buf, 0, count);
-      dc.appendWithSpace(str);
+      uc.getBU().toStringBytes(dc, buf, 0, count, 15);
+      
    }
 
    public String toString1Line() {

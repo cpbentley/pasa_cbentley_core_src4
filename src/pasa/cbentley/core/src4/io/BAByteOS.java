@@ -12,6 +12,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
  * 
@@ -175,7 +176,6 @@ public class BAByteOS extends OutputStream implements IStringable {
       return copyOf(count);
    }
 
-
    /**
     * Writes <code>len</code> bytes from the specified byte array
     * starting at offset <code>off</code> to this byte array output stream.
@@ -216,7 +216,6 @@ public class BAByteOS extends OutputStream implements IStringable {
       out.write(buf, 0, count);
    }
 
-   
    //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();
@@ -227,14 +226,16 @@ public class BAByteOS extends OutputStream implements IStringable {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "BAOutputS");
+      dc.root(this, BAByteOS.class, 230);
       toStringPrivate(dc);
+      dc.nl();
+      uc.getBU().toStringBytes(dc, buf, 0, count, 15);
    }
 
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }
-   
+
    /**
     * Converts the buffer's contents into a string decoding bytes using the
     * platform's default character set. The length of the new <tt>String</tt>
@@ -251,12 +252,11 @@ public class BAByteOS extends OutputStream implements IStringable {
     * @since  JDK1.1
     */
    private void toStringPrivate(Dctx dc) {
-      String str = new String(buf, 0, count);
-      dc.appendWithSpace(str);
+      dc.appendVarWithSpace("count", count);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BAOutputS");
+      dc.root1Line(this, BAByteOS.class);
       toStringPrivate(dc);
    }
 
@@ -265,6 +265,5 @@ public class BAByteOS extends OutputStream implements IStringable {
    }
 
    //#enddebug
-   
 
 }

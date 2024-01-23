@@ -17,6 +17,10 @@ public class ObjectU implements IStringable {
       this.uc = uc;
    }
 
+   public UCtx getUC() {
+      return uc;
+   }
+   
    //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 
+import pasa.cbentley.core.src4.api.ApiManager;
 import pasa.cbentley.core.src4.event.BusEvent;
 import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
@@ -34,6 +35,8 @@ import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 import pasa.cbentley.core.src4.logging.UserLogSystemOut;
 import pasa.cbentley.core.src4.memory.IMemory;
 import pasa.cbentley.core.src4.memory.MemorySimpleCreator;
+import pasa.cbentley.core.src4.stator.IStatorFactory;
+import pasa.cbentley.core.src4.stator.StatorFactoryUC;
 import pasa.cbentley.core.src4.strings.StringComparator;
 import pasa.cbentley.core.src4.thread.WorkerThread;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
@@ -281,6 +284,10 @@ public class UCtx implements ICtx, IEventsCore {
 
    private DIDManager      didManager;
 
+   private StatorFactoryUC statorFactoryUC;
+
+   private ApiManager apiManager;
+
    /**
     * Assume a simple Java Host 
     */
@@ -382,6 +389,12 @@ public class UCtx implements ICtx, IEventsCore {
       return dis;
    }
 
+   public ApiManager getApiManager() {
+      if(apiManager == null) {
+         apiManager = new ApiManager(this);
+      }
+      return apiManager;
+   }
    public BADataIS createNewBADataIS(byte[] data, int offset) {
       BAByteIS bis = new BAByteIS(this, data, offset, data.length);
       BADataIS dis = new BADataIS(this, bis);
@@ -424,6 +437,12 @@ public class UCtx implements ICtx, IEventsCore {
       return config;
    }
 
+   public void setConfigU(IConfigU configU) {
+      if(configU == null) {
+         throw new NullPointerException();
+      }
+      this.config = configU;
+   }
    public int getCtxID() {
       return CTX_ID;
    }
@@ -477,6 +496,16 @@ public class UCtx implements ICtx, IEventsCore {
       return geo2dU;
    }
 
+   /**
+    * By default no factory for Ctx
+    */
+   public IStatorFactory getStatorFactory() {
+      if (statorFactoryUC == null) {
+         statorFactoryUC = new StatorFactoryUC(this);
+      }
+      return statorFactoryUC;
+   }
+
    public IOUtils getIOU() {
       return iou;
    }
@@ -522,7 +551,6 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public byte[] getSettings() {
-      // TODO Auto-generated method stub
       return null;
    }
 
@@ -600,7 +628,7 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public void setSettings(byte[] data) {
-      // TODO Auto-generated method stub
+      //we do not save any data yet
    }
 
    /**
@@ -675,16 +703,19 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, UCtx.class, 544);
+      dc.root(this, UCtx.class, 690);
       toStringPrivate(dc);
       dc.nlLvl(config, IConfigU.class);
-      dc.nlLvl(ctxManager, "ctxManager");
       dc.nlLvl(eventBusRoot, "eventBusRoot");
-      dc.nlLvl(workerThread, "workerThread");
+      dc.nlLvl(workerThread, "workerThread", WorkerThread.class);
       dc.nlLvl(mem, "IMemory");
       dc.appendVarWithSpace("stringProducer", stringProducer);
       dc.nlLvl(userLog, "IUserlog");
       dc.nlLvl(dlog, "IDLog");
+
+      //the manager is never to Stringed by a Ctx
+      //if you need Manager, you will get the whole application toStringed
+      //dc.nlLvl(ctxManager, "ctxManager");
    }
 
    public boolean toString(Dctx dctx, Object o) {
@@ -724,6 +755,19 @@ public class UCtx implements ICtx, IEventsCore {
    public void toStringCheckNull(Object o) {
       if (o == null) {
          throw new NullPointerException();
+      }
+   }
+
+   public String toStringStaticID(int staticID) {
+      switch (staticID) {
+         case IStaticIDs.SID_STRINGS:
+            return "Strings";
+         case IStaticIDs.SID_EVENTS:
+            return "Events";
+         case IStaticIDs.SID_DIDS:
+            return "DIDs";
+         default:
+            return null;
       }
    }
 

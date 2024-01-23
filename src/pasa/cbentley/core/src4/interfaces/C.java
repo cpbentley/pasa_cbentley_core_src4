@@ -17,26 +17,49 @@ package pasa.cbentley.core.src4.interfaces;
  */
 public interface C extends ITech {
 
-   public static final int LINE_0_HORIZONTAL        = 0;
+   public static final int ANC_0_TOP_LEFT           = 0;
 
-   public static final int LINE_1_VERTICAL          = 1;
+   public static final int ANC_1_TOP_CENTER         = 1;
 
+   public static final int ANC_2_TOP_RIGHT          = 2;
+
+   public static final int ANC_3_CENTER_LEFT        = 3;
+
+   public static final int ANC_4_CENTER_CENTER      = 4;
+
+   public static final int ANC_5_CENTER_RIGHT       = 5;
+
+   public static final int ANC_6_BOT_LEFT           = 6;
+
+   public static final int ANC_7_BOT_CENTER         = 7;
+
+   public static final int ANC_8_BOT_RIGHT          = 8;
+
+   /**
+    * When Anchor is computed, it can be outside a rectangle.
+    * However
+    */
+   public static final int ANC_MINUS1_OUTSIDE       = -1;
+
+   /**
+    * 
+    */
+   public static final int ANGLE_DOWN_270           = 270;
+
+   /**
+    * 
+    */
    public static final int ANGLE_LEFT_180           = 180;
 
-   public static final int TEST_0_FAIL              = 0;
-
-   public static final int TEST_1_SUCCESS           = 1;
-
-   public static final int TEST_2_UNKNOWN           = 2;
+   /**
+    * 
+    */
+   public static final int ANGLE_RIGHT_0            = 0;
 
    /**
     * Equals to angle 90 degree
     */
    public static final int ANGLE_UP_90              = 90;
-
-   public static final int ANGLE_DOWN_270           = 270;
-
-   public static final int ANGLE_RIGHT_0            = 0;
 
    public static final int DIAG_DIR_0_TOP_LEFT      = 0;
 
@@ -64,6 +87,45 @@ public interface C extends ITech {
    public static final int DIR_6_BotLeft            = 6;
 
    public static final int DIR_7_BotRight           = 7;
+
+   public static final int LINE_0_HORIZONTAL        = 0;
+
+   public static final int LINE_1_VERTICAL          = 1;
+
+   public static final int LOGIC_0_UNDEFINED        = 0;
+
+   public static final int LOGIC_1_TOP_LEFT         = 1;
+
+   public static final int LOGIC_2_CENTER           = 2;
+
+   public static final int LOGIC_3_BOTTOM_RIGHT     = 3;
+
+   public static final int POS_0_TOP                = 0;
+
+   public static final int POS_1_BOT                = 1;
+
+   public static final int POS_2_LEFT               = 2;
+
+   public static final int POS_3_RIGHT              = 3;
+
+   public static final int POS_4_CENTER             = 4;
+
+   /**
+    * Clock wise incremental position on the diag borders
+    */
+   public static final int POSDIAG_0_TOP_LEFT       = 0;
+
+   public static final int POSDIAG_1_TOP_RIGHT      = 1;
+
+   public static final int POSDIAG_2_BOT_RIGHT      = 2;
+
+   public static final int POSDIAG_3_BOT_LEFT       = 3;
+
+   public static final int TEST_0_FAIL              = 0;
+
+   public static final int TEST_1_SUCCESS           = 1;
+
+   public static final int TEST_2_UNKNOWN           = 2;
 
    public static final int TYPE_00_TOP              = 0;
 
@@ -104,58 +166,5 @@ public interface C extends ITech {
    public static final int TYPE_18_BotRightDiagTop  = 18;
 
    public static final int TYPE_19_BotRightDiagLeft = 19;
-
-   /**
-    * Clock wise incremental position on the diag borders
-    */
-   public static final int POSDIAG_0_TOP_LEFT       = 0;
-
-   public static final int POSDIAG_1_TOP_RIGHT      = 1;
-
-   public static final int POSDIAG_2_BOT_RIGHT      = 2;
-
-   public static final int POSDIAG_3_BOT_LEFT       = 3;
-
-   public static final int POS_0_TOP                = 0;
-
-   public static final int POS_1_BOT                = 1;
-
-   public static final int POS_2_LEFT               = 2;
-
-   public static final int POS_3_RIGHT              = 3;
-
-   public static final int POS_4_CENTER             = 4;
-
-   public static final int LOGIC_0_UNDEFINED        = 0;
-
-   public static final int LOGIC_1_TOP_LEFT         = 1;
-
-   public static final int LOGIC_2_CENTER           = 2;
-
-   public static final int LOGIC_3_BOTTOM_RIGHT     = 3;
-
-   /**
-    * When Anchor is computed, it can be outside a rectangle.
-    * However
-    */
-   public static final int ANC_MINUS1_OUTSIDE       = -1;
-
-   public static final int ANC_0_TOP_LEFT           = 0;
-
-   public static final int ANC_1_TOP_CENTER         = 1;
-
-   public static final int ANC_2_TOP_RIGHT          = 2;
-
-   public static final int ANC_3_CENTER_LEFT        = 3;
-
-   public static final int ANC_4_CENTER_CENTER      = 4;
-
-   public static final int ANC_5_CENTER_RIGHT       = 5;
-
-   public static final int ANC_6_BOT_LEFT           = 6;
-
-   public static final int ANC_7_BOT_CENTER         = 7;
-
-   public static final int ANC_8_BOT_RIGHT          = 8;
 
 }

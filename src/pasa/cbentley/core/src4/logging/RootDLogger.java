@@ -4,30 +4,29 @@
  */
 package pasa.cbentley.core.src4.logging;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 
 /**
  * @author Charles Bentley
  *
  */
-public abstract class RootDLogger implements IDLog {
+public abstract class RootDLogger extends ObjectU implements IDLog {
    //#mdebug
 
-   private UCtx                uc;
+   private ILogEntryAppender[] appenders;
 
    /**
     * Count will increment and then reset to 0.
     */
    private long                count;
 
-   private ILogEntryAppender[] appenders;
-
    /**
     * By default create a default {@link SystemOutAppender}
     * @param uc
     */
    public RootDLogger(UCtx uc) {
-      this.uc = uc;
+      super(uc);
       appenders = new ILogEntryAppender[] { new SystemOutAppender(uc) };
    }
 
@@ -42,14 +41,6 @@ public abstract class RootDLogger implements IDLog {
       appenders[appenders.length - 1] = appender;
    }
 
-   public ILogEntryAppender getDefault() {
-      return appenders[0];
-   }
-
-   public int getLevelDefault() {
-      return ITechLvl.LVL_08_INFO;
-   }
-
    /**
     * Array of non null appenders
     * @return
@@ -58,18 +49,14 @@ public abstract class RootDLogger implements IDLog {
       return appenders;
    }
 
-   /**
-    * 
-    * @param msg
-    * @param str
-    * @param c
-    * @param method
-    * @param m
-    * @param flag
-    */
-   public void ptPrint(String msg, IStringable str, Class c, String method, String m, int flag) {
-      ptPrint(msg, str, c, method, m, flag, getLevelDefault(), false);
+   public ILogEntryAppender getDefault() {
+      return appenders[0];
    }
+
+   public int getLevelDefault() {
+      return ITechLvl.LVL_08_INFO;
+   }
+
 
    /**
     * This is used for quick debugging without having to change configuration of the logger.
@@ -88,14 +75,17 @@ public abstract class RootDLogger implements IDLog {
       ptPrint(msg, str, c, method, ITechTags.STRING_01_ALWAYS, ITechTags.FLAG_01_PRINT_ALWAYS, lvl, oneLine);
    }
 
-   private String methodIndent = null;
-
-   public synchronized void methodStart(Class c, String method, int lvl) {
-      methodIndent = c.getName() + "#" + method;
-   }
-
-   public synchronized void methodEnd(Class c, String method, int lvl) {
-      methodIndent = null;
+   /**
+    * 
+    * @param msg
+    * @param str
+    * @param c
+    * @param method
+    * @param m
+    * @param flag
+    */
+   public void ptPrint(String msg, IStringable str, Class c, String method, String m, int flag) {
+      ptPrint(msg, str, c, method, m, flag, getLevelDefault(), false);
    }
 
    /**
@@ -125,7 +115,7 @@ public abstract class RootDLogger implements IDLog {
          entry.setCount(count);
          entry.setMethod(method);
          entry.setClassL(c);
-         
+
          if (stringable != null) {
             entry.setClassStringable(stringable.getClass());
          }
@@ -139,35 +129,25 @@ public abstract class RootDLogger implements IDLog {
       }
    }
 
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
+   //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, RootDLogger.class, "@line151");
+      dc.root(this, RootDLogger.class, 144);
       toStringPrivate(dc);
+      super.toString(dc.sup());
+      dc.nlLvlArray("Appenders", appenders);
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, RootDLogger.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("count", count);
    }
 
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, RootDLogger.class);
-      toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
+   //#enddebug
 
    //#enddebug
 

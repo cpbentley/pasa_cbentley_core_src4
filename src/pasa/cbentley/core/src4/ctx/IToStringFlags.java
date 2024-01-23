@@ -61,5 +61,7 @@ public interface IToStringFlags extends IFlags {
 
    public static final int FLAG_DATA_06_SHOW_NULLS    = 1 << 5;
 
+   public static final int FLAG_DATA_07_COLLAPSED     = 1 << 6;
+
    //#enddebug
 }

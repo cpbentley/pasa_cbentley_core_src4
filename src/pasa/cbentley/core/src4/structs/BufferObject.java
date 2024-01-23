@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.structs;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
@@ -19,7 +20,7 @@ import pasa.cbentley.core.src4.utils.ArrayUtils;
  * @author Charles Bentley
  *
  */
-public class BufferObject implements IStringable {
+public class BufferObject extends ObjectU implements IStringable {
 
    private int      count     = 0;
 
@@ -37,7 +38,6 @@ public class BufferObject implements IStringable {
 
    private int      offset    = 0;
 
-   private UCtx     uc;
 
    /**
     * 1,1
@@ -56,9 +56,9 @@ public class BufferObject implements IStringable {
     * @param increment few adds take a small increment., lots take a big increment
     */
    public BufferObject(UCtx uc, int startSize, int increment, int bufferFront) {
+      super(uc);
       set(new Object[startSize]);
       this.increment = increment;
-      this.uc = uc;
       this.offset = bufferFront;
    }
 
@@ -67,8 +67,8 @@ public class BufferObject implements IStringable {
     * @param ar
     */
    public BufferObject(UCtx uc, String[] ar) {
+      super(uc);
       set(ar);
-      this.uc = uc;
    }
 
    /**
@@ -360,42 +360,34 @@ public class BufferObject implements IStringable {
       objects[offset + index] = obj;
    }
 
+
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
+   public void toString(Dctx dc) {
+      dc.root(this, BufferObject.class, 380);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      
+      dc.append(':');
+      for (int i = 0; i < objects.length; i++) {
+         dc.nlLvlObject("i="+i, objects[i]);
+      }
    }
 
-   public void toString(Dctx dc) {
-      dc.root(this, "BufferObject");
+   private void toStringPrivate(Dctx dc) {
       dc.append(" offset=" + offset);
       dc.append(" increment=" + increment);
       dc.append(" count=" + count);
-      dc.append(':');
-      for (int i = 0; i < objects.length; i++) {
-         dc.nl();
-         dc.append(i);
-         dc.append(":" + objects[i]);
-      }
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BufferObject");
-      dc.append(" #" + count);
-      dc.append(':');
-      for (int i = 0; i < count; i++) {
-         dc.append("" + objects[i]);
-         dc.append(' ');
-      }
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
+      dc.root1Line(this, BufferObject.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug
+   
+
+
 
 }

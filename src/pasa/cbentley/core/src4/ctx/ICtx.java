@@ -7,6 +7,7 @@ package pasa.cbentley.core.src4.ctx;
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.core.src4.stator.IStatorFactory;
 
 /**
  * Implement "static" code context.
@@ -66,7 +67,14 @@ public interface ICtx extends IStringable {
    public IConfig getConfig();
 
    /**
+    * Each {@link ICtx} controls the Factory that can create its objects from.
+    * @return
+    */
+   public IStatorFactory getStatorFactory();
+   /**
+    * For the given {@link IStaticIDs} type (e.g {@link IStaticIDs#SID_STRINGS},
     * 
+    * maps the key to ZeroBased value
     * @param type
     * @param key
     * @return
@@ -119,6 +127,8 @@ public interface ICtx extends IStringable {
     * @return
     */
    public String toStringProducerID(int pid);
+
+   public String toStringStaticID(int pid);
 
    public void toStringSetToStringFlag(int flag, boolean v);
 

@@ -5,8 +5,47 @@
 package pasa.cbentley.core.src4.stator;
 
 import pasa.cbentley.core.src4.interfaces.ITech;
+import pasa.cbentley.core.src4.utils.ColorUtils;
 
 public interface ITechStator extends ITech {
 
-   public static final int MAGIC_WORD_STATOR = 65487654;
+   
+   public static final int MAGIC_WORD_STATOR         = ColorUtils.getRGBInt(150, 200, 200, 201);
+
+   public static final int MAGIC_WORD_PREFS          = ColorUtils.getRGBInt(200, 202, 200, 201);
+
+   public static final int MAGIC_WORD_WRITER         = ColorUtils.getRGBInt(240, 200, 200, 201);
+
+   public static final int MAGIC_WORD_OBJECT         = ColorUtils.getRGBInt(245, 200, 200, 201);
+
+   public static final int MAGIC_WORD_OBJECT_NULL    = ColorUtils.getRGBInt(245, 205, 200, 201);
+
+   public static final int MAGIC_WORD_OBJECT_POINTER = ColorUtils.getRGBInt(247, 200, 200, 201);
+
+   /**
+    * That's the main Writer/Reader from which others types are
+    */
+   public static final int TYPE_0_MASTER             = 0;
+
+   /**
+    * Contains view state
+    */
+   public static final int TYPE_1_VIEW               = 1;
+
+   /**
+    * State describing the data
+    */
+   public static final int TYPE_2_MODEL              = 2;
+
+   /**
+    * 
+    * When loading the application, we want to load the ctx data bytes first.
+    * 
+    * We do not want Model and View stuff.
+    */
+   public static final int TYPE_3_CTX                = 3;
+
+   public static final int TYPE_NUM                  = 4;
+
+   public static final int FLAG_1_FAILED             = 1 << 0;
 }

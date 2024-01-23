@@ -4,35 +4,44 @@
  */
 package pasa.cbentley.core.src4.stator;
 
-import pasa.cbentley.core.src4.ctx.UCtx;
-import pasa.cbentley.core.src4.helpers.BasicPrefs;
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.interfaces.IPrefsWriter;
+import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntToInts;
 import pasa.cbentley.core.src4.structs.IntToObjects;
+import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
  * 
+ * For simple write methods use
+ * 
+ * <li> {@link StatorWriter#getWriter()} {@link BADataOS}
+ * <ol>
+ * <li> {@link BADataOS#writeInt(int)}
+ * <li> {@link BADataOS#writeIntArrayByteLong(int[])}
+ * <li> {@link BADataOS#writeIntArrayIntLong(int[])}
+ * <li> {@link BADataOS#writeString(String)}
+ * <li>
+ * </ol>
+ * <p>
+ * 
+ * For writing to a key-object hashtable use
+ *  {@link StatorWriter#getKeyValuePairs()}. It acutally uses the single one from the Stator
+ * </p>
+ * Provides 
  * @author Charles Bentley
  *
  */
-public class StatorWriter implements IStringable, ITechStator {
+public class StatorWriter extends ObjectU implements IStringable, ITechStator {
 
-   private byte[]       data;
-
-   private IPrefsWriter prefs;
+   private Stator       stator;
 
    private IntToInts    table;
 
-   /**
-    * When it was created
-    */
-   private long         timestamp;
-
-   protected final UCtx uc;
+   private int          type;
 
    /**
     * Current writer
@@ -41,81 +50,51 @@ public class StatorWriter implements IStringable, ITechStator {
 
    private IntToObjects writtenObjects;
 
-   public StatorWriter(UCtx uc) {
-      this.uc = uc;
+   private int          flags;
+
+   public StatorWriter(Stator stator, int type) {
+      super(stator.getUC());
+      this.stator = stator;
+      this.type = type;
       table = new IntToInts(uc);
       writtenObjects = new IntToObjects(uc);
-   }
-
-   public byte[] getData() {
-      return data;
+      writer = uc.createNewBADataOS();
    }
 
    /**
     * Current position, so continue to write
     * @return
     */
-   public BADataOS getDataWriter() {
-      if (writer == null) {
-         writer = uc.createNewBADataOS();
-      }
+   public BADataOS getWriter() {
       return writer;
    }
 
-   public int getNumWrittenObject() {
-      return writtenObjects.getSize();
-   }
-   /**
-    * Creates a new entry position for the id,
-    * 
-    * it entry already exists
-    * @param id
-    * @return
-    */
-   public BADataOS getDataWriter(int id) {
-      if (writer == null) {
-         writer = uc.createNewBADataOS();
-      }
-
-      return writer;
+   public void setFlag(int flag, boolean b) {
+      flags = BitUtils.setFlag(flags, flag, b);
    }
 
    /**
     * Add key-value data to this {@link StatorWriter}
     * @return
     */
-   public IPrefsWriter getKeyValuePairs() {
-      if (prefs == null) {
-         prefs = new BasicPrefs(uc);
-      }
-      return prefs;
+   public IPrefsWriter getPrefs() {
+      return stator.getPrefsWriter();
    }
 
-   public long getTimestamp() {
-      return timestamp;
+   public int getNumWrittenObject() {
+      return writtenObjects.getSize();
    }
 
-   /**
-    * Assign an id
-    * @param canvasAppliAbstract
-    * @return
-    */
-   public boolean isObjectNotWritten(IStatorable statorable) {
-      int index = writtenObjects.findObjectRef(statorable);
-      if (index == -1) {
-         //create a new one
-         int objectID = writtenObjects.nextempty;
-         writtenObjects.add(statorable);
-         getDataWriter().writeInt(objectID);
-         return true;
-      } else {
-         getDataWriter().writeInt(index);
-         return false;
-      }
+   public Stator getStator() {
+      return stator;
+   }
+
+   public int getType() {
+      return type;
    }
 
    /**
-    * Call this when the stator needs to be written to disk.
+    * Provides byte array snapshot of the current data stored in this {@link StatorWriter}
     * 
     * Serialize everything stored in this stator to byte array.
     * 
@@ -124,67 +103,94 @@ public class StatorWriter implements IStringable, ITechStator {
     */
    public byte[] serialize() {
       BADataOS out = uc.createNewBADataOS();
-      out.writeInt(MAGIC_WORD_STATOR); //magic
-      out.writeInt(writtenObjects.getSize()); //max number of objects
-      if (writer != null) {
-         out.write(1);
-         out.writeByteArray(writer.getOut().getArrayRef(), 0, writer.getOut().getByteWrittenCount());
-      } else {
-         out.write(0);
-      }
-      if (prefs != null) {
-         out.write(1);
-         prefs.export(out);
-      } else {
-         out.write(0);
-      }
+      serialize(out);
       return out.getByteCopy();
    }
 
-   public void setTimestamp(long timestamp) {
-      this.timestamp = timestamp;
+   /**
+    * Inverse of {@link StatorReader#init(BADataIS)}
+    * @param out
+    */
+   public void serialize(BADataOS out) {
+      out.writeInt(MAGIC_WORD_WRITER); //magic
+      out.writeInt(type); //type so unwrap can create it
+      //we need to know its length
+      int sizeObjects = writtenObjects.getSize();
+      out.writeInt(sizeObjects); //max number of objects
+
+      if (writer != null) {
+         out.write(1);
+         out.writeOS(writer);
+      } else {
+         out.write(0);
+      }
+
    }
 
-   public void stateWriteOf(IStatorable statorable) {
+   //#mdebug
+
+   /**
+    * Called when a {@link IStatorable} asks its {@link IStatorable} children to writeselves.
+    * 
+    * The Parent knows which type of {@link StatorWriter} to use.
+    * Preferred method to use.. it also to deal with null and to see whether that object
+    * reference has already been written to this {@link StatorWriter}.
+    * <br>
+    * You should not use directly {@link IStatorable#stateWriteTo(StatorWriter)}
+    * 
+    * <p>
+    * Inverse of {@link StatorReader#readerToStatorable(IStatorable)}
+    * </p>
+    * @param statorable
+    */
+   public void writerToStatorable(IStatorable statorable) {
+      BADataOS dataWriter = getWriter();
       if (statorable == null) {
-         getDataWriter().write(0);
+         dataWriter.writeInt(MAGIC_WORD_OBJECT_NULL);
       } else {
-         getDataWriter().write(1);
-         if (isObjectNotWritten(statorable)) {
+         int index = writtenObjects.findObjectRef(statorable);
+         if (index == -1) {
+            getWriter().writeInt(MAGIC_WORD_OBJECT);
+
+            //create a new one
+            int objectID = writtenObjects.nextempty;
+            writtenObjects.add(statorable);
+            getWriter().writeInt(objectID);
+            int ctxID = statorable.getCtxOwner().getCtxID();
+            getWriter().writeInt(ctxID);
+            int classID = statorable.getStatorableClassID();
+            getWriter().writeInt(classID);
+            //now ask the statorable to write its object and children
             statorable.stateWriteTo(this);
+         } else {
+            //write object id
+            getWriter().writeInt(MAGIC_WORD_OBJECT_POINTER);
+            getWriter().writeInt(index);
          }
       }
    }
 
-   //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "State");
+      dc.root(this, StatorWriter.class, "@line170");
       toStringPrivate(dc);
-   }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      dc.nlLvl(writtenObjects, "writtenObjects");
+      dc.nlLvl(writer, "writer");
+      dc.nlLvl(stator, "stator");
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "State");
+      dc.root1Line(this, StatorWriter.class);
       toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
+      super.toString1Line(dc.sup1Line());
    }
 
    private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("type", type);
+   }
 
+   public void writeStartIndex(int len) {
+      writer.writeInt(len);
    }
 
    //#enddebug

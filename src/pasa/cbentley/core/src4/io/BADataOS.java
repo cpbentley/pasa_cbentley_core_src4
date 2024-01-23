@@ -9,7 +9,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.core.src4.utils.LongUtils;
 import pasa.cbentley.core.src4.utils.ShortUtils;
@@ -40,7 +44,7 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  * @author Charles Bentley
  *
  */
-public class BADataOS implements DataOutput {
+public class BADataOS extends ObjectU implements DataOutput, IStringable {
    /**
     * Writes a string to the specified DataOutput using
     * <a href="DataInput.html#modified-utf-8">modified UTF-8</a>
@@ -146,11 +150,12 @@ public class BADataOS implements DataOutput {
     * @see     java.io.FilterOutputStream#out
     */
    public BADataOS(UCtx uc, BAByteOS out) {
+      super(uc);
       this.out = out;
    }
 
    public BADataOS(UCtx uc, int size) {
-      this.out = new BAByteOS(uc, size);
+      this(uc, new BAByteOS(uc, size));
    }
 
    public BADataOS(UCtx uc) {
@@ -210,13 +215,34 @@ public class BADataOS implements DataOutput {
       return written;
    }
 
+   /**
+    * Write append the byte array as is.
+    */
    public void write(byte b[]) {
       write(b, 0, b.length);
    }
 
+
+   /**
+    * Inverse of {@link BADataIS#readByteArray()} 
+    * 
+    * Writes the number of bytes as header.
+    * @param b
+    */
    public void writeByteArray(byte b[]) {
       writeInt(b.length);
       write(b, 0, b.length);
+   }
+
+   /**
+    * Inverse of {@link BADataIS#readIs()}.
+    * 
+    * Write the Byte data
+    * @param da
+    */
+   public void writeOS(BADataOS da) {
+      writeInt(da.out.count);
+      write(da.out.buf, 0, da.out.count);
    }
 
    /**
@@ -499,4 +525,25 @@ public class BADataOS implements DataOutput {
          writeInt(array[i]);
       }
    }
+
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, BADataOS.class, 510);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      dc.nlLvl(out);
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("written", written);
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, BADataOS.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   //#enddebug
+
 }

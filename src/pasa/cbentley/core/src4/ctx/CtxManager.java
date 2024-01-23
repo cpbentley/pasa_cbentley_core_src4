@@ -9,11 +9,15 @@ import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.core.src4.stator.IStatorable;
+import pasa.cbentley.core.src4.logging.ITechLvl;
+import pasa.cbentley.core.src4.stator.IStatorOwner;
+import pasa.cbentley.core.src4.stator.ITechStator;
+import pasa.cbentley.core.src4.stator.Stator;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.core.src4.structs.IntToObjects;
+import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
  * Manages several code contexts {@link ICtx}.
@@ -38,7 +42,7 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
  * @author Charles Bentley
  *
  */
-public class CtxManager implements IStringable, IStatorable {
+public class CtxManager implements IStringable, IStatorOwner {
 
    /**
     * Number of static known ids.
@@ -56,7 +60,9 @@ public class CtxManager implements IStringable, IStatorable {
    /**
     * {@link ICtx#getCtxID()} and their {@link ICtx} object.
     * <br>
-    * Index is order of registration
+    * Index is order of registration.
+    * 
+    * Contains byte[] data loaded from disk if Ctx has not been created
     */
    private IntToObjects    intos;
 
@@ -66,6 +72,29 @@ public class CtxManager implements IStringable, IStatorable {
       this.uc = uc;
       intos = new IntToObjects(uc);
       ids = new IntBuffer(uc, 5);
+   }
+
+   public ICtx getCtx(int ctxID) {
+      int index = intos.findInt(ctxID);
+      if (index == -1) {
+         return null;
+      } else {
+         return (ICtx) intos.getObjectAtIndex(index);
+      }
+   }
+
+   /**
+    * 
+    * @param registrationID 1 index based ID provided during registration
+    * @return
+    * @throws ArrayIndexOutOfBoundsException
+    */
+   public ICtx getCtxFromRegID(int registrationID) {
+      return (ICtx) intos.objects[registrationID - 1];
+   }
+
+   public ICtx getCtxOwner() {
+      return uc;
    }
 
    /**
@@ -98,6 +127,10 @@ public class CtxManager implements IStringable, IStatorable {
    /**
     * Called by constructor of a {@link ICtx}
     * 
+    * <p>
+    * Calls {@link ICtx#setSettings(byte[])} if any byte array has been mapped to CTX id.
+    * </p>
+    * 
     * @param ctx
     * @return a value from 1 to [
     */
@@ -112,7 +145,9 @@ public class CtxManager implements IStringable, IStatorable {
       Object stored = intos.findIntObject(ctxID);
       //check validity of ctxid
       if (stored != null) {
-         if (stored.getClass() == ctx.getClass()) {
+         if (stored instanceof byte[]) {
+            ctx.setSettings((byte[]) stored);
+         } else if (stored.getClass() == ctx.getClass()) {
             throw new IllegalArgumentException("Same context class " + ctx.getClass().getName() + " is being registered.");
          } else {
             throw new IllegalArgumentException(ctx.getClass().getName() + " collides with existing " + stored.getClass().getName() + " with the Context ID (" + ctxID + ").");
@@ -122,14 +157,8 @@ public class CtxManager implements IStringable, IStatorable {
       return intos.nextempty;
    }
 
-   /**
-    * 
-    * @param registrationID 1 index based ID provided during registration
-    * @return
-    * @throws ArrayIndexOutOfBoundsException
-    */
-   public ICtx getCtxFromRegID(int registrationID) {
-      return (ICtx) intos.objects[registrationID - 1];
+   public void registerRemoveCtx(ICtx ctx) {
+      intos.removeRef(ctx);
    }
 
    /**
@@ -197,6 +226,18 @@ public class CtxManager implements IStringable, IStatorable {
       ids.addInt(new int[] { ctx.getCtxID(), staticID, first, last });
    }
 
+   public void stateOwnerRead(Stator stator) {
+      StatorReader stateReaderCtx = stator.getReader(ITechStator.TYPE_3_CTX);
+      BADataIS dos = stateReaderCtx.getReader();
+      stateRead(dos);
+   }
+
+   public void stateOwnerWrite(Stator stator) {
+      StatorWriter stateWriterCtx = stator.getWriter(ITechStator.TYPE_3_CTX);
+      BADataOS dos = stateWriterCtx.getWriter();
+      stateWrite(dos);
+   }
+
    /**
     * We keep the.
     * What if a module is already loaded? Can we call this method?
@@ -212,11 +253,13 @@ public class CtxManager implements IStringable, IStatorable {
                int ctxID = dis.readInt();
                byte[] data = dis.readByteArray();
                //avoid corrupted data
-               int index = intos.findInt(ctxID);
-               if (index == -1) {
+               int ctxIndex = intos.findInt(ctxID);
+               //#debug
+               uc.toDLog().pData("ctxIndex=" + ctxIndex + " for ctxID=" + ctxID, this, CtxManager.class, "settingsRead", ITechLvl.LVL_04_FINER, true);
+               if (ctxIndex == -1) {
                   intos.add(data, ctxID);
                } else {
-                  ICtx mod = (ICtx) intos.getObjectAtIndex(index);
+                  ICtx mod = (ICtx) intos.getObjectAtIndex(ctxIndex);
                   mod.setSettings(data);
                }
             }
@@ -231,35 +274,19 @@ public class CtxManager implements IStringable, IStatorable {
       }
    }
 
-   public void registerRemoveCtx(ICtx ctx) {
-      intos.removeRef(ctx);
-   }
-
-   public void stateReadFrom(StatorReader state) {
-      if (state.hasData()) {
-         stateRead(state.getDataReader());
-      } else {
-         //#debug
-         toDLog().pData("No Ctx State Data", state, CtxManager.class, "stateReadFrom", LVL_05_FINE, true);
-      }
-   }
-
-   public ICtx getCtx(int ctxID) {
-      int index = intos.findInt(ctxID);
-      if (index == -1) {
-         return null;
-      } else {
-         return (ICtx) intos.getObjectAtIndex(index);
-      }
-   }
-
    /**
-    * Write state of Module Settings
+    * Write state of {@link ICtx#getSettings()} data.
+    * 
+    * <p>
+    * 
+    * </p>
     * @param dos
     */
    public void stateWrite(BADataOS dos) {
       //write the number
       int size = intos.nextempty;
+      int writeCount = dos.size();
+
       dos.writeInt(size);
       for (int i = 0; i < size; i++) {
          Object o = intos.objects[i];
@@ -288,12 +315,10 @@ public class CtxManager implements IStringable, IStatorable {
             dos.writeInt(0);
          }
       }
+      int writeCountB = dos.size();
+      int bytesWritten = writeCountB - writeCount;
       //#debug
-      toDLog().pData("Count=" + size, this, CtxManager.class, "settingsWrite");
-   }
-
-   public void stateWriteTo(StatorWriter state) {
-      stateWrite(state.getDataWriter());
+      toDLog().pData(bytesWritten + " bytes written to BADataOS", this, CtxManager.class, "stateWrite");
    }
 
    //#mdebug
@@ -306,7 +331,7 @@ public class CtxManager implements IStringable, IStatorable {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "CtxManager");
+      dc.root(this, CtxManager.class, 309);
       dc.nlVar("StaticIDs counter", STATIC_DEFINED);
 
       //set flag to prevent make onelines at lvl2
@@ -350,9 +375,24 @@ public class CtxManager implements IStringable, IStatorable {
          int sidLast = r[i + 3];
          dc.nl();
          dc.appendVar("ModuleID", modID);
-         dc.appendVarWithSpace("sid", sID);
+         dc.appendBracketedWithSpace(toStringModuleID(modID));
+         dc.appendVarWithSpace("StaticID", sID);
+         dc.appendBracketedWithSpace(toStringStaticID(sID));
          dc.append(" [" + sidFirst + "," + sidLast + "]");
       }
+      dc.tabRemove();
+
+      //toString all ctx
+
+      for (int i = 0; i < intos.nextempty; i++) {
+         Object o = intos.objects[i];
+         if (o != null) {
+            if (o instanceof IStringable) {
+               dc.nlLvl(((IStringable) o));
+            }
+         }
+      }
+
    }
 
    public String toString1Line() {
@@ -361,25 +401,6 @@ public class CtxManager implements IStringable, IStatorable {
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "CtxManager");
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
-
-   public String toStringProducerID(int producerID) {
-      int size = intos.nextempty;
-      for (int i = 0; i < size; i++) {
-         Object o = intos.objects[i];
-         if (o instanceof ICtx) {
-            ICtx module = (ICtx) o;
-            String producer = module.toStringProducerID(producerID);
-            if (producer != null) {
-               return producer;
-            }
-         }
-      }
-      return null;
    }
 
    public String toStringEventID(int producerID, int eventID) {
@@ -397,5 +418,57 @@ public class CtxManager implements IStringable, IStatorable {
       return null;
    }
    //#enddebug
+
+   public UCtx toStringGetUCtx() {
+      return uc;
+   }
+
+   public String toStringModuleID(int moduleID) {
+      int size = intos.nextempty;
+      for (int i = 0; i < size; i++) {
+         Object o = intos.objects[i];
+         if (o instanceof ICtx) {
+            ICtx module = (ICtx) o;
+            if (module.getCtxID() == moduleID) {
+               //StringUtils.
+               StringUtils strU = uc.getStrU();
+               String name = module.getClass().getName();
+               String str = strU.getStringAfterLastIndex(name, '.');
+               return str;
+            }
+         }
+      }
+      return null;
+   }
+
+   public String toStringProducerID(int producerID) {
+      int size = intos.nextempty;
+      for (int i = 0; i < size; i++) {
+         Object o = intos.objects[i];
+         if (o instanceof ICtx) {
+            ICtx module = (ICtx) o;
+            String producer = module.toStringProducerID(producerID);
+            if (producer != null) {
+               return producer;
+            }
+         }
+      }
+      return null;
+   }
+
+   public String toStringStaticID(int staticID) {
+      int size = intos.nextempty;
+      for (int i = 0; i < size; i++) {
+         Object o = intos.objects[i];
+         if (o instanceof ICtx) {
+            ICtx module = (ICtx) o;
+            String producer = module.toStringStaticID(staticID);
+            if (producer != null) {
+               return producer;
+            }
+         }
+      }
+      return null;
+   }
 
 }

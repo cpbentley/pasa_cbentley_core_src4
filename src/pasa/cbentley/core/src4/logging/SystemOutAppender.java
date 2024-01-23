@@ -175,7 +175,7 @@ public class SystemOutAppender extends BaseAppender {
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      dc.appendVarWithSpace("outputCounter", outputCounter);;
    }
 
    //#enddebug

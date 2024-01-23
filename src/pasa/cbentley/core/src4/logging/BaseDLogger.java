@@ -245,13 +245,13 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, BaseDLogger.class, "@line5");
+      dc.root(this, BaseDLogger.class, 250);
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
 
    private void toStringPrivate(Dctx dc) {
-      
+
    }
 
    public void toString1Line(Dctx dc) {
@@ -259,8 +259,6 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
-
-   
 
    //#enddebug
 

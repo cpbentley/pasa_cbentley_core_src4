@@ -11,6 +11,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -40,7 +41,7 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * @author Charles Bentley
  *
  */
-public class BADataIS implements DataInput, IStringable {
+public class BADataIS extends ObjectU implements DataInput, IStringable {
 
    /**
     * Reads from the
@@ -140,15 +141,13 @@ public class BADataIS implements DataInput, IStringable {
       return new String(chararr, 0, chararr_count);
    }
 
-   protected byte       bytearr[]    = new byte[80];
+   protected byte     bytearr[]    = new byte[80];
 
-   protected char       chararr[]    = new char[80];
+   protected char     chararr[]    = new char[80];
 
-   protected BAByteIS   in;
+   protected BAByteIS in;
 
-   protected byte       readBuffer[] = new byte[8];
-
-   protected final UCtx uc;
+   protected byte     readBuffer[] = new byte[8];
 
    /**
     * Creates a DataInputStream that uses the specified
@@ -157,7 +156,7 @@ public class BADataIS implements DataInput, IStringable {
     * @param  in   the specified input stream
     */
    public BADataIS(UCtx uc, BAByteIS in) {
-      this.uc = uc;
+      super(uc);
       this.in = in;
    }
 
@@ -167,8 +166,7 @@ public class BADataIS implements DataInput, IStringable {
     * @param out
     */
    public BADataIS(UCtx uc, BADataOS out) {
-      this.uc = uc;
-      this.in = new BAByteIS(uc, out.getOut().toByteArray());
+      this(uc, new BAByteIS(uc, out.getOut().toByteArray()));
    }
 
    /**
@@ -181,6 +179,10 @@ public class BADataIS implements DataInput, IStringable {
 
    public int getPosition() {
       return in.pos;
+   }
+
+   public boolean hasMore() {
+      return in.available() != 0;
    }
 
    public int read() {
@@ -376,6 +378,20 @@ public class BADataIS implements DataInput, IStringable {
    }
 
    /**
+    * Inverse of {@link BADataOS#writeOS(BADataOS)}
+    * @return
+    */
+   public BADataIS readIs() {
+      int len = readInt();
+      byte[] data = in.buf;
+      int offset = in.pos;
+      BAByteIS readerByte = new BAByteIS(uc, data, offset, len);
+      this.skipBytes(len);
+      BADataIS dis = new BADataIS(uc, readerByte);
+      return dis;
+   }
+
+   /**
     */
    public int readUnsignedByte() {
       int ch = in.read();
@@ -408,34 +424,22 @@ public class BADataIS implements DataInput, IStringable {
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "BADataIS");
+      dc.root(this, BADataIS.class, 414);
       toStringPrivate(dc);
-   }
+      super.toString(dc.sup());
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BADataIS");
-      toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
+      dc.nlLvl(in);
    }
 
    private void toStringPrivate(Dctx dc) {
 
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, BADataIS.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug

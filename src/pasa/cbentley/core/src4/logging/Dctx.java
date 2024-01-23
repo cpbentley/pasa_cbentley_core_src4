@@ -16,6 +16,7 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.BitUtils;
+import pasa.cbentley.core.src4.utils.CharUtils;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.core.src4.utils.StringUtils;
 
@@ -79,6 +80,10 @@ public class Dctx implements IToStringFlags {
     */
    private char[]         linesArrayStart = new char[] { '┌', '→', '╓', '←', '╒' };
 
+   private String         nlRoot;
+
+   private String         nlTabs;
+
    private IntToStrings   nulls;
 
    private CounterInt     numLines;
@@ -98,6 +103,8 @@ public class Dctx implements IToStringFlags {
    private IntToObjects   processingObjectsSingle;
 
    private StringBBuilder sb;
+
+   private String         strInterTab     = "  ";
 
    private int            tick;
 
@@ -147,10 +154,6 @@ public class Dctx implements IToStringFlags {
       this.isExpand = parent.isExpand;
       this.isLineNumbers = parent.isLineNumbers;
    }
-
-   private String nlRoot;
-
-   private String nlTabs;
 
    /**
     * 
@@ -237,6 +240,78 @@ public class Dctx implements IToStringFlags {
       sb.append(string);
    }
 
+   public void append(String[] strs, int offset, int len, String sep) {
+      for (int i = offset; i < offset + len; i++) {
+         if (i != offset) {
+            sb.append(sep);
+         }
+         sb.append(strs[i]);
+      }
+   }
+
+   public void append(String[] strs, String sep) {
+      this.append(strs, 0, strs.length, sep);
+   }
+
+   public void appendBracketedWithSpace(String str) {
+      this.append(' ');
+      this.append('[');
+      this.append(str);
+      this.append(']');
+   }
+
+   public void appendColorRGB(int colorRGB) {
+      sb.append(uc.getColorU().toStringColorRGB(colorRGB));
+   }
+
+   public void appendColorWithName(int rgb) {
+      this.appendColorWithName("color", rgb);
+   }
+
+   public void appendColorWithName(String color, int rgb) {
+      sb.append(color);
+      sb.append('=');
+      ColorUtils colorU = uc.getColorU();
+      colorU.toStringColorWithName(rgb, this);
+   }
+
+   public void appendColorWithSpace(String color, int rgb) {
+      sb.append(' ');
+      sb.append(color);
+      sb.append('=');
+      sb.append(uc.getColorU().toStringColor(rgb));
+   }
+
+   public void appendFlags(int flags, String title, IntToStrings data, boolean isPositive) {
+      sb.append(title);
+      if (isPositive) {
+         sb.append(" as TRUE = ");
+      } else {
+         sb.append(" as FALSE = ");
+      }
+      int count = 0;
+      for (int i = 0; i < data.getSize(); i++) {
+         int flag = data.getInt(i);
+         boolean hasFlag = BitUtils.hasFlag(flags, flag);
+         if ((isPositive && hasFlag) || (!isPositive && !hasFlag)) {
+            String str = data.getString(i);
+            if (count != 0) {
+               sb.append(",");
+            }
+            sb.append(str);
+            count++;
+         }
+      }
+   }
+
+   public void appendFlagsNegative(int flags, String title, IntToStrings data) {
+      this.appendFlags(flags, title, data, false);
+   }
+
+   public void appendFlagsPositive(int flags, String title, IntToStrings data) {
+      this.appendFlags(flags, title, data, true);
+   }
+
    /**
     * Appends the characters of string ignoring the given c
     * @param string
@@ -250,6 +325,19 @@ public class Dctx implements IToStringFlags {
             sb.append(ch);
          }
       }
+   }
+
+   public void appendPretty(String val, int value, int max) {
+      int numChars = String.valueOf(max).length();
+      String pretty = uc.getStrU().prettyInt0Padd(value, numChars);
+      append(val);
+      append(pretty);
+   }
+
+   public void appendVar(String s, boolean v) {
+      sb.append(s);
+      sb.append('=');
+      sb.append(String.valueOf(v));
    }
 
    /**
@@ -279,58 +367,6 @@ public class Dctx implements IToStringFlags {
          }
       }
 
-   }
-
-   public void append(String[] strs, int offset, int len, String sep) {
-      for (int i = offset; i < offset + len; i++) {
-         if (i != offset) {
-            sb.append(sep);
-         }
-         sb.append(strs[i]);
-      }
-   }
-
-   public void append(String[] strs, String sep) {
-      this.append(strs, 0, strs.length, sep);
-   }
-
-   public void appendColorRGB(int colorRGB) {
-      sb.append(uc.getColorU().toStringColorRGB(colorRGB));
-   }
-
-   public void appendColorWithSpace(String color, int rgb) {
-      sb.append(' ');
-      sb.append(color);
-      sb.append('=');
-      sb.append(uc.getColorU().toStringColor(rgb));
-   }
-
-   public void appendColorWithName(int rgb) {
-      this.appendColorWithName("color", rgb);
-   }
-
-   public void appendColorWithName(String color, int rgb) {
-      sb.append(color);
-      sb.append('=');
-      ColorUtils colorU = uc.getColorU();
-      colorU.toStringColorWithName(rgb, this);
-   }
-
-   public void line() {
-      this.nl();
-   }
-
-   public void appendPretty(String val, int value, int max) {
-      int numChars = String.valueOf(max).length();
-      String pretty = uc.getStrU().prettyInt0Padd(value, numChars);
-      append(val);
-      append(pretty);
-   }
-
-   public void appendVar(String s, boolean v) {
-      sb.append(s);
-      sb.append('=');
-      sb.append(String.valueOf(v));
    }
 
    public void appendVar(String s, int v) {
@@ -365,6 +401,13 @@ public class Dctx implements IToStringFlags {
       sb.append(v);
    }
 
+   public void appendVarWithNewLine(String s, boolean v) {
+      nl();
+      sb.append(s);
+      sb.append('=');
+      sb.append(String.valueOf(v));
+   }
+
    public void appendVarWithNewLine(String s, int v) {
       nl();
       sb.append(s);
@@ -372,11 +415,9 @@ public class Dctx implements IToStringFlags {
       sb.append(v);
    }
 
-   public void appendVarWithNewLine(String s, boolean v) {
-      nl();
-      sb.append(s);
-      sb.append('=');
-      sb.append(String.valueOf(v));
+   public void appendVarWithNewLine(String s, int[] ar, String sep, boolean size) {
+      this.nl();
+      debugAlone(s, ar, sep, size);
    }
 
    public void appendVarWithNewLine(String s, String v) {
@@ -433,18 +474,13 @@ public class Dctx implements IToStringFlags {
       debugAlone(s, ar, " ");
    }
 
+   public void appendVarWithSpace(String s, int[] ar, String sep) {
+      debugAlone(s, ar, sep);
+   }
+
    public void appendVarWithSpace(String s, int[] ar, String sep, boolean size) {
       sb.append(' ');
       debugAlone(s, ar, sep, size);
-   }
-
-   public void appendVarWithNewLine(String s, int[] ar, String sep, boolean size) {
-      this.nl();
-      debugAlone(s, ar, sep, size);
-   }
-
-   public void appendVarWithSpace(String s, int[] ar, String sep) {
-      debugAlone(s, ar, sep);
    }
 
    public void appendVarWithSpace(String s, Integer v) {
@@ -557,6 +593,16 @@ public class Dctx implements IToStringFlags {
       }
    }
 
+   public void debugAlone(String title, int[] ar, String sep) {
+      sb.append(title);
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            append(sep);
+         }
+         append(ar[i]);
+      }
+   }
+
    public void debugAlone(String title, int[] ar, String sep, boolean size) {
       sb.append(title);
       sb.append('=');
@@ -578,16 +624,6 @@ public class Dctx implements IToStringFlags {
       sb.append(']');
    }
 
-   public void debugAlone(String title, int[] ar, String sep) {
-      sb.append(title);
-      for (int i = 0; i < ar.length; i++) {
-         if (i != 0) {
-            append(sep);
-         }
-         append(ar[i]);
-      }
-   }
-
    private void doTitlePrefix() {
       if (titlePrefix != null) {
          sb.append(titlePrefix);
@@ -601,6 +637,7 @@ public class Dctx implements IToStringFlags {
          sb.append('[');
          sb.append(titleSuffix);
          sb.append(']');
+         titleSuffix = null;
       }
    }
 
@@ -620,7 +657,17 @@ public class Dctx implements IToStringFlags {
    }
 
    private char getLevelStartChar1Line() {
-      return '#';
+      return '→';
+   }
+
+   public String getNlTab(int numTabs) {
+      StringBBuilder sb = new StringBBuilder(uc);
+      for (int i = 0; i < numTabs; i++) {
+         char c = linesArray[i % linesArray.length];
+         sb.append(c);
+         sb.append(strInterTab);
+      }
+      return sb.toString();
    }
 
    public StringBBuilder getSB() {
@@ -666,6 +713,10 @@ public class Dctx implements IToStringFlags {
    public Dctx Level() {
       Dctx dc = new Dctx(uc, this);
       return dc;
+   }
+
+   public void line() {
+      this.nl();
    }
 
    /**
@@ -720,11 +771,6 @@ public class Dctx implements IToStringFlags {
       Dctx dc = new Dctx(uc, this);
       dc.tab();
       return dc;
-   }
-
-   public void nlSpace() {
-      nl();
-      space();
    }
 
    public void nl() {
@@ -838,6 +884,10 @@ public class Dctx implements IToStringFlags {
       nlLvl(title, is, 0, true);
    }
 
+   public void nlLvl(IStringable is, String title, Class cl) {
+      nlLvl(title, is, 0, true, cl);
+   }
+
    /**
     * 
     * @param title
@@ -898,8 +948,20 @@ public class Dctx implements IToStringFlags {
       nlLvl(title, is, flags, isTitleSuffix, false);
    }
 
+   public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix, Class cl) {
+      nlLvl(title, is, flags, isTitleSuffix, false, cl);
+   }
+
    public void nlLvl(String title, IStringable is, int flags, boolean flip, boolean list) {
       nlLvl(title, is, flags, flip, list, true);
+   }
+
+   public void nlLvl(String title, IStringable is, int flags, boolean flip, boolean list, Class cl) {
+      nlLvl(title, is, flags, flip, list, true, cl);
+   }
+
+   public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix, boolean listNulls, boolean showTitleWhenNotNull) {
+      nlLvl(title, is, flags, isTitleSuffix, listNulls, showTitleWhenNotNull, null);
    }
 
    /**
@@ -912,13 +974,28 @@ public class Dctx implements IToStringFlags {
     * @param showTitleWhenNotNull when true, show title when {@link IStringable} is not null.
     * That list is printed by the call {@link Dctx#listNulls()}
     */
-   public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix, boolean listNulls, boolean showTitleWhenNotNull) {
+   public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix, boolean listNulls, boolean showTitleWhenNotNull, Class cl) {
       if (is == null) {
          if (listNulls) {
             nulls.add(title);
          } else {
             Dctx dc = newLevel(flags);
-            dc.append(title + " is Null");
+            if (cl == null) {
+               dc.append(getLevelStartChar());
+               dc.append(' ');
+               dc.append(title + " is Null");
+            } else {
+               dc.append(getLevelStartChar());
+               dc.append(' ');
+               sb.append('(');
+               String strCl = getClassSimpleName(cl);
+               append(strCl);
+               append(".java:");
+               append(15);
+               append(")");
+               dc.append(' ');
+               dc.append(title + " is Null");
+            }
          }
       } else {
          Dctx dc = newLevel(flags);
@@ -940,10 +1017,11 @@ public class Dctx implements IToStringFlags {
             //dc.setRootReference(reference);
             if (isLineNumbers) {
                int lineNum = processedObjectsMulti.getInt(referenceIndex);
-               this.append("@Line[");
-               this.append(lineNum);
-               this.append("]");
+               String suffix = "@Line " + lineNum + "";
+               dc.setTitleSuffix(suffix);
+               this.lineForCollapsed = lineNum;
             }
+            dc.setFlag(FLAG_DATA_07_COLLAPSED, true);
             is.toString1Line(dc);
          } else {
             is.toString(dc);
@@ -969,10 +1047,6 @@ public class Dctx implements IToStringFlags {
          processingObjectsSingle.add(is, numLines.getCount());
          is.toString1Line(this);
       }
-   }
-
-   public void nlLvlCtx(ICtx ctx, Class cl) {
-      this.nlLvl(ctx, cl);
    }
 
    /**
@@ -1001,6 +1075,11 @@ public class Dctx implements IToStringFlags {
       }
    }
 
+   /**
+    * Considered {@link IStringable} inside, otherwise {@link ClassCastException}
+    * @param ar
+    * @param t
+    */
    public void nlLvlArray(Object[] ar, String t) {
       if (ar == null) {
          nl();
@@ -1214,6 +1293,10 @@ public class Dctx implements IToStringFlags {
       nlLvlArray(t, ars);
    }
 
+   public void nlLvlCtx(ICtx ctx, Class cl) {
+      this.nlLvl(ctx, cl);
+   }
+
    public void nlLvlIgnoreNull(String t, IStringable is) {
       Dctx dc = new Dctx(uc, this);
       dc.flags = flags;
@@ -1323,9 +1406,21 @@ public class Dctx implements IToStringFlags {
          if (o instanceof IStringable) {
             nlLvlTitleIfNull((IStringable) o, title);
          } else {
-            uc.toString(this, o, title);
+            boolean isPrinted = uc.toString(this, o, title);
+            if (!isPrinted) {
+               nlLvl(title, new StringableWrapper(uc, o));
+            }
          }
       }
+   }
+
+   /**
+    * Compared to {@link Dctx#nlLvlO(Object, String)}, this method
+    * @param title
+    * @param o
+    */
+   public void nlLvlObject(String title, Object o) {
+      nlLvlO(o, title);
    }
 
    public void nlLvlOWithTitle(Object o, String title, ICtx ctx) {
@@ -1341,14 +1436,6 @@ public class Dctx implements IToStringFlags {
             this.nl();
             uc.toString(this, o, title);
          }
-      }
-   }
-
-   public void nlLvlObject(String title, Object o) {
-      if (o == null) {
-         nlLvl(title, null);
-      } else {
-         nlLvl(title, new StringableWrapper(uc, o));
       }
    }
 
@@ -1380,6 +1467,16 @@ public class Dctx implements IToStringFlags {
             }
          }
       }
+   }
+
+   public void nlSpace() {
+      nl();
+      space();
+   }
+
+   public void nlTab() {
+      nl();
+      tab();
    }
 
    public void nlThread(String title, Thread t) {
@@ -1443,11 +1540,6 @@ public class Dctx implements IToStringFlags {
       } else {
          nulls.add(string);
       }
-   }
-
-   public void nlTab() {
-      nl();
-      tab();
    }
 
    public void oneLine(IStringable is) {
@@ -1539,15 +1631,56 @@ public class Dctx implements IToStringFlags {
 
    public void root1Line(Object o, Class cl) {
       String str = getClassSimpleName(cl);
-      this.root1Line(o, str);
+      this.root1Line(o, str, cl);
    }
 
-   public void root1Line(Object o, String str) {
-      sb.append(getLevelStartChar1Line());
-      doTitlePrefix();
-      sb.append(str);
+   public void root1LineCollapsed(Object o, String str, int line) {
+      if (isClassLinks) {
+         sb.append(getLevelStartChar());
+         doTitlePrefix();
+         sb.append(' ');
+         sb.append('(');
+         append(str);
+         append(".java:");
+         append(line);
+         append(")");
+      } else {
+         sb.append(getLevelStartChar());
+         doTitlePrefix();
+         append(str);
+      }
       setCompact(true);
       doTitleSuffix();
+   }
+
+   private int lineForCollapsed;
+
+   public void root1Line(Object o, String str) {
+      root1Line(o, str, null);
+   }
+
+   public void root1Line(Object o, String str, Class cl) {
+      if (hasFlag(FLAG_DATA_07_COLLAPSED)) {
+         this.setFlag(FLAG_DATA_07_COLLAPSED, false);
+         root1LineCollapsed(o, str, lineForCollapsed);
+      } else {
+         if (isClassLinks && cl != null) {
+            sb.append(getLevelStartChar1Line());
+            doTitlePrefix();
+            sb.append(' ');
+            sb.append('(');
+            append(str);
+            append(".java:40)");
+            setCompact(true);
+            doTitleSuffix();
+         } else {
+            sb.append(getLevelStartChar1Line());
+            doTitlePrefix();
+            sb.append(str);
+            setCompact(true);
+            doTitleSuffix();
+         }
+      }
    }
 
    public void rootCtx(ICtx ctx, Class cl) {
@@ -1574,14 +1707,6 @@ public class Dctx implements IToStringFlags {
       tab();
    }
 
-   public void rootN1Line(Object o, String str) {
-      sb.append(getLevelStartChar1Line());
-      doTitlePrefix();
-      sb.append(str);
-      setCompact(true);
-      doTitleSuffix();
-   }
-
    public void rootN(Object o, String str, Class cl, int line) {
       //add a suffix
       if (isClassLinks) {
@@ -1596,6 +1721,14 @@ public class Dctx implements IToStringFlags {
          setTitlePrefix(sb.toString());
       }
       this.rootN(o, str);
+   }
+
+   public void rootN1Line(Object o, String str) {
+      sb.append(getLevelStartChar1Line());
+      doTitlePrefix();
+      sb.append(str);
+      setCompact(true);
+      doTitleSuffix();
    }
 
    public void rootN1Line(Object o, String str, Class cl, int line) {
@@ -1667,6 +1800,10 @@ public class Dctx implements IToStringFlags {
       flags = BitUtils.setFlag(flags, flag, v);
    }
 
+   public boolean hasFlag(int flag) {
+      return BitUtils.hasFlag(flags, flag);
+   }
+
    /**
     * Sets
     * @param ctx
@@ -1718,15 +1855,15 @@ public class Dctx implements IToStringFlags {
    }
 
    /**
-    * Increase tabulation
+    * Increase tabulation.
+    * 
+    * Undo with {@link Dctx#tabRemove()}
     */
    public void tab() {
       char c = linesArray[numTabs % linesArray.length];
       nlTabs = nlTabs + c + strInterTab;
       numTabs++;
    }
-
-   private String strInterTab = "  ";
 
    /**
     * Decrease tabulation
@@ -1736,16 +1873,6 @@ public class Dctx implements IToStringFlags {
          numTabs--;
          nlTabs = getNlTab(numTabs);
       }
-   }
-
-   public String getNlTab(int numTabs) {
-      StringBBuilder sb = new StringBBuilder(uc);
-      for (int i = 0; i < numTabs; i++) {
-         char c = linesArray[i % linesArray.length];
-         sb.append(c);
-         sb.append(strInterTab);
-      }
-      return sb.toString();
    }
 
    /**
@@ -1781,41 +1908,27 @@ public class Dctx implements IToStringFlags {
       }
    }
 
-   public void appendFlags(int flags, String title, IntToStrings data, boolean isPositive) {
-      sb.append(title);
-      if (isPositive) {
-         sb.append(" as TRUE = ");
+   public void nlLvlArrayBytes(String title, byte[] data) {
+      if (data == null) {
+         this.nl();
+         this.append(title);
+         this.append(" is null");
       } else {
-         sb.append(" as FALSE = ");
-      }
-      int count = 0;
-      for (int i = 0; i < data.getSize(); i++) {
-         int flag = data.getInt(i);
-         boolean hasFlag = BitUtils.hasFlag(flags, flag);
-         if ((isPositive && hasFlag) || (!isPositive && !hasFlag)) {
-            String str = data.getString(i);
-            if (count != 0) {
-               sb.append(",");
-            }
-            sb.append(str);
-            count++;
-         }
+         this.nl();
+         nlLvlArrayBytes(title, data, 0, data.length, 15);
       }
    }
 
-   public void appendFlagsNegative(int flags, String title, IntToStrings data) {
-      this.appendFlags(flags, title, data, false);
-   }
-
-   public void appendFlagsPositive(int flags, String title, IntToStrings data) {
-      this.appendFlags(flags, title, data, true);
-   }
-
-   public void appendBracketedWithSpace(String str) {
-      this.append(' ');
-      this.append('[');
-      this.append(str);
-      this.append(']');
+   public void nlLvlArrayBytes(String title, byte[] data, int offset, int len, int colSize) {
+      if (data == null) {
+         this.nl();
+         this.append(title);
+         this.append(" is null");
+      } else {
+         this.nl();
+         this.append(title);
+         uc.getBU().toStringBytes(this, data, offset, len, colSize);
+      }
    }
 
    //#enddebug
