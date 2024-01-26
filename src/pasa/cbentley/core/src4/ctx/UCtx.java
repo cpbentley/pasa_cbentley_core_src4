@@ -118,6 +118,7 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  * <li>Yet provides the flexibility to implement the {@link IConfig} interfaces using text file or XML files.
  * </ul>
  * <li>Rule #4 The constructor of the ProjectNameCtx contains all the dependencies to other code contexts.
+ * <li> As a corollary of rule #4, the constructor of a Code Ctx cannot instantiate another Code Ctx.
  * <li>Field references of code contexts are saved as <code>protected final</code> as a class field. 
  * <li>What does the .ctx package contains?
  * <ul>
@@ -225,89 +226,76 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  */
 public class UCtx implements ICtx, IEventsCore {
 
-   public static final int CTX_ID = 1;
+   public static final int  CTX_ID = 1;
 
-   private ArrayUtils      au;
+   private ArrayUtils       au;
 
-   private BitUtils        bu;
+   private BitUtils         bu;
 
-   private ColorUtils      coloru;
+   private ColorUtils       coloru;
 
-   private IConfigU        config;
+   private IConfigU         config;
 
-   private CtxManager      ctxManager;
+   private final CtxManager ctxManager;
 
-   private CharUtils       cu;
+   private CharUtils        cu;
 
    //#debug
-   private IDLog           dlog;
+   private IDLog            dlog;
 
-   private EventBusArray   eventBusRoot;
+   private EventBusArray    eventBusRoot;
 
-   private Geo2dUtils      geo2dU;
+   private Geo2dUtils       geo2dU;
 
-   private IOUtils         iou;
+   private IOUtils          iou;
 
-   private IntUtils        iu;
+   private IntUtils         iu;
 
-   private LongUtils       lu;
+   private LongUtils        lu;
 
-   private MathUtils       mathUtils;
+   private MathUtils        mathUtils;
 
-   private IMemory         mem;
+   private IMemory          mem;
 
-   private Random          random = null;
+   private Random           random = null;
 
-   private int             registrationID;
+   private int              registrationID;
 
-   private IStrComparator  strc;
+   private IStrComparator   strc;
 
    /**
     * Might be null.
     */
-   private IStringProducer stringProducer;
+   private IStringProducer  stringProducer;
 
-   private StringUtils     stru;
+   private StringUtils      stru;
 
-   private ShortUtils      su;
+   private ShortUtils       su;
 
    //#debug
-   private int             toStringFlags;
+   private int              toStringFlags;
 
-   private URLUtils        urlu;
+   private URLUtils         urlu;
 
-   private IUserLog        userLog;
+   private IUserLog         userLog;
 
-   private WorkerThread    workerThread;
+   private WorkerThread     workerThread;
 
-   private String          encoding;
+   private String           encoding;
 
-   private DIDManager      didManager;
+   private DIDManager       didManager;
 
-   private StatorFactoryUC statorFactoryUC;
+   private StatorFactoryUC  statorFactoryUC;
 
-   private ApiManager apiManager;
+   private ApiManager       apiManager;
+
+   private String           name;
 
    /**
     * Assume a simple Java Host 
     */
    public UCtx() {
-      config = new ConfigUDef(this);
-      setCtxManager(new CtxManager(this));
-      aInit();
-   }
-
-   /**
-    * Register new {@link UCtx} with Manager
-    * @param cm
-    */
-   public UCtx(CtxManager cm) {
-      config = new ConfigUDef(this);
-      if (cm == null) {
-         throw new NullPointerException();
-      }
-      this.setCtxManager(cm);
-      aInit();
+      this(null,null);
    }
 
    /**
@@ -315,15 +303,20 @@ public class UCtx implements ICtx, IEventsCore {
     * @param config when null defaults to {@link ConfigUDef}
     */
    public UCtx(IConfigU config) {
+      this(config, null);
+   }
+
+   public UCtx(IConfigU config, String name) {
       if (config == null) {
-         config = new ConfigUDef(this);
-      } else {
-         //it cannot have been created with us
-         //#debug
-         config.toStringSetDebugUCtx(this);
-      }
+         config = new ConfigUDef();
+      } 
+      
+      //#debug
+      config.toStringSetDebugUCtx(this);
+      
+      this.name = name;
       this.config = config;
-      setCtxManager(new CtxManager(this));
+      ctxManager = new CtxManager(this);
       aInit();
    }
 
@@ -342,7 +335,11 @@ public class UCtx implements ICtx, IEventsCore {
       iou = new IOUtils(this);
 
       //#debug
-      dlog = new BaseDLogger(this);
+      BaseDLogger dlog = new BaseDLogger(this);
+      if (name != null) {
+         dlog.setName(name);
+      }
+      this.dlog = dlog;
       ILogConfigurator logConfigurator = config.toStringGetLogConfigurator(this);
       //TODO there might be different appenders with different configurations
       //Files etc etc Here we deal with default appender
@@ -351,9 +348,9 @@ public class UCtx implements ICtx, IEventsCore {
       logConfigurator.apply(configOfAppender); //apply config
 
       String message = "Very First Log Message; Using LogConfigurator:" + logConfigurator.getClass().getName();
-      dlog.pAlways(message, null, UCtx.class, "constructor");
+      dlog.pAlways(message, null, UCtx.class, "[" + +this.hashCode() + "]");
       dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor");
-      dlog.pAlways("IUConfig", config, UCtx.class, "constructor");
+      dlog.pAlways("IConfigU", config, UCtx.class, "constructor");
 
       //this is not for debug purposes. its the application log for the application user.
       this.userLog = new UserLogSystemOut(this);
@@ -390,11 +387,12 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public ApiManager getApiManager() {
-      if(apiManager == null) {
+      if (apiManager == null) {
          apiManager = new ApiManager(this);
       }
       return apiManager;
    }
+
    public BADataIS createNewBADataIS(byte[] data, int offset) {
       BAByteIS bis = new BAByteIS(this, data, offset, data.length);
       BADataIS dis = new BADataIS(this, bis);
@@ -438,11 +436,12 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public void setConfigU(IConfigU configU) {
-      if(configU == null) {
+      if (configU == null) {
          throw new NullPointerException();
       }
       this.config = configU;
    }
+
    public int getCtxID() {
       return CTX_ID;
    }
@@ -611,9 +610,6 @@ public class UCtx implements ICtx, IEventsCore {
       return workerThread;
    }
 
-   public void setCtxManager(CtxManager ctxManager) {
-      this.ctxManager = ctxManager;
-   }
 
    //#mdebug
    public void toStringSetDLog(IDLog log) {
@@ -748,7 +744,7 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "UCtx");
+      dc.root1Line(this, UCtx.class);
       toStringPrivate(dc);
    }
 
@@ -855,6 +851,7 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("name", name);
       dc.appendVarWithSpace("ctxid", getCtxID());
       dc.appendVarWithSpace("RegistrationID", getRegistrationID());
       dc.appendVarWithSpace("encoding", encoding);

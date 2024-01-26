@@ -97,7 +97,7 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
          int objectID = reader.readInt();
          IStatorable o = (IStatorable) map.getObjectAtIndex(objectID);
          if (o == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Could not find objectID" + objectID + " for");
          }
          //sanity check
          if (currentInstance != null) {
@@ -134,20 +134,37 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
                }
                IStatorFactory fac = ctx.getStatorFactory();
                if (fac == null) {
-                  throw new IllegalArgumentException("No Factory for ");
+                  manageErrorNullFactory(ctxID, classID, ctx);
                }
-               o = (IStatorable) fac.createObject(classID);
+               o = (IStatorable) fac.createObject(this, classID);
                if (o == null) {
-                  throw new IllegalArgumentException("Class ID not supported " + classID);
+                  manageErrorNullObject(ctxID, classID, ctx, fac);
                }
-               o.stateReadFrom(this);
+               //set it before reading because stateRead might need it because of a child parent link.
                map.setObject(o, objectID);
+
+               o.stateReadFrom(this);
                return o;
             }
          }
       } else {
          throw new IllegalArgumentException();
       }
+   }
+
+   private void manageErrorNullFactory(int ctxID, int classID, ICtx ctx) {
+      //because of
+      String msg = "Could not create Factory for ctxID=" + ctxID + " " + ctx.getClass().getName();
+      //#debug
+      toDLog().pNull(msg, null, StatorReader.class, "readObject");
+      throw new IllegalArgumentException(msg);
+   }
+
+   private void manageErrorNullObject(int ctxID, int classID, ICtx ctx, IStatorFactory fac) {
+      //because of
+      //#debug
+      toDLog().pNull("Could not create object ", this, StatorReader.class, "readObject", LVL_05_FINE, true);
+      throw new IllegalArgumentException("Class ID not supported " + classID + " for " + fac.getClass());
    }
 
    public int getNumObjects() {
@@ -207,7 +224,7 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
     * One way to init it
     * called by {@link Stator}
     * 
-    * Inverse of {@link StatorWriter#serialize(BADataOS)}
+    * Inverse of {@link StatorWriter#serializeData(BADataOS)}
     * @param reader
     */
    public void init(BADataIS dis) {
@@ -221,12 +238,28 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
          //badly constructed
          throw new IllegalArgumentException("bad ctrl byte");
       }
-      
+
       initSub(dis);
    }
 
+   /**
+    * Current reader position. Will change when reader is read
+    * @return
+    */
+   public int getReaderByteOffset() {
+      return this.reader.getPosition();
+   }
+
+   /**
+    * The byte array being used by this {@link StatorReader}.
+    * @return
+    */
+   public byte[] getReaderByte() {
+      return this.reader.getArray();
+   }
+
    protected void initSub(BADataIS dis) {
-      
+
    }
 
    /**
@@ -262,6 +295,11 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
 
    public void setFlag(int flag, boolean b) {
       flags = BitUtils.setFlag(flags, flag, b);
+      if (flag == ITechStator.FLAG_1_FAILED) {
+         if (b) {
+            this.stator.setFailedTrue();
+         }
+      }
    }
 
    /**
@@ -298,6 +336,13 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
 
    public int readStartIndex() {
       return reader.readInt();
+   }
+
+   public void checkInt(int v) {
+      int i = readInt();
+      if (i != v) {
+         throw new IllegalArgumentException(v + "!=" + i);
+      }
    }
 
    //#enddebug

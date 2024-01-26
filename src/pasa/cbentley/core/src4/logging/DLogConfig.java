@@ -105,6 +105,9 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       if (hasFlagMaster(MASTER_FLAG_07_THREAD_DATA)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
       }
+      if (hasFlagMaster(MASTER_FLAG_10_OWNER_NAME_UC)) {
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_08_OWNER_NAME, true);
+      }
       //Dev override master flag
       if (type.hasDevFlag(DEV_4_THREAD)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);

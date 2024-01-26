@@ -6,6 +6,7 @@ package pasa.cbentley.core.src4.logging;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
+import pasa.cbentley.core.src4.utils.StringUtils;
 
 public class SystemOutAppender extends BaseAppender {
 
@@ -27,6 +28,8 @@ public class SystemOutAppender extends BaseAppender {
       return null;
    }
 
+   private volatile int outputCounterNext = 0;
+
    /**
     * The log entry is a value type and is owned by the Appender. It is not shared.
     */
@@ -45,12 +48,36 @@ public class SystemOutAppender extends BaseAppender {
       //get DLogEntry appenders for this call
       StringBBuilder sb = new StringBBuilder(uc, 500);
 
+      int count = sb.getCount();
+      if (ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
+         sb.append(entry.getNameOwner());
+         sb.append('\t');
+      }
+      int workingCounter = outputCounterNext; //avoid thread issues
+
+      if (workingCounter == 0) {
+         sb.append(StringUtils.BLOCK_FULL);
+         sb.append(StringUtils.ARROW_RIGHT);
+         sb.append(workingCounter);
+      } else if (workingCounter < 10) {
+         sb.append(' ');
+         sb.append(' ');
+         sb.append(workingCounter);
+      } else if (workingCounter < 100) {
+         sb.append(' ');
+         sb.append(workingCounter);
+      } else {
+         sb.append(workingCounter);
+      }
+      sb.append(' ');
+
       //first enter message. format is hard coded
       String tagString = entry.getTagString();
       sb.append(tagString);
       if (ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
          sb.append("[" + entry.getThreadName() + "]");
       }
+      int extraSpaces = sb.getCount() - count;
       sb.tab();
 
       //format specific
@@ -100,7 +127,14 @@ public class SystemOutAppender extends BaseAppender {
                sb.append(str);
             }
          } else {
-            String objnl = "\n\t"; //the newline tab for the DCtx of the Stringable
+            //create a new line prefix with as many spaces are necessary to match the start
+            StringBBuilder sbnl = new StringBBuilder(uc, extraSpaces + 2);
+            sbnl.append('\n');
+            for (int i = 0; i < extraSpaces; i++) {
+               sbnl.append('-');
+            }
+            sbnl.append('\t');
+            String objnl = sbnl.toString(); //the newline tab for the DCtx of the Stringable
             Dctx dc = new Dctx(uc, objnl);
             stringable.toString(dc);
             dc.toStringCtx();
@@ -122,14 +156,15 @@ public class SystemOutAppender extends BaseAppender {
       //         System.out.print("|");
       //      } else {
       //      }
-      outputCounter++;
-      if (outputCounter == 10000) {
-         outputCounter = 1;
+      synchronized (System.out) {
+         outputCounter++;
+         if (outputCounter == 10000) {
+            outputCounter = 1;
+         }
+         outputCounterNext = outputCounter;
+         System.out.println(strToPrint);
+         previousStr = strToPrint;
       }
-      System.out.print(outputCounter);
-      System.out.print(" ");
-      System.out.println(strToPrint);
-      previousStr = strToPrint;
 
    }
 
@@ -175,7 +210,8 @@ public class SystemOutAppender extends BaseAppender {
    }
 
    private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("outputCounter", outputCounter);;
+      dc.appendVarWithSpace("outputCounter", outputCounter);
+      ;
    }
 
    //#enddebug

@@ -88,6 +88,7 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       ptPrint(msg, str, c, method, m, flag, getLevelDefault(), false);
    }
 
+   private String name;
    /**
     * 
     * @param msg
@@ -112,6 +113,7 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       ILogEntryAppender[] appenders = getAppenders();
       for (int i = 0; i < appenders.length; i++) {
          DLogEntry entry = new DLogEntry();
+         entry.setNameOwner(name);
          entry.setCount(count);
          entry.setMethod(method);
          entry.setClassL(c);
@@ -127,6 +129,10 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
          entry.setLevel(lvl);
          appenders[i].processLogEntry(entry);
       }
+   }
+   
+   public long getCount() {
+      return count;
    }
 
    //#mdebug
@@ -145,6 +151,14 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
 
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("count", count);
+   }
+
+   public String getName() {
+      return name;
+   }
+
+   public void setName(String name) {
+      this.name = name;
    }
 
    //#enddebug

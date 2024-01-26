@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.structs.synch;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -17,17 +18,15 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * @author Charles Bentley
  *
  */
-public class MutexSignal implements IStringable {
+public class MutexSignal extends ObjectU implements IStringable {
 
    /**
     * Guard against spurious wakeups (in linux)
     */
-   private boolean      isClosed = true;
-
-   protected final UCtx uc;
+   private boolean isClosed = true;
 
    public MutexSignal(UCtx uc) {
-      this.uc = uc;
+      super(uc);
    }
 
    /**
@@ -62,22 +61,22 @@ public class MutexSignal implements IStringable {
       this.isClosed = true;
    }
 
+   public synchronized void acquireTest() {
+      while (this.isClosed) {
+         try {
+            wait();
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+      }
+      this.isClosed = true;
+   }
+
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "MutexSignal");
+      dc.root(this, MutexSignal.class, 70);
       toStringPrivate(dc);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      super.toString(dc.sup());
    }
 
    private void toStringPrivate(Dctx dc) {
@@ -85,12 +84,9 @@ public class MutexSignal implements IStringable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "MutexSignal");
+      dc.root1Line(this, MutexSignal.class);
       toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
+      super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug

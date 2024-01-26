@@ -34,6 +34,7 @@ public class ConfigUSettable implements IConfigU {
    public ConfigUSettable() {
       encoding = "UTF-8";
    }
+
    public String getDefaultEncoding() {
       return encoding;
    }
@@ -93,7 +94,7 @@ public class ConfigUSettable implements IConfigU {
    public void setLogConfigurator(ILogConfigurator logConfigurator) {
       this.logConfigurator = logConfigurator;
    }
-   
+
    //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();
@@ -104,7 +105,7 @@ public class ConfigUSettable implements IConfigU {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ConfigUSettable.class);
+      dc.root(this, ConfigUSettable.class, 107);
       toStringPrivate(dc);
       dc.appendVarWithSpace("isEraseSettings", isEraseSettings);
       dc.appendVarWithSpace("isEraseSettingsAll", isEraseSettingsAll);

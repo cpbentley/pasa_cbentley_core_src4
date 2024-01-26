@@ -167,5 +167,11 @@ public interface IDLog extends IStringable {
 
    public void pCmd1(String msg, IStringable str, Class c, String method);
 
+   /**
+    * Number of printed statements
+    * @return
+    */
+   public long getCount();
+
    //#enddebug
 }

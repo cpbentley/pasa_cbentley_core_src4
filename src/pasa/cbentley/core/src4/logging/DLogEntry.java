@@ -24,18 +24,31 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  *
  */
 public class DLogEntry implements ITechLvl {
+   private Class       classL;
+
+   private Class       classStringable;
+
+   /**
+    * ID counter of log entry. usually incrementing and set by logger
+    */
+   private long        count;
+
+   private int         flagsDev;
+
+   private int         lvl;
+
+   private String      method;
+
    //#mdebug
    private String      msg;
 
-   private IStringable stringable;
+   private String      name;
 
    private String      string1Line;
 
+   private IStringable stringable;
+
    private String      stringFull;
-
-   private Class       classL;
-
-   private String      method;
 
    private int         tagID;
 
@@ -47,161 +60,17 @@ public class DLogEntry implements ITechLvl {
     */
    private String      tagString;
 
-   /**
-    * Time of the log.. not mandatory.
-    */
-   private long        timeStamp;
-
    private String      threadName;
 
    private Throwable   throwable;
 
    /**
-    * ID counter of log entry. usually incrementing and set by logger
+    * Time of the log.. not mandatory.
     */
-   private long        count;
-
-   private int         lvl;
-
-   private int         flagsDev;
-
-   private Class       classStringable;
+   private long        timeStamp;
 
    public DLogEntry() {
       lvl = LVL_05_FINE;
-   }
-
-   public void fillThreadName() {
-      if (threadName == null) {
-         threadName = Thread.currentThread().getName();
-      }
-   }
-
-   public String getThreadName() {
-      return threadName;
-   }
-
-   public String getMsg() {
-      return msg;
-   }
-
-   public void setMsg(String msg) {
-      this.msg = msg;
-   }
-
-   public LogEntryType getType() {
-      return new LogEntryType();
-   }
-
-   /**
-    * 
-    * @return
-    */
-   public Class getClassL() {
-      return classL;
-   }
-
-   public Class getClassStringable() {
-      return classStringable;
-   }
-
-   public void setClassStringable(Class c) {
-      this.classStringable = c;
-   }
-
-   public void setClassL(Class c) {
-      this.classL = c;
-   }
-
-   public String getMethod() {
-      return method;
-   }
-
-   public void setMethod(String method) {
-      this.method = method;
-   }
-
-   public int getTagID() {
-      return tagID;
-   }
-
-   public int getLevel() {
-      return lvl;
-   }
-
-   public void setLevel(int lvl) {
-      this.lvl = lvl;
-   }
-
-   public void setTagID(int tagID) {
-      this.tagID = tagID;
-   }
-
-   public String getTagString() {
-      return tagString;
-   }
-
-   public void setTagString(String tagString) {
-      this.tagString = tagString;
-   }
-
-   public long getCount() {
-      return count;
-   }
-
-   public void setCount(long count) {
-      this.count = count;
-   }
-
-   public IStringable getStringable() {
-      return stringable;
-   }
-
-   public void setStringable(IStringable stringable) {
-      this.stringable = stringable;
-   }
-
-   public String getString1Line() {
-      if (string1Line == null) {
-         if (stringable == null) {
-            string1Line = "";
-         } else {
-            string1Line = stringable.toString1Line();
-         }
-      }
-      return string1Line;
-   }
-
-   public String getStringFull() {
-      if (stringFull == null) {
-         if (stringable == null) {
-            stringFull = "";
-         } else {
-            stringFull = stringable.toString();
-         }
-      }
-      return stringFull;
-   }
-
-   /**
-    * Converts all objects to String. derefence objects linked to application
-    * so they will not be garbaged collected.
-    */
-   public void flatten() {
-      stringable = null;
-      throwable = null;
-   }
-
-   /**
-    * Get the {@link Throwable} if any associated with this 
-    * @return
-    */
-   public Throwable getThrowable() {
-      return throwable;
-   }
-
-   public void setThrowable(Throwable throwable) {
-      this.throwable = throwable;
    }
 
    /**
@@ -220,6 +89,103 @@ public class DLogEntry implements ITechLvl {
       return ec;
    }
 
+   public void fillThreadName() {
+      if (threadName == null) {
+         threadName = Thread.currentThread().getName();
+      }
+   }
+
+   /**
+    * Converts all objects to String. derefence objects linked to application
+    * so they will not be garbaged collected.
+    */
+   public void flatten() {
+      stringable = null;
+      throwable = null;
+   }
+
+   /**
+    * 
+    * @return
+    */
+   public Class getClassL() {
+      return classL;
+   }
+
+   public Class getClassStringable() {
+      return classStringable;
+   }
+
+   public long getCount() {
+      return count;
+   }
+
+   public int getLevel() {
+      return lvl;
+   }
+
+   public String getMethod() {
+      return method;
+   }
+
+   public String getMsg() {
+      return msg;
+   }
+
+   public String getNameOwner() {
+      return name;
+   }
+
+   public String getString1Line() {
+      if (string1Line == null) {
+         if (stringable == null) {
+            string1Line = "";
+         } else {
+            string1Line = stringable.toString1Line();
+         }
+      }
+      return string1Line;
+   }
+
+   public IStringable getStringable() {
+      return stringable;
+   }
+
+   public String getStringFull() {
+      if (stringFull == null) {
+         if (stringable == null) {
+            stringFull = "";
+         } else {
+            stringFull = stringable.toString();
+         }
+      }
+      return stringFull;
+   }
+
+   public int getTagID() {
+      return tagID;
+   }
+
+   public String getTagString() {
+      return tagString;
+   }
+
+   public String getThreadName() {
+      return threadName;
+   }
+
+   /**
+    * Get the {@link Throwable} if any associated with this 
+    * @return
+    */
+   public Throwable getThrowable() {
+      return throwable;
+   }
+
+   public LogEntryType getType() {
+      return new LogEntryType();
+   }
+
    /**
     * Has the dev set the flag in its call of the method
     * @param flag
@@ -227,6 +193,18 @@ public class DLogEntry implements ITechLvl {
     */
    public boolean hasDevFlag(int flag) {
       return BitUtils.hasFlag(flagsDev, flag);
+   }
+
+   public void setClassL(Class c) {
+      this.classL = c;
+   }
+
+   public void setClassStringable(Class c) {
+      this.classStringable = c;
+   }
+
+   public void setCount(long count) {
+      this.count = count;
    }
 
    /**
@@ -239,6 +217,38 @@ public class DLogEntry implements ITechLvl {
     */
    public void setDevFlags(int flags) {
       flagsDev = flags;
+   }
+
+   public void setLevel(int lvl) {
+      this.lvl = lvl;
+   }
+
+   public void setMethod(String method) {
+      this.method = method;
+   }
+
+   public void setMsg(String msg) {
+      this.msg = msg;
+   }
+
+   public void setNameOwner(String name) {
+      this.name = name;
+   }
+
+   public void setStringable(IStringable stringable) {
+      this.stringable = stringable;
+   }
+
+   public void setTagID(int tagID) {
+      this.tagID = tagID;
+   }
+
+   public void setTagString(String tagString) {
+      this.tagString = tagString;
+   }
+
+   public void setThrowable(Throwable throwable) {
+      this.throwable = throwable;
    }
 
    //#enddebug

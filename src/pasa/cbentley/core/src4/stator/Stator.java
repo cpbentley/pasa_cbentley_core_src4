@@ -24,6 +24,11 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
  */
 public class Stator extends ObjectU implements IStringable, ITechStator {
 
+   private StatorReader   activeReader;
+
+   private StatorWriter   activeWriter;
+
+   private boolean        isFailed;
 
    private BasicPrefs     prefs;
 
@@ -53,6 +58,11 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
       writers = new StatorWriter[numTypes];
    }
 
+   public void checkTypeEx(int type) {
+      if (type < 0 || type > TYPE_NUM) {
+         throw new IllegalArgumentException("type=" + type);
+      }
+   }
 
    /**
     * Override when using more specalized Stator and reader.
@@ -63,8 +73,16 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
       return new StatorReader(this, type);
    }
 
-   protected StatorWriter createWriter(int type) {
+   public StatorWriter createWriter(int type) {
       return new StatorWriter(this, type);
+   }
+
+   public StatorReader getActiveReader() {
+      return activeReader;
+   }
+
+   public StatorWriter getActiveWriter() {
+      return activeWriter;
    }
 
    private BasicPrefs getKeyValuePairs() {
@@ -92,11 +110,20 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
     * @return
     */
    public StatorReader getReader(int type) {
+      activeReader = readers[type];
       return readers[type];
    }
 
    public long getTimestamp() {
       return timestamp;
+   }
+
+   public StatorWriter getWriter(int type) {
+      if (writers[type] == null) {
+         writers[type] = createWriter(type);
+      }
+      activeWriter = writers[type];
+      return writers[type];
    }
 
    public boolean hasReader(int type) {
@@ -105,13 +132,6 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
 
    public boolean hasWriter(int type) {
       return writers[type] != null;
-   }
-
-   public StatorWriter getWriter(int type) {
-      if (writers[type] == null) {
-         writers[type] = createWriter(type);
-      }
-      return writers[type];
    }
 
    /**
@@ -133,53 +153,6 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
       importPrefsFrom(dis);
    }
 
-   public void checkTypeEx(int type) {
-      if (type < 0 || type > TYPE_NUM) {
-         throw new IllegalArgumentException("type=" + type);
-      }
-   }
-
-   protected StatorReader readStatorReader(BADataIS dis) {
-      int type = dis.readInt();
-      checkTypeEx(type);
-      StatorReader statorReader = createReader(type);
-      statorReader.init(dis);
-      return statorReader;
-   }
-
-   protected void importWriterToReader(BADataIS dis) {
-      StatorReader readStatorReader = readStatorReader(dis);
-      int type = readStatorReader.getType();
-      readers[type] = readStatorReader;
-   }
-
-   protected boolean switchMagic(int magic, BADataIS dis) {
-      if (magic == MAGIC_WORD_PREFS) {
-         importPrefs(dis);
-         return true;
-      } else if (magic == MAGIC_WORD_WRITER) {
-         importWriterToReader(dis);
-         return true;
-      } else {
-         return switchMagicSub(magic, dis);
-      }
-   }
-
-   protected boolean switchMagicSub(int magic, BADataIS dis) {
-      //#debug
-      toDLog().pAlways("Wrong Magic " + magic, this, Stator.class, "switchMagic", LVL_05_FINE, true);
-      return false;
-   }
-
-   private void importTed(BADataIS dis) {
-      boolean isContinue = dis.hasMore();
-      while (isContinue) {
-         int magicToken = dis.readInt();
-         boolean success = switchMagic(magicToken, dis);
-         isContinue = success && dis.hasMore();
-      }
-   }
-
    /**
     * Replaces prefs with or Add ?
     * @param data
@@ -199,6 +172,33 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
          throw new IllegalArgumentException();
       }
       importPrefsFrom(dis);
+   }
+
+   private void importTed(BADataIS dis) {
+      boolean isContinue = dis.hasMore();
+      while (isContinue) {
+         int magicToken = dis.readInt();
+         boolean success = switchMagic(magicToken, dis);
+         isContinue = success && dis.hasMore();
+      }
+   }
+
+   protected void importWriterToReader(BADataIS dis) {
+      StatorReader readStatorReader = readStatorReader(dis);
+      int type = readStatorReader.getType();
+      readers[type] = readStatorReader;
+   }
+
+   public boolean isFailed() {
+      return isFailed;
+   }
+
+   protected StatorReader readStatorReader(BADataIS dis) {
+      int type = dis.readInt();
+      checkTypeEx(type);
+      StatorReader statorReader = createReader(type);
+      statorReader.init(dis);
+      return statorReader;
    }
 
    public byte[] serializeAll() {
@@ -244,13 +244,56 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
 
       for (int i = 0; i < writers.length; i++) {
          if (writers[i] != null) {
-            writers[i].serialize(out);
+            writers[i].serializeWhole(out);
          }
       }
    }
 
+   public void setActiveReaderWith(BADataIS dis) {
+      StatorReader createReader = createReader(TYPE_5_TEMP_CONTAINER);
+      createReader.init(dis);
+      this.activeReader = createReader;
+   }
+
+   public void setActiveReaderWith(byte[] dataCtx, int offset, int length) {
+      BAByteIS in = new BAByteIS(uc, dataCtx, offset, length);
+      BADataIS dis = new BADataIS(uc, in);
+      setActiveReaderWith(dis);
+   }
+
+   /**
+    * All writes after this call from this Stator are made on a single
+    * whatever requests are made
+    * @param ctxID
+    */
+   public void setActiveWriteTemp() {
+      this.activeWriter = createWriter(TYPE_5_TEMP_CONTAINER);
+   }
+
+   public void setFailedTrue() {
+      isFailed = true;
+   }
+
    public void setTimestamp(long timestamp) {
       this.timestamp = timestamp;
+   }
+
+   protected boolean switchMagic(int magic, BADataIS dis) {
+      if (magic == MAGIC_WORD_PREFS) {
+         importPrefs(dis);
+         return true;
+      } else if (magic == MAGIC_WORD_WRITER) {
+         importWriterToReader(dis);
+         return true;
+      } else {
+         return switchMagicSub(magic, dis);
+      }
+   }
+
+   protected boolean switchMagicSub(int magic, BADataIS dis) {
+      //#debug
+      toDLog().pAlways("Wrong Magic " + magic, this, Stator.class, "switchMagic", LVL_05_FINE, true);
+      return false;
    }
 
    //#mdebug

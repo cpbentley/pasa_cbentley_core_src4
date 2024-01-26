@@ -21,7 +21,7 @@ public class StatorFactoryUC extends ObjectU implements IStatorFactory, ITechSta
       return null;
    }
 
-   public Object createObject(int classID) {
+   public Object createObject(StatorReader reader, int classID) {
       switch (classID) {
          case CLASSID_001_CTX:
             break;
@@ -35,8 +35,9 @@ public class StatorFactoryUC extends ObjectU implements IStatorFactory, ITechSta
       return uc;
    }
 
-   public boolean isSupported(int classID) {
-      switch (classID) {
+   public boolean isSupported(IStatorable statorable) {
+      int id = statorable.getStatorableClassID();
+      switch (id) {
          case CLASSID_001_CTX:
             break;
 

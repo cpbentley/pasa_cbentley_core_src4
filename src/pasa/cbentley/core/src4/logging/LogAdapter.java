@@ -318,5 +318,10 @@ public class LogAdapter implements IDLog {
       return uc;
    }
 
+   public long getCount() {
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
    //#enddebug
 }

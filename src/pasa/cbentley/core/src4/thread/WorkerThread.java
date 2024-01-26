@@ -57,6 +57,10 @@ public class WorkerThread extends Thread implements IStringable {
       }
    }
 
+   public boolean isRunningATask() {
+      return isRunning;
+   }
+   
    public void run() {
       while (true) {
          Runnable r = null;

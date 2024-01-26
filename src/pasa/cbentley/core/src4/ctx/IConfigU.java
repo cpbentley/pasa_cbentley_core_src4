@@ -18,13 +18,18 @@ import pasa.cbentley.core.src4.logging.ILogConfigurator;
  * <li> Local -> {@link LocaleID}
  * 
  * <p>
- * 
+ * {@link IConfigU} do not have {@link UCtx} in the constructor parameter. It is set later 
+ * by {@link UCtx} using {@link IConfigU#toStringSetDebugUCtx(UCtx)}
  * </p>
  * @author Charles Bentley
  *
  */
 public interface IConfigU extends IConfig {
 
+   /**
+    * 
+    * @return
+    */
    public String getDefaultEncoding();
 
    /**

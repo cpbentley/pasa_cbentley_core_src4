@@ -8,46 +8,72 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.ILogConfigurator;
 import pasa.cbentley.core.src4.logging.LogConfiguratorAllFinest;
 
-public class ConfigUDef extends ConfigAbstract implements IConfigU {
+public class ConfigUDef implements IConfigU {
 
-   public ConfigUDef(UCtx uc) {
-      super(uc);
-      isIgnoreSettings = false;
-      isEraseSettings = false;
+   private ILogConfigurator logConfigurator;
+
+   private UCtx             uc;
+
+   public ConfigUDef() {
    }
 
    public String getDefaultEncoding() {
       return "UTF-8";
    }
 
+   public boolean isEraseSettings() {
+      return false;
+   }
+
    public boolean isEraseSettingsAll() {
-      return isEraseSettings;
+      return false;
    }
 
    public boolean isForceExceptions() {
       return false;
    }
 
-   public boolean isIgnoreSettingsAll() {
-      return isIgnoreSettings;
+   public boolean isHardcoded() {
+      return true;
    }
-   
+
+   public boolean isIgnoreSettings() {
+      return false;
+   }
+
+   public boolean isIgnoreSettingsAll() {
+      return false;
+   }
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, ConfigUDef.class, "@line5");
+      dc.root(this, ConfigUDef.class, 70);
       toStringPrivate(dc);
-      super.toString(dc.sup());
 
       dc.nl();
       dc.appendVarWithSpace("toStringIsUsingClassLinks", toStringIsUsingClassLinks());
       dc.appendVarWithSpace("isForceExceptions", isForceExceptions());
    }
 
+   public String toString1Line() {
+      return Dctx.toString1Line(this);
+   }
+
+
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ConfigUDef.class);
       toStringPrivate(dc);
-      super.toString1Line(dc.sup1Line());
+   }
+
+   public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {
+      if (logConfigurator == null) {
+         logConfigurator = new LogConfiguratorAllFinest();
+      }
+      return logConfigurator;
+   }
+
+   public UCtx toStringGetUCtx() {
+      return uc;
    }
 
    public boolean toStringIsUsingClassLinks() {
@@ -57,8 +83,17 @@ public class ConfigUDef extends ConfigAbstract implements IConfigU {
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("isIgnoreSettingsAll", isIgnoreSettingsAll());
       dc.appendVarWithSpace("isEraseSettingsAll", isEraseSettingsAll());
+      dc.appendVarWithSpace("isEraseSettings", isEraseSettings());
+      dc.appendVarWithSpace("isForceExceptions", isForceExceptions());
    }
 
+   public void toStringSetDebugUCtx(UCtx uc) {
+      this.uc = uc;
+   }
+
+   public void toStringSetLogConfigurator(ILogConfigurator logConfigurator) {
+      this.logConfigurator = logConfigurator;
+   }
 
    //#enddebug
 

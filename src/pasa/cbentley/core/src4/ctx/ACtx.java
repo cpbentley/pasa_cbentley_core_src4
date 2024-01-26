@@ -14,6 +14,16 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * Abstract context class for other modules that want to participate with {@link UCtx} in the context pattern.
  * <p>
  * Each module ctx class is a god like object that lives in peace with other gods thanks to the {@link CtxManager}.
+ * 
+ * Gods are configured by a master {@link IConfig} interface. Any God with specific configuration extends that interface.
+ * Since Gods are configurable, it is logical that they also have state data if only for user-modified configuration values.
+ * Are those modified configuration values to be persist for the next run ? User wants that. Or does he ? 
+ * If he wants a change, why not simple using different configuration then ? And have a mechanism a given config file is chosen
+ * Also most of the time, if an application wants to save some settings, it can use an ad-hoc class just for that.
+ * 
+ * Why poluting {@link ACtx} with state data ? So it was decided not to include state here.
+ * But the {@link CtxManager} provides a way for supporting ctx that want to have their state anyways.
+ * 
  * </p>
  * <p>
  * Javadoc of the context provides all the starting information on how to use the module.
@@ -77,6 +87,7 @@ public abstract class ACtx implements ICtx {
       this.cm = cm;
 
       id = cm.registerCtx(this);
+      
    }
 
    public IConfig getConfig() {

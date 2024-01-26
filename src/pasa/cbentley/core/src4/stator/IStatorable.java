@@ -9,6 +9,9 @@ import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
  * An {@link IStatorable} is a class that wants to write its state and read previous saved state.
+ * and whose class can be instantiated by {@link IStatorFactory}. Singletons are not {@link IStatorable}
+ * but {@link IStatorOwner}s.
+ * 
  * <li> {@link IStatorable#stateReadFrom(StatorReader)}
  * <li> {@link IStatorable#stateWriteTo(StatorWriter)}
  * 
@@ -75,6 +78,10 @@ public interface IStatorable extends IStringable {
     */
    public int getStatorableClassID();
 
+   /**
+    * 
+    * @return
+    */
    public ICtx getCtxOwner();
 
 }

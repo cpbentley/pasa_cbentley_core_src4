@@ -10,7 +10,12 @@ public interface IStatorFactory {
 
    public Object[] createArray(int classID, int size);
 
-   public boolean isSupported(int classID);
+   /**
+    * selector for the class supported ?
+    * @param statorable
+    * @return
+    */
+   public boolean isSupported(IStatorable statorable);
 
    /**
     * The Context to which belongs the Factory;
@@ -19,9 +24,13 @@ public interface IStatorFactory {
    public ICtx getCtx();
 
    /**
-    * Returns null if class ID is not know
-    * @param classID
+    * Returns null if class ID is not know.
+    * 
+    * Object constructor parameters are {@link IStatorable} and read in front on the {@link StatorReader}
+    * as
+    * @param reader allows the factory to read parameters
+    * @param classID selector for the class
     * @return
     */
-   public Object createObject(int classID);
+   public Object createObject(StatorReader reader, int classID);
 }

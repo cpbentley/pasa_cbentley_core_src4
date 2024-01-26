@@ -4,26 +4,29 @@
  */
 package pasa.cbentley.core.src4.structs.synch;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 
-public class FairLock implements IStringable {
+public class FairLock extends ObjectU implements IStringable {
    private boolean      isLocked      = false;
 
    private Thread       lockingThread = null;
 
    private IntToObjects waitingThreads;
 
-   protected final UCtx uc;
-
    public FairLock(UCtx uc) {
-      this.uc = uc;
+      super(uc);
       waitingThreads = new IntToObjects(uc);
    }
 
+   /**
+    * Adds the current thread in the waiting list.
+    * @throws InterruptedException
+    */
    public void lock() throws InterruptedException {
       QueueObject queueObject = new QueueObject();
       boolean isLockedForThisThread = true;
@@ -52,6 +55,9 @@ public class FairLock implements IStringable {
       }
    }
 
+   /**
+    * Call this when running thread has locked this lock with a call to {@link FairLock#lock()}
+    */
    public synchronized void unlock() {
       if (this.lockingThread != Thread.currentThread()) {
          throw new IllegalMonitorStateException("Calling thread has not locked this lock");
@@ -64,34 +70,23 @@ public class FairLock implements IStringable {
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "FairLock");
+      dc.root(this, FairLock.class, 75);
       toStringPrivate(dc);
-   }
+      super.toString(dc.sup());
+      dc.nlLvl(waitingThreads, "waitingThreads");
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      dc.nlLvlO(lockingThread, "lockingThread");
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      dc.appendVarWithSpace("isLocked", isLocked);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "FairLock");
+      dc.root1Line(this, FairLock.class);
       toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
+      super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug

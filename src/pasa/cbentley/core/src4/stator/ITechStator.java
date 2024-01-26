@@ -9,7 +9,6 @@ import pasa.cbentley.core.src4.utils.ColorUtils;
 
 public interface ITechStator extends ITech {
 
-   
    public static final int MAGIC_WORD_STATOR         = ColorUtils.getRGBInt(150, 200, 200, 201);
 
    public static final int MAGIC_WORD_PREFS          = ColorUtils.getRGBInt(200, 202, 200, 201);
@@ -17,6 +16,8 @@ public interface ITechStator extends ITech {
    public static final int MAGIC_WORD_WRITER         = ColorUtils.getRGBInt(240, 200, 200, 201);
 
    public static final int MAGIC_WORD_OBJECT         = ColorUtils.getRGBInt(245, 200, 200, 201);
+
+   public static final int MAGIC_WORD_OBJECT_PARAM   = ColorUtils.getRGBInt(245, 200, 206, 201);
 
    public static final int MAGIC_WORD_OBJECT_NULL    = ColorUtils.getRGBInt(245, 205, 200, 201);
 
@@ -45,7 +46,14 @@ public interface ITechStator extends ITech {
     */
    public static final int TYPE_3_CTX                = 3;
 
-   public static final int TYPE_NUM                  = 4;
+   /**
+    * Single use Type used for special read/write
+    */
+   public static final int TYPE_4_TEMP               = 4;
+
+   public static final int TYPE_5_TEMP_CONTAINER     = 5;
+
+   public static final int TYPE_NUM                  = 6;
 
    public static final int FLAG_1_FAILED             = 1 << 0;
 }

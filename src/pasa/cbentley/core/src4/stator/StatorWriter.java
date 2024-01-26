@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.stator;
 
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.interfaces.IPrefsWriter;
 import pasa.cbentley.core.src4.io.BADataIS;
@@ -69,6 +70,10 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       return writer;
    }
 
+   public void writeInt(int v) {
+      writer.writeInt(v);
+   }
+
    public void setFlag(int flag, boolean b) {
       flags = BitUtils.setFlag(flags, flag, b);
    }
@@ -103,7 +108,7 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
     */
    public byte[] serialize() {
       BADataOS out = uc.createNewBADataOS();
-      serialize(out);
+      serializeWhole(out);
       return out.getByteCopy();
    }
 
@@ -111,9 +116,17 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
     * Inverse of {@link StatorReader#init(BADataIS)}
     * @param out
     */
-   public void serialize(BADataOS out) {
+   public void serializeWhole(BADataOS out) {
       out.writeInt(MAGIC_WORD_WRITER); //magic
       out.writeInt(type); //type so unwrap can create it
+      serializeData(out);
+   }
+
+   /**
+    * Inverse of {@link StatorReader#init(BADataIS)}
+    * @param out
+    */
+   public void serializeData(BADataOS out) {
       //we need to know its length
       int sizeObjects = writtenObjects.getSize();
       out.writeInt(sizeObjects); //max number of objects
@@ -124,7 +137,10 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       } else {
          out.write(0);
       }
+   }
 
+   public int getBytesWritten() {
+      return writer.size();
    }
 
    //#mdebug
@@ -156,9 +172,19 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
             int objectID = writtenObjects.nextempty;
             writtenObjects.add(statorable);
             getWriter().writeInt(objectID);
-            int ctxID = statorable.getCtxOwner().getCtxID();
+            ICtx ctxOwner = statorable.getCtxOwner();
+            int ctxID = ctxOwner.getCtxID();
             getWriter().writeInt(ctxID);
             int classID = statorable.getStatorableClassID();
+            //sanity check if factory supports that class
+            IStatorFactory statorFactory = ctxOwner.getStatorFactory();
+            if(statorFactory == null) {
+               throw new IllegalArgumentException("No Factory for "+ statorable.getClass().getName() + " Ctx:" + ctxOwner.getClass().getName());
+            }
+            if (!statorFactory.isSupported(statorable)) {
+               throw new IllegalArgumentException(statorable.getClass().getName() + " != " + statorFactory.getClass().getName());
+            }
+
             getWriter().writeInt(classID);
             //now ask the statorable to write its object and children
             statorable.stateWriteTo(this);

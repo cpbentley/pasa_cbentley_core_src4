@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.logging;
 
+import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.ITech;
 
 public interface ITechConfig extends ITech {
@@ -14,7 +15,7 @@ public interface ITechConfig extends ITech {
 
    public static final String STRING_F_03_STACK                     = "Stack";
 
-   public static final String STRING_F_04_THREAD               = "Thread";
+   public static final String STRING_F_04_THREAD                    = "Thread";
 
    public static final String STRING_F_05_TIMESTAMP                 = "Timestamp";
 
@@ -36,13 +37,24 @@ public interface ITechConfig extends ITech {
    /**
     * Show thread value in log line
     */
-   public static final int    FORMAT_FLAG_04_THREAD            = 1 << 3;
+   public static final int    FORMAT_FLAG_04_THREAD                 = 1 << 3;
 
    /**
     * Log entry records the timestamp.
     * Can be used to print difference between
     */
    public static final int    FORMAT_FLAG_05_TIMESTAMP              = 1 << 4;
+
+   /**
+    * Shows in front before line number
+    * 
+    * usefull when several different {@link UCtx} writing to System.out
+    */
+   public static final int    FORMAT_FLAG_08_OWNER_NAME             = 1 << 7;
+
+   public static final int    FORMAT_FLAG_06_                       = 1 << 5;
+
+   public static final int    FORMAT_FLAG_07_                       = 1 << 6;
 
    /**
     * Lever to block all print. Ignores all other flags except {@link IDLog#MASTER_FLAG_02_OPEN_ALL_PRINT}
@@ -106,6 +118,11 @@ public interface ITechConfig extends ITech {
     * Assume all tags are true, will reject only flags that are explicitly false
     */
    public static final int    MASTER_FLAG_08_OPEN_ALL_BUT_FALSE     = 1 << 7;
+
+   /**
+    * Name of UCt in front
+    */
+   public static final int    MASTER_FLAG_10_OWNER_NAME_UC          = 1 << 9;
 
    /**
     * Check the {@link IStringable} class for positives or negatives

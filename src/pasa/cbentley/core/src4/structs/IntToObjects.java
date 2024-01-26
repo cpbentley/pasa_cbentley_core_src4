@@ -195,6 +195,9 @@ public class IntToObjects implements IStringable {
       }
    }
 
+   /**
+    * Nullify all object references
+    */
    public void clear() {
       nextempty = 0;
       for (int i = 0; i < objects.length; i++) {
@@ -485,9 +488,9 @@ public class IntToObjects implements IStringable {
    public void growArray() {
       growArray(1);
    }
-   
+
    public Object getLast() {
-      return objects[nextempty-1];
+      return objects[nextempty - 1];
    }
 
    public void growArray(int increment) {
