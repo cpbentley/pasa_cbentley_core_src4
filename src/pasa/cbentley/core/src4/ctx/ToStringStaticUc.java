@@ -8,6 +8,7 @@ import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.ITechThread;
 import pasa.cbentley.core.src4.interfaces.ITechTransform;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
+import pasa.cbentley.core.src4.thread.ITechRunnable;
 
 public class ToStringStaticUc extends ToStringStaticBase {
 
@@ -101,6 +102,27 @@ public class ToStringStaticUc extends ToStringStaticBase {
             return "KeepOn";
          default:
             return "Unknown " + state;
+      }
+   }
+
+   public static String toStringState(int state) {
+      switch (state) {
+         case ITechRunnable.STATE_0_RUNNING:
+            return "Running";
+         case ITechRunnable.STATE_1_PAUSED:
+            return "Pause";
+         case ITechRunnable.STATE_2_CANCELED:
+            return "Canceled";
+         case ITechRunnable.STATE_3_STOPPED:
+            return "Stopped";
+         case ITechRunnable.STATE_4_CANCELED_ERROR:
+            return "Errored";
+         case ITechRunnable.STATE_5_INTERRUPTED:
+            return "Interrupted";
+         case ITechRunnable.STATE_6_FINISHED:
+            return "Finished";
+         default:
+            return "UnknownState" + state;
       }
    }
 }

@@ -260,6 +260,13 @@ public class Dctx implements IToStringFlags {
       this.append(']');
    }
 
+   public void appendBracketedWithSpace(boolean b) {
+      this.append(' ');
+      this.append('[');
+      this.append(String.valueOf(b));
+      this.append(']');
+   }
+
    public void appendColorRGB(int colorRGB) {
       sb.append(uc.getColorU().toStringColorRGB(colorRGB));
    }

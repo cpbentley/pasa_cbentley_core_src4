@@ -40,41 +40,35 @@ public class SystemOutAppender extends BaseAppender {
       IDLogConfig config = logEntryAppender.getConfig();
 
       //apply the config to the entry
-      DLogEntryOfConfig ec = entry.computeDLogEntryOfConfig(config);
+      DLogEntryOfConfig logEntryc = entry.computeDLogEntryOfConfig(config);
 
-      if (!ec.isAccepted()) {
+      if (logEntryc.hasFormatFlag(FORMAT_FLAG_06_BIG)) {
+         if (config.hasFlagMaster(MASTER_FLAG_11_IGNORES_BIGS)) {
+            return;
+         }
+      }
+
+      if (!logEntryc.isAccepted()) {
          return;
       }
+
       //get DLogEntry appenders for this call
       StringBBuilder sb = new StringBBuilder(uc, 500);
 
       int count = sb.getCount();
-      if (ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
+      if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
          sb.append(entry.getNameOwner());
          sb.append('\t');
       }
       int workingCounter = outputCounterNext; //avoid thread issues
 
-      if (workingCounter == 0) {
-         sb.append(StringUtils.BLOCK_FULL);
-         sb.append(StringUtils.ARROW_RIGHT);
-         sb.append(workingCounter);
-      } else if (workingCounter < 10) {
-         sb.append(' ');
-         sb.append(' ');
-         sb.append(workingCounter);
-      } else if (workingCounter < 100) {
-         sb.append(' ');
-         sb.append(workingCounter);
-      } else {
-         sb.append(workingCounter);
-      }
+      appendPrefxLineNumber(sb, workingCounter);
       sb.append(' ');
 
       //first enter message. format is hard coded
       String tagString = entry.getTagString();
       sb.append(tagString);
-      if (ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
+      if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
          sb.append("[" + entry.getThreadName() + "]");
       }
       int extraSpaces = sb.getCount() - count;
@@ -92,15 +86,23 @@ public class SystemOutAppender extends BaseAppender {
       }
       String method = entry.getMethod();
       int indexLine = -1;
-      if ((indexLine = method.indexOf("@line")) != -1) {
+      if ((indexLine = method.indexOf("@")) != -1) {
          String methodStr = method.substring(0, indexLine);
-         String lineNumber = method.substring(indexLine + "@line".length(), method.length());
-         sb.append(" ");
-         sb.append("(");
+         String lineData = method.substring(indexLine, method.length());
+         int startLineValue = indexLine + 1;
+         if (lineData.startsWith("@line")) {
+            startLineValue = indexLine + 5;
+         }
+         String lineNumber = method.substring(startLineValue, method.length());
+
+         sb.append(">");
+         sb.append(' '); //a link needs to prefixed with " ("  otherwise eclipse system out does not create a link
+         sb.append('('); //a link needs to prefixed with " ("  otherwise eclipse system out does not create a link
          sb.append(cname);
          sb.append(".java:");
          sb.append(lineNumber);
-         sb.append(")#");
+         sb.append(')');
+         sb.append("#");
          sb.append(methodStr);
       } else {
          String mstr = cname + "#" + entry.getMethod();
@@ -118,7 +120,7 @@ public class SystemOutAppender extends BaseAppender {
       IStringable stringable = entry.getStringable();
       if (stringable != null) {
          //check if we have to 1 line
-         if (ec.isOneLineConfig()) {
+         if (logEntryc.isOneLineConfig()) {
             if (hasMessage) {
                sb.append("|"); //appends separator between message and stringable
             }
@@ -128,12 +130,14 @@ public class SystemOutAppender extends BaseAppender {
             }
          } else {
             //create a new line prefix with as many spaces are necessary to match the start
-            StringBBuilder sbnl = new StringBBuilder(uc, extraSpaces + 2);
+            StringBBuilder sbnl = new StringBBuilder(uc, extraSpaces + 2); //+2 for the \n and \t
             sbnl.append('\n');
-            for (int i = 0; i < extraSpaces; i++) {
+            appendPrefxLineNumber(sbnl, workingCounter);
+            sbnl.append(' ');
+            for (int i = 0; i < extraSpaces - 3; i++) {
                sbnl.append('-');
             }
-            sbnl.append('\t');
+            //sbnl.append('\t');
             String objnl = sbnl.toString(); //the newline tab for the DCtx of the Stringable
             Dctx dc = new Dctx(uc, objnl);
             stringable.toString(dc);
@@ -147,7 +151,7 @@ public class SystemOutAppender extends BaseAppender {
       }
       String nl = "\n";
       //fill the stack trace of the calls
-      stackTrace(ec, entry, sb, nl, config);
+      stackTrace(logEntryc, entry, sb, nl, config);
 
       String strToPrint = sb.toString();
 
@@ -166,6 +170,23 @@ public class SystemOutAppender extends BaseAppender {
          previousStr = strToPrint;
       }
 
+   }
+
+   private void appendPrefxLineNumber(StringBBuilder sb, int workingCounter) {
+      if (workingCounter == 0) {
+         sb.append(StringUtils.BLOCK_FULL);
+         sb.append(StringUtils.ARROW_RIGHT);
+         sb.append(workingCounter);
+      } else if (workingCounter < 10) {
+         sb.append('0');
+         sb.append('0');
+         sb.append(workingCounter);
+      } else if (workingCounter < 100) {
+         sb.append('0');
+         sb.append(workingCounter);
+      } else {
+         sb.append(workingCounter);
+      }
    }
 
    /**

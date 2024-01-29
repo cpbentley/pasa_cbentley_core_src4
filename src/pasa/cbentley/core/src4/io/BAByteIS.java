@@ -250,7 +250,7 @@ public class BAByteIS extends InputStream implements IStringable {
       dc.root(this, BAByteIS.class, 250);
       toStringPrivate(dc);
       dc.nl();
-      uc.getBU().toStringBytes(dc, buf, 0, count, 15);
+      uc.getBU().toStringBytes(dc, buf, 0, count, uc.getConfigU().toStringGetBytesOn1Line());
       
    }
 

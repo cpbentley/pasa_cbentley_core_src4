@@ -83,5 +83,7 @@ public interface IConfigU extends IConfig {
     */
    public void toStringSetLogConfigurator(ILogConfigurator logConfigurator);
 
+   public int toStringGetBytesOn1Line();
+
    //#enddebug
 }

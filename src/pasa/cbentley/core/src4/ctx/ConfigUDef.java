@@ -59,10 +59,13 @@ public class ConfigUDef implements IConfigU {
       return Dctx.toString1Line(this);
    }
 
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ConfigUDef.class);
       toStringPrivate(dc);
+   }
+
+   public int toStringGetBytesOn1Line() {
+      return 20;
    }
 
    public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {

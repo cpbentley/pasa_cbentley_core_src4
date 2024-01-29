@@ -43,6 +43,10 @@ public interface IDLogConfig extends IStringable, ITechConfig {
     */
    public boolean hasFlagFormat(int flag);
 
+   public boolean hasFlagTag(int flag);
+   
+   public boolean hasFlagMaster(int flag);
+
    /**
     * 
     */

@@ -7,6 +7,7 @@ package pasa.cbentley.core.src4.thread;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import pasa.cbentley.core.src4.ctx.ToStringStaticUc;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -28,27 +29,6 @@ import pasa.cbentley.core.src4.structs.synch.MutexSignal;
  *
  */
 public abstract class AbstractBRunnable implements IBRunnable {
-
-   public static String toStringState(int state) {
-      switch (state) {
-         case ITechRunnable.STATE_0_RUNNING:
-            return "Running";
-         case ITechRunnable.STATE_1_PAUSED:
-            return "Pause";
-         case ITechRunnable.STATE_2_CANCELED:
-            return "Canceled";
-         case ITechRunnable.STATE_3_STOPPED:
-            return "Stopped";
-         case ITechRunnable.STATE_4_CANCELED_ERROR:
-            return "Errored";
-         case ITechRunnable.STATE_5_INTERRUPTED:
-            return "Interrupted";
-         case ITechRunnable.STATE_6_FINISHED:
-            return "Finished";
-         default:
-            return "UnknownState" + state;
-      }
-   }
 
    /**
     * 
@@ -336,7 +316,7 @@ public abstract class AbstractBRunnable implements IBRunnable {
    public void requestNewState(int state) {
 
       //#debug
-      toDLog().pFlow("newstate=" + toStringState(state), this, AbstractBRunnable.class, "requestNewState", LVL_05_FINE, true);
+      toDLog().pFlow("newstate=" + ToStringStaticUc.toStringState(state), this, AbstractBRunnable.class, "requestNewState", LVL_05_FINE, true);
       /*
        * Declaring a volatile Java variable means: 
        * The value of this variable will never be cached thread-locally:
@@ -450,8 +430,8 @@ public abstract class AbstractBRunnable implements IBRunnable {
    }
 
    private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("state", toStringState(state));
-      dc.appendVarWithSpace("stateRequest", toStringState(stateRequest));
+      dc.appendVarWithSpace("state", ToStringStaticUc.toStringState(state));
+      dc.appendVarWithSpace("stateRequest", ToStringStaticUc.toStringState(stateRequest));
    }
    //#enddebug
 }

@@ -101,6 +101,9 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       if (type.hasDevFlag(DEV_3_STACK)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_03_STACK, true);
       }
+      if (type.hasDevFlag(DEV_6_BIG)) {
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_06_BIG, true);
+      }
 
       if (hasFlagMaster(MASTER_FLAG_07_THREAD_DATA)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
@@ -499,7 +502,6 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       positivesTraceClass.put(c, Boolean.TRUE);
    }
 
-
    public void toString(Dctx dc) {
       dc.root(this, DLogConfig.class, "@line490");
 
@@ -518,6 +520,8 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       toStringFlagMasterTrue(MASTER_FLAG_07_THREAD_DATA, STRING_M_07_THREAD_DATA, dc);
       toStringFlagMasterTrue(MASTER_FLAG_08_OPEN_ALL_BUT_FALSE, STRING_M_08_OPEN_ALL_BUT_FALSE, dc);
       toStringFlagMasterTrue(MASTER_FLAG_09_TREAT_STRINGABLE_CLASS, STRING_M_09_TREAT_STRINGABLE_CLASS, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_10_OWNER_NAME_UC, STRING_M_10_OWNER_NAME, dc);
+      toStringFlagMasterTrue(MASTER_FLAG_11_IGNORES_BIGS, STRING_M_11_IGNORE_BIGS, dc);
 
       dc.nl();
       dc.appendWithSpace("Format Trues  = ");
@@ -526,10 +530,13 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       toStringFlagFormatTrue(FORMAT_FLAG_03_STACK, STRING_F_03_STACK, dc);
       toStringFlagFormatTrue(FORMAT_FLAG_04_THREAD, STRING_F_04_THREAD, dc);
       toStringFlagFormatTrue(FORMAT_FLAG_05_TIMESTAMP, STRING_F_05_TIMESTAMP, dc);
+      toStringFlagFormatTrue(FORMAT_FLAG_06_BIG, STRING_F_06_BIG, dc);
+      toStringFlagFormatTrue(FORMAT_FLAG_08_OWNER_NAME, STRING_F_08_OWNER_NAME, dc);
 
       dc.nl();
       dc.append("Tags Trues = ");
       toStringFlagTagTrue(FLAG_01_PRINT_ALWAYS, STRING_01_ALWAYS, dc);
+      toStringFlagTagTrue(FLAG_04_PRINT_STATOR, STRING_04_STATOR, dc);
       toStringFlagTagTrue(FLAG_05_PRINT_UI, STRING_05_UI, dc);
       toStringFlagTagTrue(FLAG_06_PRINT_WORK, STRING_06_WORK, dc);
       toStringFlagTagTrue(FLAG_07_PRINT_EVENT, STRING_07_EVENT, dc);
@@ -550,11 +557,12 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       toStringFlagTagTrue(FLAG_22_PRINT_STATE, STRING_22_STATE, dc);
       toStringFlagTagTrue(FLAG_23_PRINT_ANIM, STRING_23_ANIM, dc);
       toStringFlagTagTrue(FLAG_24_PRINT_DRAW, STRING_24_DRAW, dc);
-      toStringFlagTagTrue(FLAG_25_PRINT_NULL, STRING_25_NULL, dc);
+      toStringFlagTagTrue(FLAG_02_PRINT_NULL, STRING_02_NULL, dc);
 
       dc.nl();
       dc.append("TagNegs Trues = ");
       toStringFlagTagNegTrue(FLAG_01_PRINT_ALWAYS, STRING_01_ALWAYS, dc);
+      toStringFlagTagNegTrue(FLAG_04_PRINT_STATOR, STRING_04_STATOR, dc);
       toStringFlagTagNegTrue(FLAG_05_PRINT_UI, STRING_05_UI, dc);
       toStringFlagTagNegTrue(FLAG_06_PRINT_WORK, STRING_06_WORK, dc);
       toStringFlagTagNegTrue(FLAG_07_PRINT_EVENT, STRING_07_EVENT, dc);
@@ -575,14 +583,13 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       toStringFlagTagNegTrue(FLAG_22_PRINT_STATE, STRING_22_STATE, dc);
       toStringFlagTagNegTrue(FLAG_23_PRINT_ANIM, STRING_23_ANIM, dc);
       toStringFlagTagNegTrue(FLAG_24_PRINT_DRAW, STRING_24_DRAW, dc);
-      toStringFlagTagNegTrue(FLAG_25_PRINT_NULL, STRING_25_NULL, dc);
+      toStringFlagTagNegTrue(FLAG_02_PRINT_NULL, STRING_02_NULL, dc);
 
       toStringHashClass(dc, "Negative Classes", negatives);
       toStringHashClass(dc, "Positive Classes", positivesClasses);
       toStringHashClass(dc, "FullPositive Classes", fullPositives);
       toStringHashClass(dc, "Trace Classes", positivesTraceClass);
    }
-
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, DLogConfig.class);
@@ -617,7 +624,6 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
          dc.append(flagToStringSeparator);
       }
    }
-
 
    private void toStringHashClass(Dctx dc, String title, Hashtable ht) {
       dc.nl();

@@ -143,12 +143,24 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       pFlow(msg, str, c, method, getLevelDefault(), false);
    }
 
+   public void pFlowBig(String msg, IStringable str, Class c, String method) {
+      super.ptPrintBig(msg, str, c, method, ITechTags.STRING_09_FLOW, ITechTags.FLAG_09_PRINT_FLOW, getLevelDefault());
+   }
+
    public void pFlow(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_09_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, oneLine);
    }
 
    public void pFlow(String msg, IStringable str, Class c, String method, int lvl, int flags) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_09_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, flags);
+   }
+
+   public void pStator(String msg, IStringable str, Class c, String method) {
+      pStator(msg, str, c, method, getLevelDefault(), false);
+   }
+
+   public void pStator(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, str, c, method, ITechTags.STRING_04_STATOR, ITechTags.FLAG_04_PRINT_STATOR, lvl, oneLine);
    }
 
    public void pInit(String msg, IStringable str, Class c, String method) {
@@ -189,7 +201,7 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    }
 
    public void pNull(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
-      super.ptPrint(msg, str, c, method, ITechTags.STRING_25_NULL, ITechTags.FLAG_25_PRINT_NULL, lvl, oneLine);
+      super.ptPrint(msg, str, c, method, ITechTags.STRING_02_NULL, ITechTags.FLAG_02_PRINT_NULL, lvl, oneLine);
    }
 
    public void pNull(String msg, IStringable str, Class c, String method) {

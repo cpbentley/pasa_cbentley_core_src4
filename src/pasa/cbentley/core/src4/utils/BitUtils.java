@@ -1236,13 +1236,42 @@ public class BitUtils {
    public void toStringBytes(Dctx sb, byte[] ar, int offset, int len, int cols) {
       int count = 0;
       for (int i = offset; i < offset + len; i++) {
-         sb.append(ar[i]);
+         byte v = ar[i];
+         if(v < 0) {
+            if(v < -99) {
+               sb.append(v);
+            } else if(v < -10) {
+               sb.append(' ');
+               sb.append(v);
+            } else {
+               sb.append(' ');
+               sb.append(' ');
+               sb.append(v);
+            }
+         } else {
+            if(v == 0) {
+               sb.append("   0");
+            } else {
+               if(v > 99) {
+                  sb.append(' ');
+                  sb.append(v);
+               } else if(v > 10) {
+                  sb.append(' ');
+                  sb.append(' ');
+                  sb.append(v);
+               } else {
+                  sb.append(' ');
+                  sb.append(' ');
+                  sb.append(' ');
+                  sb.append(v);
+               }
+            }
+         }
+         
          count++;
          if ((count % cols) == 0) {
             sb.nl();
-         } else {
-            sb.append('\t');
-         }
+         } 
       }
    }
 

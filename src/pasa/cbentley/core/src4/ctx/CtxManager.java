@@ -259,6 +259,9 @@ public class CtxManager implements IStringable, IStatorOwner {
    }
 
    public void stateOwnerRead(Stator stator) {
+      //#debug
+      toDLog().pStator("firstStator " + ((firstStator == null) ? " is null " : " is NOT NULL"), null, CtxManager.class, "stateOwnerRead@263");
+
       if (firstStator == null) {
          firstStator = stator;
       }
@@ -326,95 +329,10 @@ public class CtxManager implements IStringable, IStatorOwner {
       int writeCountB = dos.size();
       int bytesWritten = writeCountB - writeCount;
       //#debug
-      toDLog().pData("End of Method:" + bytesWritten + " bytes were written to BADataOS", null, CtxManager.class, "stateWrite");
+      toDLog().pStator("-->" + bytesWritten + " bytes were written to StatorWriter", null, CtxManager.class, "stateOwnerWrite@323");
 
    }
 
-   /**
-    * We keep the.
-    * What if a module is already loaded? Can we call this method?
-    * 
-    * @param dis
-    */
-   public void stateRead(BADataIS dis) {
-      try {
-         int num = dis.readInt();
-         for (int i = 0; i < num; i++) {
-            int val = dis.readInt();
-            if (val == 1) {
-               int ctxID = dis.readInt();
-               byte[] data = dis.readByteArray();
-               //avoid corrupted data
-               int ctxIndex = intos.findInt(ctxID);
-               //#debug
-               uc.toDLog().pData("ctxIndex=" + ctxIndex + " for ctxID=" + ctxID, this, CtxManager.class, "settingsRead", ITechLvl.LVL_04_FINER, true);
-               if (ctxIndex == -1) {
-                  intos.add(data, ctxID);
-               } else {
-                  ICtx mod = (ICtx) intos.getObjectAtIndex(ctxIndex);
-                  mod.setSettings(data);
-               }
-            }
-         }
-         //#debug
-         uc.toDLog().pData("Count=" + num, this, CtxManager.class, "settingsRead");
-      } catch (IllegalStateException e) {
-         //reset all data
-
-         //#debug
-         toDLog().pEx("Corruption when reading CtxManager state", this, CtxManager.class, "stateRead", e);
-      }
-   }
-
-   public void stateWrite2(BADataOS dos) {
-   }
-
-   /**
-    * Write state of {@link ICtx#getSettings()} data.
-    * 
-    * <p>
-    * 
-    * </p>
-    * @param dos
-    */
-   public void stateWrite(BADataOS dos) {
-      //write the number
-      int size = intos.nextempty;
-      int writeCount = dos.size();
-
-      dos.writeInt(size);
-      for (int i = 0; i < size; i++) {
-         Object o = intos.objects[i];
-         byte[] data = null;
-         int ctxID = intos.ints[i];
-         //
-         if (o instanceof ICtx) {
-            ICtx module = (ICtx) o;
-            data = module.getSettings();
-         } else if (o instanceof byte[]) {
-            data = (byte[]) o;
-         } else {
-            //log dev warning
-            throw new RuntimeException();
-         }
-
-         if (data != null) {
-            dos.writeInt(1);
-            dos.writeInt(ctxID);
-            dos.writeByteArray(data);
-            //#debug
-            toDLog().pData(data.length + " bytes of data for ctxID " + ctxID + " " + toStringCtxID(ctxID), null, CtxManager.class, "settingsWrite");
-         } else {
-            //#debug
-            toDLog().pData("No data for ctxID " + ctxID + " " + toStringCtxID(ctxID), null, CtxManager.class, "settingsWrite");
-            dos.writeInt(0);
-         }
-      }
-      int writeCountB = dos.size();
-      int bytesWritten = writeCountB - writeCount;
-      //#debug
-      toDLog().pData("End of Method:" + bytesWritten + " bytes were written to BADataOS", null, CtxManager.class, "stateWrite");
-   }
 
    //#mdebug
    public IDLog toDLog() {

@@ -16,6 +16,8 @@ public interface ITechTags extends ITech {
 
    public static final int    FLAG_01_PRINT_ALWAYS    = 1 << 0;
 
+   public static final int    FLAG_04_PRINT_STATOR    = 1 << 3;
+
    public static final int    FLAG_05_PRINT_UI        = 1 << 4;
 
    public static final int    FLAG_06_PRINT_WORK      = 1 << 5;
@@ -59,11 +61,13 @@ public interface ITechTags extends ITech {
    /**
     * Message that should not occur, generating a NPE if not catching
     */
-   public static final int    FLAG_25_PRINT_NULL      = 1 << 24;
+   public static final int    FLAG_02_PRINT_NULL      = 1 << 1;
 
    public static final int    FLAG_ALL                = -1;
 
    public static final String STRING_01_ALWAYS        = "Always";
+
+   public static final String STRING_04_STATOR        = "Stator";
 
    public static final String STRING_05_UI            = "Ui    ";
 
@@ -105,6 +109,6 @@ public interface ITechTags extends ITech {
 
    public static final String STRING_24_DRAW          = "Draw  ";
 
-   public static final String STRING_25_NULL          = "Null";
+   public static final String STRING_02_NULL          = "Null";
 
 }

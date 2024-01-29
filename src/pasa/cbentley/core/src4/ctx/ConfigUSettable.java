@@ -27,12 +27,16 @@ public class ConfigUSettable implements IConfigU {
 
    private ILogConfigurator logConfigurator;
 
+   private int              toStringBytesOn1Line;
+
    private boolean          toStringIsUsingClassLinks;
 
    protected UCtx           uc;
 
    public ConfigUSettable() {
       encoding = "UTF-8";
+      toStringBytesOn1Line = 20;
+      toStringIsUsingClassLinks = true;
    }
 
    public String getDefaultEncoding() {
@@ -95,6 +99,10 @@ public class ConfigUSettable implements IConfigU {
       this.logConfigurator = logConfigurator;
    }
 
+   public void setToStringBytesOn1Line(int toStringBytesOn1Line) {
+      this.toStringBytesOn1Line = toStringBytesOn1Line;
+   }
+
    //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();
@@ -123,6 +131,10 @@ public class ConfigUSettable implements IConfigU {
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ConfigUSettable.class);
       toStringPrivate(dc);
+   }
+
+   public int toStringGetBytesOn1Line() {
+      return toStringBytesOn1Line;
    }
 
    public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {

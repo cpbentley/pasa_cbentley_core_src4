@@ -21,6 +21,8 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
     */
    private long                count;
 
+   private String name;
+
    /**
     * By default create a default {@link SystemOutAppender}
     * @param uc
@@ -49,6 +51,10 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       return appenders;
    }
 
+   public long getCount() {
+      return count;
+   }
+
    public ILogEntryAppender getDefault() {
       return appenders[0];
    }
@@ -57,6 +63,9 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       return ITechLvl.LVL_08_INFO;
    }
 
+   public String getName() {
+      return name;
+   }
 
    /**
     * This is used for quick debugging without having to change configuration of the logger.
@@ -88,7 +97,6 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       ptPrint(msg, str, c, method, m, flag, getLevelDefault(), false);
    }
 
-   private String name;
    /**
     * 
     * @param msg
@@ -105,6 +113,11 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       }
       this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, devFlags);
    }
+   
+   protected void ptPrintBig(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl) {
+      this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, ITechDev.DEV_6_BIG);
+   }
+
 
    protected synchronized void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, int flags) {
       //thread separation 
@@ -130,9 +143,9 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
          appenders[i].processLogEntry(entry);
       }
    }
-   
-   public long getCount() {
-      return count;
+
+   public void setName(String name) {
+      this.name = name;
    }
 
    //#mdebug
@@ -151,14 +164,6 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
 
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("count", count);
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public void setName(String name) {
-      this.name = name;
    }
 
    //#enddebug

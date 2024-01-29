@@ -22,4 +22,6 @@ public interface ITechLvl extends ITech {
 
    public static final int LVL_10_SEVERE  = 10;
 
+   public static final int LVL_11_EXIT    = 11;
+
 }

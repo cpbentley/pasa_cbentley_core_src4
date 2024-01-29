@@ -19,6 +19,10 @@ public interface ITechConfig extends ITech {
 
    public static final String STRING_F_05_TIMESTAMP                 = "Timestamp";
 
+   public static final String STRING_F_06_BIG                       = "Big";
+
+   public static final String STRING_F_08_OWNER_NAME                = "OwnerName";
+
    /**
     * ?
     */
@@ -52,7 +56,7 @@ public interface ITechConfig extends ITech {
     */
    public static final int    FORMAT_FLAG_08_OWNER_NAME             = 1 << 7;
 
-   public static final int    FORMAT_FLAG_06_                       = 1 << 5;
+   public static final int    FORMAT_FLAG_06_BIG                    = 1 << 5;
 
    public static final int    FORMAT_FLAG_07_                       = 1 << 6;
 
@@ -125,6 +129,11 @@ public interface ITechConfig extends ITech {
    public static final int    MASTER_FLAG_10_OWNER_NAME_UC          = 1 << 9;
 
    /**
+    * When this flag is set, ignores Big
+    */
+   public static final int    MASTER_FLAG_11_IGNORES_BIGS           = 1 << 10;
+
+   /**
     * Check the {@link IStringable} class for positives or negatives
     */
    public static final int    MASTER_FLAG_09_TREAT_STRINGABLE_CLASS = 1 << 8;
@@ -146,5 +155,9 @@ public interface ITechConfig extends ITech {
    public static final String STRING_M_08_OPEN_ALL_BUT_FALSE        = "OpenAllButFalse";
 
    public static final String STRING_M_09_TREAT_STRINGABLE_CLASS    = "TreatStringableClass";
+
+   public static final String STRING_M_10_OWNER_NAME                = "OwnerName";
+
+   public static final String STRING_M_11_IGNORE_BIGS               = "IgnoreBigs";
 
 }

@@ -20,6 +20,10 @@ public class LogAdapter implements IDLog {
       throw new RuntimeException("not implemented yet");
    }
 
+   public long getCount() {
+      return 0;
+   }
+
    public ILogEntryAppender getDefault() {
       throw new RuntimeException("not implemented yet");
    }
@@ -29,10 +33,6 @@ public class LogAdapter implements IDLog {
    }
 
    public void methodStart(Class c, String method, int lvl) {
-      throw new RuntimeException("not implemented yet");
-   }
-
-   public void pNull(String msg, IStringable str, Class c, String method) {
       throw new RuntimeException("not implemented yet");
    }
 
@@ -78,6 +78,14 @@ public class LogAdapter implements IDLog {
    public void pCmd(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       throw new RuntimeException("not implemented yet");
 
+   }
+
+   public void pCmd1(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");
+   }
+
+   public void pData(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");
    }
 
    public void pData(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
@@ -173,6 +181,10 @@ public class LogAdapter implements IDLog {
       throw new RuntimeException("not implemented yet");
    }
 
+   public void pFlowBig(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");
+   }
+
    public void pInit(String msg, IStringable str, Class c, String method) {
       throw new RuntimeException("not implemented yet");
 
@@ -212,6 +224,14 @@ public class LogAdapter implements IDLog {
 
    }
 
+   public void pModel1(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");
+   }
+
+   public void pNull(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");
+   }
+
    public void pNull(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       throw new RuntimeException("not implemented yet");
    }
@@ -239,6 +259,14 @@ public class LogAdapter implements IDLog {
    public void pState(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       throw new RuntimeException("not implemented yet");
 
+   }
+
+   public void pStator(String msg, IStringable str, Class c, String method) {
+      throw new RuntimeException("not implemented yet");
+   }
+
+   public void pStator(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
+      throw new RuntimeException("not implemented yet");
    }
 
    public void pTest(String msg, IStringable str, Class c, String method) {
@@ -276,18 +304,6 @@ public class LogAdapter implements IDLog {
 
    }
 
-   public void pData(String msg, IStringable str, Class c, String method) {
-      throw new RuntimeException("not implemented yet");
-   }
-
-   public void pModel1(String msg, IStringable str, Class c, String method) {
-      throw new RuntimeException("not implemented yet");
-   }
-
-   public void pCmd1(String msg, IStringable str, Class c, String method) {
-      throw new RuntimeException("not implemented yet");
-   }
-
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();
    }
@@ -305,10 +321,6 @@ public class LogAdapter implements IDLog {
       return Dctx.toString1Line(this);
    }
 
-   private void toStringPrivate(Dctx dc) {
-
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, LogAdapter.class);
       toStringPrivate(dc);
@@ -318,9 +330,8 @@ public class LogAdapter implements IDLog {
       return uc;
    }
 
-   public long getCount() {
-      // TODO Auto-generated method stub
-      return 0;
+   private void toStringPrivate(Dctx dc) {
+
    }
 
    //#enddebug

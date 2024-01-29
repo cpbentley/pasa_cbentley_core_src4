@@ -73,6 +73,10 @@ public interface IDLog extends IStringable {
 
    public void pDraw(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
 
+   public void pStator(String msg, IStringable str, Class c, String method);
+
+   public void pStator(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+
    public void pEvent(String msg, IStringable str, Class c, String method);
 
    public void pEvent(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
@@ -114,6 +118,15 @@ public interface IDLog extends IStringable {
    public void pFlag(int flag, String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
 
    public void pFlow(String msg, IStringable str, Class c, String method);
+
+   /**
+    * We know its big chunk of data. Only printed if {@link ITechConfig}
+    * @param msg
+    * @param str
+    * @param c
+    * @param method
+    */
+   public void pFlowBig(String msg, IStringable str, Class c, String method);
 
    public void pFlow(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
 
