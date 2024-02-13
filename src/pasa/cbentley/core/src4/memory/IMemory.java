@@ -163,6 +163,8 @@ public interface IMemory extends IStringable {
     */
    public Object[] ensureCapacity(Object[] ar, int size, int grow);
 
+   public Object[] ensureCapacity(Object[] objects, int offset, int size, int grow);
+
    /**
     * Ensure size of the String array and add incr as padding if possible
     * <br>

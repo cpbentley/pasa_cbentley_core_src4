@@ -213,6 +213,24 @@ public class MemorySimpleCreator implements IMemory {
       return ar;
    }
 
+   public Object[] ensureCapacity(Object[] ar, int offset, int size, int grow) {
+      int total = offset + size + grow;
+      if (ar == null) {
+         //#debug
+         toDLog().pMemory("Objects is null. size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
+         return new Object[total];
+      }
+      if (total < ar.length) {
+         return ar;
+      }
+      //#debug
+      toDLog().pMemory("Objects.length=" + ar.length + " size=" + size + " grow=" + grow, null, MemorySimpleCreator.class, "ensureCapacity", LVL_05_FINE, true);
+      Object[] oldData = ar;
+      ar = new Object[total];
+      System.arraycopy(oldData, 0, ar, 0, oldData.length);
+      return ar;
+   }
+   
    public Object[] ensureCapacity(Object[] ar, int size, int grow) {
       if (ar == null) {
          //#debug

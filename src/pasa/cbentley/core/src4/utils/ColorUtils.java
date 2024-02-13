@@ -566,6 +566,27 @@ public class ColorUtils implements IColors, IStringable {
    //#enddebug
 
    /**
+    * Returns a String such as (a,r,g,b)
+    * @param c
+    * @return
+    */
+   public String toStringColor(int c) {
+      return "(" + ((c >> 24) & 0xFF) + "," + ((c >> 16) & 0xFF) + "," + ((c >> 8) & 0xFF) + "," + (c & 0xFF) + ")";
+   }
+
+   public void toStringColor(StringBBuilder sb, int c) {
+      sb.append("(");
+      sb.append(((c >> 24) & 0xFF));
+      sb.append(",");
+      sb.append(((c >> 16) & 0xFF));
+      sb.append(",");
+      sb.append(((c >> 8) & 0xFF));
+      sb.append(",");
+      sb.append(((c >> 0) & 0xFF));
+      sb.append(")");
+   }
+
+   /**
     * Alpha is removed..
     * @param rgb
     * @return
@@ -591,34 +612,6 @@ public class ColorUtils implements IColors, IStringable {
       }
    }
 
-   public void toStringColorWithName(int color, Dctx dc) {
-      toStringColor(dc, color);
-      dc.append('[');
-      dc.append(toStringColorName(color));
-      dc.append(']');
-   }
-
-   /**
-    * Returns a String such as (a,r,g,b)
-    * @param c
-    * @return
-    */
-   public String toStringColor(int c) {
-      return "(" + ((c >> 24) & 0xFF) + "," + ((c >> 16) & 0xFF) + "," + ((c >> 8) & 0xFF) + "," + (c & 0xFF) + ")";
-   }
-
-   public void toStringColor(StringBBuilder sb, int c) {
-      sb.append("(");
-      sb.append(((c >> 24) & 0xFF));
-      sb.append(",");
-      sb.append(((c >> 16) & 0xFF));
-      sb.append(",");
-      sb.append(((c >> 8) & 0xFF));
-      sb.append(",");
-      sb.append(((c >> 0) & 0xFF));
-      sb.append(")");
-   }
-
    /**
     * Returns a String such as [r-g-b]
     * @param c
@@ -626,6 +619,13 @@ public class ColorUtils implements IColors, IStringable {
     */
    public String toStringColorRGB(int c) {
       return "[" + ((c >> 16) & 0xFF) + "-" + ((c >> 8) & 0xFF) + "-" + (c & 0xFF) + "]";
+   }
+
+   public void toStringColorWithName(int color, Dctx dc) {
+      toStringColor(dc, color);
+      dc.append('[');
+      dc.append(toStringColorName(color));
+      dc.append(']');
    }
 
    public UCtx toStringGetUCtx() {

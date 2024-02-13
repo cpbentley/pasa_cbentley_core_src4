@@ -94,7 +94,9 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  * <li>toString() method outputs the debug visualization of the class. This must be implemented.
  * <li>All toString and miscellanous debug code must be enclosed by antenna preprocessing directives #debug #mdebug/#enddebug. 
  * <li>Code should not ever rely on toString() methods for making logic decisions. It always was and always will be fragile.
+ * </p>
  * 
+ * <p>
  * <br>
  * Historically, {@link UCtx} was born out of the need to access the Debug Context (name {@link Dctx}) in a non static way.
  * All debug frameworks/libraries that uses static references had to be scrapped, because even debug static state had to disappear.
@@ -124,7 +126,7 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  * <ul>
  * <li> {@link IConfig} and possibly a default Java implementation of it.
  * <li>IEvents prefixed interfaces such as {@link IEventsCore} are located in ctx package.
- * <li>{@link IToStringFlags} prefixed interfaces used to dynamically configure a {@link Dctx}
+ * <li>{@link IToStringFlags} prefixed interfaces used to dynamically configure a {@link Dctx} (Debug Context)
  * <li>{@link ToStringStaticUc} for debugging integer constant object of the code context
  * <li> The <code>.ctx</code> contains an IEvents interface and IStrings and any interface defining
  * 
@@ -291,11 +293,13 @@ public class UCtx implements ICtx, IEventsCore {
 
    private String           name;
 
+   private ILogConfigurator toStringLogConfigurator;
+
    /**
     * Assume a simple Java Host 
     */
    public UCtx() {
-      this(null,null);
+      this(null, null);
    }
 
    /**
@@ -309,11 +313,11 @@ public class UCtx implements ICtx, IEventsCore {
    public UCtx(IConfigU config, String name) {
       if (config == null) {
          config = new ConfigUDef();
-      } 
-      
+      }
+
       //#debug
       config.toStringSetDebugUCtx(this);
-      
+
       this.name = name;
       this.config = config;
       ctxManager = new CtxManager(this);
@@ -340,14 +344,15 @@ public class UCtx implements ICtx, IEventsCore {
          dlog.setName(name);
       }
       this.dlog = dlog;
-      ILogConfigurator logConfigurator = config.toStringGetLogConfigurator(this);
+
+      toStringLogConfigurator = config.toStringGetLogConfigurator(this);
       //TODO there might be different appenders with different configurations
       //Files etc etc Here we deal with default appender
       ILogEntryAppender logAppender = dlog.getDefault();
       IDLogConfig configOfAppender = logAppender.getConfig();
-      logConfigurator.apply(configOfAppender); //apply config
+      toStringLogConfigurator.apply(configOfAppender); //apply config
 
-      String message = "Very First Log Message; Using LogConfigurator:" + logConfigurator.getClass().getName();
+      String message = "Very First Log Message; Using LogConfigurator:" + toStringLogConfigurator.getClass().getName();
       dlog.pAlways(message, null, UCtx.class, "[" + +this.hashCode() + "]");
       dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor");
       dlog.pAlways("IConfigU", config, UCtx.class, "constructor");
@@ -355,25 +360,23 @@ public class UCtx implements ICtx, IEventsCore {
       //this is not for debug purposes. its the application log for the application user.
       this.userLog = new UserLogSystemOut(this);
 
-      eventBusRoot = new EventBusArray(this, this, getEventBaseTopology());
       registrationID = ctxManager.registerCtx(this);
 
       ctxManager.registerStaticID(this, IStaticIDs.SID_STRINGS);
       ctxManager.registerStaticID(this, IStaticIDs.SID_EVENTS);
-      //#debug
-      ctxManager.registerStaticID(this, IStaticIDs.SID_DIDS);
-      //#debug
-      ctxManager.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringDIDs.A_DID_OFFSET_A_UC, IToStringDIDs.A_DID_OFFSET_Z_UC);
+
+      ctxManager.registerStaticRange(this, IStaticIDs.SID_EVENTS, IEventsCore.A_SID_CORE_EVENT_A, IEventsCore.A_SID_CORE_EVENT_Z);
+      eventBusRoot = new EventBusArray(this, this, getEventBaseTopology(), IEventsCore.A_SID_CORE_EVENT_A);
 
       encoding = config.getDefaultEncoding();
 
-      //#debug
+      //#mdebug
+      ctxManager.registerStaticID(this, IStaticIDs.SID_DIDS);
+      ctxManager.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringDIDs.A_DID_OFFSET_A_UC, IToStringDIDs.A_DID_OFFSET_Z_UC);
       didManager = new DIDManager(this);
-      //#debug
       config.toStringSetDebugUCtx(this);
-
-      //#debug
       toDLog().pInit("Created", this, UCtx.class, "aInit", LVL_05_FINE, true);
+      //#enddebug
    }
 
    public void bip(Exception e, long bip) {
@@ -471,11 +474,12 @@ public class UCtx implements ICtx, IEventsCore {
 
    public int[] getEventBaseTopology() {
       int[] events = new int[BASE_EVENTS];
-      events[PID_0_ANY] = PID_0_ANY_X_NUM;
-      events[PID_1_FRAMEWORK] = PID_1_FRAMEWORK_X_NUM;
-      events[PID_2_HOST] = PID_2_HOST_X_NUM;
-      events[PID_3_MEMORY] = PID_3_MEMORY_X_NUM;
-      events[PID_4_LIFE] = PID_4_LIFE_X_NUM;
+      events[PID_00] = PID_00_XX;
+      events[PID_01] = PID_01_XX;
+      events[PID_02] = PID_02_XX;
+      events[PID_03] = PID_03_XX;
+      events[PID_04] = PID_04_XX;
+      events[PID_05] = PID_05_XX;
       return events;
    }
 
@@ -609,7 +613,6 @@ public class UCtx implements ICtx, IEventsCore {
       }
       return workerThread;
    }
-
 
    //#mdebug
    public void toStringSetDLog(IDLog log) {
@@ -769,63 +772,63 @@ public class UCtx implements ICtx, IEventsCore {
 
    public String toStringEventID(int pid, int eid) {
       switch (pid) {
-         case PID_0_ANY:
+         case PID_00_ANY:
             return "Any";
-         case PID_1_FRAMEWORK:
+         case PID_01_FRAMEWORK:
             switch (eid) {
-               case PID_1_FRAMEWORK_0_ANY:
+               case PID_01_FRAMEWORK_0_ANY:
                   return "Any";
-               case PID_1_FRAMEWORK_1_CTX_CREATED:
+               case PID_01_FRAMEWORK_1_CTX_CREATED:
                   return "CtxCreated";
-               case PID_1_FRAMEWORK_2_LANGUAGE_CHANGED:
+               case PID_01_FRAMEWORK_2_LANGUAGE_CHANGED:
                   return "LanguageChanged";
                default:
                   return "UnknownEID" + eid;
             }
-         case PID_2_HOST:
+         case PID_02_HOST:
             switch (eid) {
-               case PID_2_HOST_0_ANY:
+               case PID_02_HOST_0_ANY:
                   return "Any";
                default:
                   return "UnknownEID" + eid;
             }
-         case PID_3_MEMORY:
+         case PID_03_MEMORY:
             switch (eid) {
-               case PID_3_MEMORY_0_ANY:
+               case PID_03_MEMORY_0_ANY:
                   return "Any";
-               case PID_3_MEMORY_1_OUT_OF_MEMORY_GC:
+               case PID_03_MEMORY_1_OUT_OF_MEMORY_GC:
                   return "OutOfMemoryGC";
-               case PID_3_MEMORY_2_USER_REQUESTED_GC:
+               case PID_03_MEMORY_2_USER_REQUESTED_GC:
                   return "UserRequestedGC";
-               case PID_3_MEMORY_3_OBJECT_DESTROY:
+               case PID_03_MEMORY_3_OBJECT_DESTROY:
                   return "ObjectDestroy";
                default:
                   return "UnknownEID" + eid;
             }
-         case PID_4_LIFE:
+         case PID_04_LIFE:
             switch (eid) {
-               case PID_4_LIFE_0_ANY:
+               case PID_04_LIFE_0_ANY:
                   return "Any";
-               case PID_4_LIFE_1_STARTED:
+               case PID_04_LIFE_1_STARTED:
                   return "Started";
-               case PID_4_LIFE_2_PAUSED:
+               case PID_04_LIFE_2_PAUSED:
                   return "Paused";
-               case PID_4_LIFE_3_RESUMED:
+               case PID_04_LIFE_3_RESUMED:
                   return "Resumed";
-               case PID_4_LIFE_4_STOPPED:
+               case PID_04_LIFE_4_STOPPED:
                   return "Stopped";
-               case PID_4_LIFE_5_DESTROYED:
+               case PID_04_LIFE_5_DESTROYED:
                   return "Destroyed";
                default:
                   return "UnknownEID" + eid;
             }
-         case PID_5_THREAD:
+         case PID_05_THREAD:
             switch (eid) {
-               case PID_5_THREAD_0_ANY:
+               case PID_05_THREAD_0_ANY:
                   return "Any";
-               case PID_5_THREAD_1_PULSE_ON:
+               case PID_05_THREAD_1_PULSE_ON:
                   return "PulseOn";
-               case PID_5_THREAD_2_PULSE_OFF:
+               case PID_05_THREAD_2_PULSE_OFF:
                   return "PulseOff";
                default:
                   return "UnknownEID" + eid;
@@ -857,19 +860,23 @@ public class UCtx implements ICtx, IEventsCore {
       dc.appendVarWithSpace("encoding", encoding);
    }
 
+   public ILogConfigurator toStringGetLogConfigurator() {
+      return toStringLogConfigurator;
+   }
+
    public String toStringProducerID(int pid) {
       switch (pid) {
-         case PID_0_ANY:
+         case PID_00_ANY:
             return "Any";
-         case PID_1_FRAMEWORK:
+         case PID_01_FRAMEWORK:
             return "Framework";
-         case PID_2_HOST:
+         case PID_02_HOST:
             return "Host";
-         case PID_3_MEMORY:
+         case PID_03_MEMORY:
             return "Memory";
-         case PID_4_LIFE:
+         case PID_04_LIFE:
             return "Life";
-         case PID_5_THREAD:
+         case PID_05_THREAD:
             return "Thread";
          default:
             return null;

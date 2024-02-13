@@ -134,6 +134,8 @@ public interface IDLog extends IStringable {
 
    public void pInit(String msg, IStringable str, Class c, String method);
 
+   public void pInitBig(String msg, IStringable str, Class c, String method);
+
    public void pInit(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
 
    public void pInit1(String msg, IStringable str, Class c, String method);

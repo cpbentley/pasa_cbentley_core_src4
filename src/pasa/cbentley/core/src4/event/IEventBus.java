@@ -94,13 +94,6 @@ import pasa.cbentley.core.src4.logging.IStringable;
 public interface IEventBus extends IStringable, ITechThread {
 
    /**
-    * Registering with this PID will forward any event from any producer.
-    * <br>
-    * 
-    */
-   public static final int PID_0_ANY = 0;
-
-   /**
     * Registers 
     * This method allows a Consumer to register to events without having
     * a reference to the producer. Simply use the contextually and statically defined
@@ -111,20 +104,6 @@ public interface IEventBus extends IStringable, ITechThread {
     * @param eventID
     */
    public void addConsumer(IEventConsumer con, int prodID, int eventID);
-
-   /**
-    * 
-    * @param pid
-    * @throws IllegalArgumentException if pid is not a registered
-    */
-   public void unregisterDynamicProducerID(int pid);
-
-   /**
-    * Gets the next PID.
-    * @param topoloyNumEvents the number of event families for that producer
-    * @return
-    */
-   public int createNewProducerID(int topoloyNumEvents);
 
    /**
     * 
@@ -148,13 +127,24 @@ public interface IEventBus extends IStringable, ITechThread {
     * Then it will put the event on the bus with {@link IEventBus#putOnBus(BusEvent)}.
     * 
     * {@link IEventsCore}
-    * <br>
+    * 
     * @param producerID static id defined at the module level
     * @param eventID static id defining the event sub type. 
     * @param producer the object that produced the event
     * @return
     */
    public BusEvent createEvent(int producerID, int eventID, Object producer);
+
+   /**
+    * Gets the next PID.
+    * <p>
+    * Usage: The code context of a table model using events to notify changes to the ui, 
+    * each new such model creates a new PID to generate its events and provides it to its views.
+    * </p>
+    * @param topoloyNumEvents the number of event families for that producer
+    * @return
+    */
+   public int createNewProducerID(int topoloyNumEvents);
 
    /**
     * Returns the {@link ICtx} that created this event bus
@@ -197,6 +187,13 @@ public interface IEventBus extends IStringable, ITechThread {
     * @param consumer
     */
    public void removeConsumer(IEventConsumer consumer);
+
+   /**
+    * 
+    * @param pid
+    * @throws IllegalArgumentException if pid is not a registered
+    */
+   public void removeDynamicProducerID(int pid);
 
    /**
     * Shortcut method to create an event with the given parameters

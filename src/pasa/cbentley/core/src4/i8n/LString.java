@@ -4,12 +4,13 @@
  */
 package pasa.cbentley.core.src4.i8n;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
- * Default implementation of {@link IString}
+ * Default implementation of {@link I8nString}
  * 
  * It has
  * <li> A {@link LocaleID} telling which language the string belongs to
@@ -28,7 +29,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * <p>
  * <b>Potential Uses</b>
  * </p>
- * <li>User selects {@link IString} through interface. Resets cache.
+ * <li>User selects {@link I8nString} through interface. Resets cache.
  * <li>User sets a translation.
  * <br>
  * 
@@ -48,7 +49,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles Bentley
  *
  */
-public class LString implements IString {
+public class LString extends ObjectU implements I8nString {
 
    protected String                def;
 
@@ -101,6 +102,7 @@ public class LString implements IString {
     * @param def
     */
    public LString(IStringProducer dd, int key, String def) {
+      super(dd.getUC());
       this.stringProducer = dd;
       this.keyInt = key;
       this.def = def;
@@ -112,8 +114,9 @@ public class LString implements IString {
     * @param id
     * @param def
     */
-   public LString(IStringProducer uc, String id, String def) {
-      this.stringProducer = uc;
+   public LString(IStringProducer dd, String id, String def) {
+      super(dd.getUC());
+      this.stringProducer = dd;
       this.id = id;
       this.def = def;
       myString = def;
@@ -170,26 +173,26 @@ public class LString implements IString {
       suffix = str;
    }
 
+
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "LString");
+      dc.root(this, LString.class, 180);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+   private void toStringPrivate(Dctx dc) {
+      
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "LString");
+      dc.root1Line(this, LString.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
-   public UCtx toStringGetUCtx() {
-      return stringProducer.getUCtx();
-   }
    //#enddebug
+   
+
 
 }

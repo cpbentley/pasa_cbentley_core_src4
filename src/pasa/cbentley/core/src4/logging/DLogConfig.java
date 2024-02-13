@@ -225,6 +225,11 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
    }
 
    public boolean isAccepted(DLogEntry type) {
+      boolean isClassFullDebug = isClassFullPositive(type.getClassL());
+      if(isClassFullDebug) {
+         return true;
+      }
+      
       //fail fast
       if (type.getLevel() < logLevel) {
          return false;
@@ -283,6 +288,10 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
             return hasFlagTag;
          }
       }
+   }
+
+   public boolean isClassFullPositive(Class c) {
+      return fullPositives.containsKey(c);
    }
 
    /**

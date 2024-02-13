@@ -266,6 +266,7 @@ public class IntUtils implements IStringable {
       return 4;
    }
 
+   
    public static int getMax(int[] ar) {
       return getMax(ar, 0, ar.length);
    }

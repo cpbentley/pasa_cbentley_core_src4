@@ -4,6 +4,8 @@
  */
 package pasa.cbentley.core.src4.interfaces;
 
+import pasa.cbentley.core.src4.logging.ToStringStaticC;
+
 /**
  * Cheap collection of int enumerations.
  * <br>
@@ -12,10 +14,19 @@ package pasa.cbentley.core.src4.interfaces;
  * Note: Single letter interfaces don't use the I prefix convention.
  * Since by convention, you cannot have single letter classes.
  * 
+ * @see ToStringStaticC
  * @author Charles Bentley
  *
  */
 public interface C extends ITech {
+
+   public static final int AXIS_0_VERTICAL          = 0;
+
+   public static final int AXIS_1_HORIZONTAL        = 1;
+
+   public static final int AXIS_2_ASCENDING         = 2;
+
+   public static final int AXIS_3_DESCENDING        = 3;
 
    public static final int ANC_0_TOP_LEFT           = 0;
 

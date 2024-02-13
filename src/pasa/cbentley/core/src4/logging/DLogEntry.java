@@ -112,6 +112,10 @@ public class DLogEntry implements ITechLvl {
       return classL;
    }
 
+   /**
+    * The class being toStringed in the print statement
+    * @return
+    */
    public Class getClassStringable() {
       return classStringable;
    }

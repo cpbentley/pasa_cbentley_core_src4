@@ -17,7 +17,7 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * <br>
  * The application sees this interface.
  * 
- * {@link IEventsCore#PID_1_FRAMEWORK_2_LANGUAGE_CHANGED}
+ * {@link IEventsCore#PID_01_FRAMEWORK_2_LANGUAGE_CHANGED}
  * 
  * @author Charles Bentley
  *
@@ -40,13 +40,13 @@ public interface IStringProducer extends IStringable {
    public LocaleID addLocaleID(String name, String suffix);
 
    /**
-    * Creates a mutable {@link IString} used to represent
+    * Creates a mutable {@link I8nString} used to represent
     * a user visible string.
     * <br>
     * @param key
     * @return
     */
-   public IString getIString(int key);
+   public I8nString getIString(int key);
 
    /**
     * If no null and default language is set, returns def.
@@ -54,7 +54,7 @@ public interface IStringProducer extends IStringable {
     * @param def
     * @return
     */
-   public IString getIString(String key, String def);
+   public I8nString getIString(String key, String def);
 
    /**
     * 
@@ -63,19 +63,19 @@ public interface IStringProducer extends IStringable {
     * @param suffix
     * @return
     */
-   public IString getIString(String key, String def, String suffix);
+   public I8nString getIString(String key, String def, String suffix);
 
    /**
-    * Returns the {@link IString} for the integer key and current {@link LocaleID}. 
+    * Returns the {@link I8nString} for the integer key and current {@link LocaleID}. 
     * 
     * <p>
-    * If the key is not found, the {@link IString} is loaded with def String
+    * If the key is not found, the {@link I8nString} is loaded with def String
     * </p>
     * @param key
     * @param def
     * @return
     */
-   public IString getIStringKey(int key, String def);
+   public I8nString getIStringKey(int key, String def);
 
    /**
     * The {@link LocaleID} associated with the given suffix. null if suffix is not found
@@ -117,7 +117,7 @@ public interface IStringProducer extends IStringable {
    public String getString(int key);
 
    /**
-    * One can also get just a String for those cases where {@link IString} is not supported.
+    * One can also get just a String for those cases where {@link I8nString} is not supported.
     * <br>
     * @param key
     * @return
@@ -169,6 +169,6 @@ public interface IStringProducer extends IStringable {
     */
    public IStringMapper getStringMapper();
    
-   public UCtx getUCtx();
+   public UCtx getUC();
 
 }

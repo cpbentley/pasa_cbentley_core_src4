@@ -44,103 +44,122 @@ import pasa.cbentley.core.src4.interfaces.IEvents;
  */
 public interface IEventsCore extends IEvents {
 
+   public static final int A_SID_CORE_EVENT_A                  = 0;
+
+   public static final int A_SID_CORE_EVENT_Z                  = 9;
+
    /**
     * Number of statically defined events
     */
-   public static final int  BASE_EVENTS                        = 5;
+   public static final int BASE_EVENTS                         = 6;
+
+   public static final int PID_00                              = 0;
 
    /**
+    * 
     * Reserved
     * Events will of instances must register a dynamic PID
     * outside the static range.
     */
-   public static final int  PID_0_ANY                          = 0;
+   public static final int PID_00_ANY                          = A_SID_CORE_EVENT_A + PID_00;
 
-   public static final int  PID_0_ANY_X_NUM                    = 1;
+   public static final int PID_00_ANY_0                        = 0;
+
+   public static final int PID_00_XX                           = 1;
+
+   public static final int PID_01                              = 1;
 
    /**
     * 
     */
-   public static final int  PID_1_FRAMEWORK                    = 1;
+   public static final int PID_01_FRAMEWORK                    = A_SID_CORE_EVENT_A + PID_01;
 
-   public static final int  PID_1_FRAMEWORK_0_ANY              = 0;
+   /**
+    * For registration only. Not for generation of events
+    */
+   public static final int PID_01_FRAMEWORK_0_ANY              = 0;
 
    /**
     * Event generated when 
     */
-   public static final int  PID_1_FRAMEWORK_1_CTX_CREATED      = 1;
+   public static final int PID_01_FRAMEWORK_1_CTX_CREATED      = 1;
 
    /**
     * When a language has been changed
     */
-   public static final int  PID_1_FRAMEWORK_2_LANGUAGE_CHANGED = 2;
+   public static final int PID_01_FRAMEWORK_2_LANGUAGE_CHANGED = 2;
 
-   public static final int  PID_1_FRAMEWORK_X_NUM              = 3;
+   public static final int PID_01_XX                           = 3;
+
+   public static final int PID_02                              = 2;
 
    /**
     * Producer ID. Uses it to send event relating to Host events.
     */
-   public static final int  PID_2_HOST                         = 2;
+   public static final int PID_02_HOST                         = A_SID_CORE_EVENT_A + PID_02;
 
-   public static final int  PID_2_HOST_0_ANY                   = 0;
+   public static final int PID_02_HOST_0_ANY                   = 0;
 
-   public static final int  PID_2_HOST_X_NUM                   = 1;
+   public static final int PID_02_HOST_1_UPDATE                = 1;
+
+   public static final int PID_02_XX                           = 2;
+
+   public static final int PID_03                              = 3;
 
    /**
     * The pid used for memory event on the {@link UCtx#getEventBusRoot()} event bus.
     */
-   public static final int  PID_3_MEMORY                       = 3;
+   public static final int PID_03_MEMORY                       = A_SID_CORE_EVENT_A + PID_03;
 
    /**
-    * Any event by producer {@link IEventsCore#PID_3_MEMORY}
+    * Any event by producer {@link IEventsCore#PID_03_MEMORY}
     */
-   public static final int  PID_3_MEMORY_0_ANY                 = 0;
+   public static final int PID_03_MEMORY_0_ANY                 = 0;
 
    /**
     * Event ID 1 for Producer Memory
     */
-   public static final int  PID_3_MEMORY_1_OUT_OF_MEMORY_GC    = 1;
+   public static final int PID_03_MEMORY_1_OUT_OF_MEMORY_GC    = 1;
 
-   public static final int  PID_3_MEMORY_2_USER_REQUESTED_GC   = 2;
+   public static final int PID_03_MEMORY_2_USER_REQUESTED_GC   = 2;
 
    /**
     * Event sent with Object as producer when object references have to be removed.
     * Typically, cache and event bus will want to catch to events
     * and de reference those objects 
     */
-   public static final int  PID_3_MEMORY_3_OBJECT_DESTROY      = 3;
+   public static final int PID_03_MEMORY_3_OBJECT_DESTROY      = 3;
 
-   public static final int  PID_3_MEMORY_X_NUM                 = 3;
+   public static final int PID_03_XX                           = 4;
 
-   public static final int  PID_4_LIFE                         = 4;
+   public static final int PID_04                              = 4;
 
-   public static final int  PID_4_LIFE_0_ANY                   = 0;
+   public static final int PID_04_LIFE                         = A_SID_CORE_EVENT_A + PID_04;
 
-   public static final int  PID_4_LIFE_1_STARTED               = 1;
+   public static final int PID_04_LIFE_0_ANY                   = 0;
 
-   public static final int  PID_4_LIFE_2_PAUSED                = 2;
+   public static final int PID_04_LIFE_1_STARTED               = 1;
 
-   public static final int  PID_4_LIFE_3_RESUMED               = 3;
+   public static final int PID_04_LIFE_2_PAUSED                = 2;
 
-   public static final int  PID_4_LIFE_4_STOPPED               = 4;
+   public static final int PID_04_LIFE_3_RESUMED               = 3;
 
-   public static final int  PID_4_LIFE_5_DESTROYED             = 5;
+   public static final int PID_04_LIFE_4_STOPPED               = 4;
 
-   public static final int  PID_4_LIFE_X_NUM                   = 6;
+   public static final int PID_04_LIFE_5_DESTROYED             = 5;
 
-   /**
-    * Static ID for events. Registered in {@link CtxManager#registerStaticID(ICtx, int)}
-    */
-   public static final int  SID_EVENTS_2                       = IStaticIDs.SID_EVENTS;
+   public static final int PID_04_XX                           = 6;
 
-   public static final int  PID_5_THREAD                       = 5;
+   public static final int PID_05                              = 5;
 
-   public static final int  PID_5_THREAD_0_ANY                 = 0;
+   public static final int PID_05_THREAD                       = A_SID_CORE_EVENT_A + PID_05;
 
-   public static final int  PID_5_THREAD_1_PULSE_ON            = 1;
+   public static final int PID_05_THREAD_0_ANY                 = 0;
 
-   public static final int  PID_5_THREAD_2_PULSE_OFF           = 2;
+   public static final int PID_05_THREAD_1_PULSE_ON            = 1;
 
-   public static final int PID_5_THREAD_X_NUM                 = 3;
+   public static final int PID_05_THREAD_2_PULSE_OFF           = 2;
+
+   public static final int PID_05_XX                           = 3;
 
 }

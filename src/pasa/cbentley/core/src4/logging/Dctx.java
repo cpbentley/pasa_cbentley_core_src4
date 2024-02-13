@@ -7,6 +7,7 @@ package pasa.cbentley.core.src4.logging;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IToStringFlags;
 import pasa.cbentley.core.src4.ctx.UCtx;
@@ -311,6 +312,13 @@ public class Dctx implements IToStringFlags {
       }
    }
 
+   public void appendFlagsNewLine(int flags, String title, IntToStrings data) {
+      nl();
+      appendFlagsPositive(flags, title, data);
+      nl();
+      appendFlagsNegative(flags, title, data);
+   }
+
    public void appendFlagsNegative(int flags, String title, IntToStrings data) {
       this.appendFlags(flags, title, data, false);
    }
@@ -561,6 +569,11 @@ public class Dctx implements IToStringFlags {
       sb.append(string);
    }
 
+   public void appendWithNewLine(String string) {
+      sb.nl();
+      sb.append(string);
+   }
+
    public void appendWithSpaceArrayNullOnly(Object[] ar, String t) {
       if (ar == null) {
          if (t.endsWith("s")) {
@@ -684,6 +697,13 @@ public class Dctx implements IToStringFlags {
    /**
     * Flag from a marked prefixed interface {@link IToStringFlags}
     * 
+    * If {@link ICtx} has not registered flags values with
+    * 
+    * {@link Dctx#setFlagData(ICtx, int, boolean)}, method calls the global method
+    * 
+    * {@link ICtx#toStringHasToStringFlag(int)} which can be set externall with
+    * 
+    * {@link ACtx#toStringSetToStringFlag(int, boolean)}
     * @param ctx
     * @param flag
     * @return
@@ -836,22 +856,30 @@ public class Dctx implements IToStringFlags {
          sb.append(" elements");
          for (int i = 0; i < num; i++) {
             nl();
+            append("         ////////////////////////    ");
             append(i);
-            append(" : ");
+            if (stringerInt != null) {
+               append(":");
+               append(stringerInt.toString(ito.ints[i]));
+            }
+            append("    \\\\\\\\\\\\\\\\\\\\\\\\\\\\");
+            nl();
+            append("#");
+            append(i);
+            append(" -> ");
             append(titleRow);
             append(" [");
             append(ito.ints[i]);
             append("]");
             if (stringerInt != null) {
-               nl();
                append(" ");
                append(stringerInt.toString(ito.ints[i]));
             }
-            nl();
             Object o = ito.objects[i];
             if (o instanceof IStringable) {
                nlLvl("", (IStringable) o);
             } else {
+               nl();
                append(o.toString());
             }
          }

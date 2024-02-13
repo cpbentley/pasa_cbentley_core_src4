@@ -147,6 +147,10 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrintBig(msg, str, c, method, ITechTags.STRING_09_FLOW, ITechTags.FLAG_09_PRINT_FLOW, getLevelDefault());
    }
 
+   public void pInitBig(String msg, IStringable str, Class c, String method) {
+      super.ptPrintBig(msg, str, c, method, ITechTags.STRING_20_INIT, ITechTags.FLAG_20_PRINT_INIT, getLevelDefault());
+   }
+
    public void pFlow(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_09_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, oneLine);
    }

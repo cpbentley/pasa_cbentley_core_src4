@@ -26,34 +26,35 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * a Locale can be associated with a Font setup.
  * So there is a Global Font setup. And a Locale based set up.
  * <br>
- * Every time an {@link IString} is to be displayed, it must be computed.
+ * Every time an {@link I8nString} is to be displayed, it must be computed/or from cache with {@link I8nString#getStr()} .
  * <br>
  * Might be a compound.
  * Eve
  * <br>
  * Implementation tips.
  * Strings displayed fleetingly on the screen should not register for the local change event.
- * <br>
- * <br>
- * Only object with a long life and know when they die so they can remove
- * Event hooks.
- * <br>
- * <br>
+ * 
+ * <p>
+ * Only object with a long life and know when they die so they can remove Event hooks.
+ * </p>
+ * 
+ * <p>
+ * 
  * A Locale string can be a combination of several strings.
  * Navigate Up. Navigate Down
  * <br>
  * A language that use only one word for Navigate Up?
  * <br>
  * LocalID several local used
+ * </p>
  * 
  * A string can be a sentence with param values from the user (numbers, names)
  * "Welcome {name}"
  * 
  * @author Charles Bentley
  *
- * TODO rename to I8nString
  */
-public interface IString extends IStringable {
+public interface I8nString extends IStringable {
 
    /**
     * Fetches the String

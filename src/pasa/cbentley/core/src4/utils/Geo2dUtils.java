@@ -42,6 +42,129 @@ public class Geo2dUtils {
       return null;
    }
 
+   public int[] getPerpendicularBisector(int x1, int y1, int x2, int y2, int abc[]) {
+      int[] abcPer = new int[3];
+      getPerpendicularBisector(x1, y1, x2, y2, abc, abcPer);
+      return abcPer;
+   }
+
+   /**
+    * 
+    * @param x1
+    * @param y1
+    * @param x2
+    * @param y2
+    * @param abc
+    * @param abcPer
+    */
+   public void getPerpendicularBisector(int x1, int y1, int x2, int y2, int abc[], int[] abcPer) {
+      int px = (x1 + y1) / 2;
+      int py = (x2 + y2) / 2;
+
+      int bMinus = -abc[1];
+      int a = abc[0];
+
+      // c = -bx + ay
+      abcPer[0] = bMinus;
+      abcPer[1] = a;
+      abcPer[2] = bMinus * px + a * py;
+
+   }
+
+   public int[] getABCLineFromPoints(int x1, int y1, int x2, int y2) {
+      int[] abc = new int[3];
+      getABCLineFromPoints(x1, y1, x2, y2, abc);
+      return abc;
+   }
+
+   /**
+    * the intersection point of 2 lines
+    * @param abc 1st line ax+by=c
+    * @param efg 2nd ex+fy=g
+    * @param res
+    */
+   public void getIntersectionLinePoint(int[] abc, int[] efg, int[] res) {
+
+      int determinant = abc[0] * efg[1] - efg[0] * abc[1];
+
+      // As points are non-collinear,
+      // determinant cannot be 0
+      int x = (efg[1] * abc[2] - abc[1] * efg[2]) / determinant;
+      int y = (abc[0] * efg[2] - efg[0] * abc[2]) / determinant;
+
+      res[0] = x;
+      res[1] = y;
+   }
+
+   /**
+    * Point of intersection between abc and perpendicular line passing through x3 and y3.
+    * @param abc
+    * @param x3
+    * @param y3
+    * @param res
+    */
+   public void getLineIntersectionPerpendicularPoint(int abc[], int x3, int y3, int[] res) {
+      int a3 = -abc[1];
+      int b3 = abc[0];
+      int c3 = a3 * x3 + b3 * y3;
+      int[] efg = new int[] { a3, b3, c3 };
+      getIntersectionLinePoint(abc, efg, res);
+   }
+
+   public void getLineIntersectionPointPerpendicular(double abc[], int x3, int y3, double[] res) {
+      double a3 = -abc[1];
+      double b3 = abc[0];
+      double c3 = a3 * x3 + b3 * y3;
+      double[] efg = new double[] { a3, b3, c3 };
+      getLineIntersectionPoint(abc, efg, res);
+   }
+
+   public int[] getIntersectionLinePoint(int[] abc, int[] efg) {
+      int[] res = new int[2];
+      getIntersectionLinePoint(abc, efg, res);
+      return res;
+   }
+
+   /**
+    * Lines cannot be co linear
+    * @param abc
+    * @param efg
+    * @param res
+    */
+   public void getLineIntersectionPoint(double abc[], double efg[], double[] res) {
+
+      double determinant = abc[0] * efg[1] - efg[0] * abc[1];
+
+      // As points are non-collinear,
+      // determinant cannot be 0
+      double x = (efg[1] * abc[2] - abc[1] * efg[2]) / determinant;
+      double y = (abc[0] * efg[2] - efg[0] * abc[2]) / determinant;
+
+      res[0] = x;
+      res[1] = y;
+   }
+
+   /**
+    * Given two points be P1(x1, y1) and P2(x2, y2). 
+    * <p>
+    * A line can be represented as <code>ax + by = c</code> 
+    * </p>
+    * So, we have, 
+    * <li>ax1 + by1 = c 
+    * <li>ax2 + by2 = c 
+    * 
+    * @param x1
+    * @param y1
+    * @param x2
+    * @param y2
+    * @param abc
+    */
+   public void getABCLineFromPoints(int x1, int y1, int x2, int y2, int abc[]) {
+      abc[0] = y2 - y1;
+      abc[1] = x1 - x2;
+      abc[2] = abc[0] * (x1) + abc[1] * (y1);
+   }
+
    protected int[] getHoleReverse1(int x, int y, int w, int h, int[] holes) {
       return getHoleReverse1(x, y, w, h, holes, 0);
    }
@@ -52,6 +175,13 @@ public class Geo2dUtils {
       double a = x * x + y * y;
       float dist = (float) Math.sqrt(a);
       return dist;
+   }
+
+   public static float getDistanceSquare(int x1, int y1, int x2, int y2) {
+      int x = x1 - x2;
+      int y = y1 - y2;
+      float distSquare = x * x + y * y;
+      return distSquare;
    }
 
    public float getAngle(int px, int py, int tx, int ty) {

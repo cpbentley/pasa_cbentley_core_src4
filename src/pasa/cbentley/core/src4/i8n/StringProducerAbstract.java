@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.i8n;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -17,13 +18,11 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * @author Charles Bentley
  *
  */
-public abstract class StringProducerAbstract implements IStringProducer, IStringable {
+public abstract class StringProducerAbstract extends ObjectU implements IStringProducer, IStringable {
 
    protected LocaleID[] lids;
 
    protected LocaleID   current;
-
-   protected final UCtx uc;
 
    /**
     * 
@@ -31,7 +30,7 @@ public abstract class StringProducerAbstract implements IStringProducer, IString
     * @param ar
     */
    public StringProducerAbstract(UCtx uc, LocaleID[] ar) {
-      this.uc = uc;
+      super(uc);
       lids = ar;
       setLocalID(ar[0]);
    }
@@ -60,10 +59,6 @@ public abstract class StringProducerAbstract implements IStringProducer, IString
       return null;
    }
 
-   public UCtx getUCtx() {
-      return uc;
-   }
-
    /**
     * Called upon start of Appli or when Language is changed.
     * <br>
@@ -76,32 +71,24 @@ public abstract class StringProducerAbstract implements IStringProducer, IString
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
-
-   public IDLog toDLog() {
-      return uc.toDLog();
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "StringProdBase");
+      dc.root(this, StringProducerAbstract.class, 80);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
       dc.nlLvl("CurrentLocale", current);
       dc.nlLvlArray1Line(lids, "Locales");
    }
 
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "StringProdBase");
-      dc.append(" ");
+   private void toStringPrivate(Dctx dc) {
       current.toString1Line(dc);
    }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, StringProducerAbstract.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
    //#enddebug
+
 }

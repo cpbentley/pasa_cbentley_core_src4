@@ -334,5 +334,10 @@ public class LogAdapter implements IDLog {
 
    }
 
+   public void pInitBig(String msg, IStringable str, Class c, String method) {
+      // TODO Auto-generated method stub
+      
+   }
+
    //#enddebug
 }

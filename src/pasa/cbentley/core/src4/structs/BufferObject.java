@@ -38,7 +38,6 @@ public class BufferObject extends ObjectU implements IStringable {
 
    private int      offset    = 0;
 
-
    /**
     * 1,1
     */
@@ -76,13 +75,22 @@ public class BufferObject extends ObjectU implements IStringable {
     * @param str
     */
    public void add(Object obj) {
-      set(uc.getMem().ensureCapacity(objects, count, increment));
+      set(uc.getMem().ensureCapacity(objects, offset, count, increment));
       objects[offset + count] = obj;
       count += 1;
    }
 
+   public void add(Object[] objs) {
+      int nums = objs.length;
+      set(uc.getMem().ensureCapacity(objects, offset, count + nums, increment + nums));
+      for (int i = 0; i < nums; i++) {
+         objects[offset + count + i] = objs[i];
+      }
+      count += nums;
+   }
+
    public void add(Object obj1, Object obj2) {
-      set(uc.getMem().ensureCapacity(objects, count + 2, increment));
+      set(uc.getMem().ensureCapacity(objects, offset, count + 2, increment));
       objects[offset + count] = obj1;
       objects[offset + count + 1] = obj2;
       count += 2;
@@ -94,7 +102,7 @@ public class BufferObject extends ObjectU implements IStringable {
     */
    public void addLeft(Object obj) {
       if (offset == 0) {
-         set(uc.getMem().ensureCapacity(objects, count + 2, increment));
+         set(uc.getMem().ensureCapacity(objects, offset, count + 2, increment));
          //shift them all up by 2 and
          ArrayUtils.shiftUp(objects, 2, offset, offset + count - 1, false);
          offset += 2;
@@ -360,16 +368,15 @@ public class BufferObject extends ObjectU implements IStringable {
       objects[offset + index] = obj;
    }
 
-
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, BufferObject.class, 380);
       toStringPrivate(dc);
       super.toString(dc.sup());
-      
+
       dc.append(':');
       for (int i = 0; i < objects.length; i++) {
-         dc.nlLvlObject("i="+i, objects[i]);
+         dc.nlLvlObject("i=" + i, objects[i]);
       }
    }
 
@@ -386,8 +393,5 @@ public class BufferObject extends ObjectU implements IStringable {
    }
 
    //#enddebug
-   
-
-
 
 }

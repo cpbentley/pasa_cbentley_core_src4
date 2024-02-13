@@ -7,6 +7,8 @@ package pasa.cbentley.core.src4.ctx;
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.logging.ILogConfigurator;
+import pasa.cbentley.core.src4.logging.ILogConfiguratorCtx;
 import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
@@ -88,6 +90,13 @@ public abstract class ACtx implements ICtx {
 
       id = cm.registerCtx(this);
       
+      //#mdebug
+      ILogConfigurator logConfig = uc.toStringGetLogConfigurator();
+      if(logConfig instanceof ILogConfiguratorCtx) {
+         ((ILogConfiguratorCtx)logConfig).configureCtx(this);
+      }
+      //#enddebug
+      
    }
 
    public IConfig getConfig() {
@@ -150,7 +159,7 @@ public abstract class ACtx implements ICtx {
     * @param key.. a key
     */
    public int getStaticKeyRegistrationID(int type, int key) {
-      throw new RuntimeException("cannot be called here. must implemented");
+      throw new RuntimeException("class must implement getStaticKeyRegistrationID "+ getClass().getName());
    }
 
    /**

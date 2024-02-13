@@ -182,7 +182,7 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
                throw new IllegalArgumentException("No Factory for "+ statorable.getClass().getName() + " Ctx:" + ctxOwner.getClass().getName());
             }
             if (!statorFactory.isSupported(statorable)) {
-               throw new IllegalArgumentException(statorable.getClass().getName() + " != " + statorFactory.getClass().getName());
+               throw new IllegalArgumentException("Bad getCtxOwner for " + statorable.getClass().getName() + " != " + statorFactory.getClass().getName());
             }
 
             getWriter().writeInt(classID);

@@ -18,7 +18,9 @@ public class MutexGuardedVolatile extends ObjectU {
    /**
     * from a memory visibility perspective, 
     * writing to a volatile variable is like exiting a synchronized block.
+    * so writing to volatile is cheap
     * reading a volatile variable is like entering a synchronized block
+    * reading a volatile is expensive. it forces merge of memory
     * 
     */
    private volatile boolean hasThreadWaiting = false;

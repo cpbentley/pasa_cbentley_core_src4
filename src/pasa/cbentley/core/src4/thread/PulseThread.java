@@ -121,7 +121,7 @@ public class PulseThread extends Thread implements IStringable, ITechThread {
                case STATE_0_ON:
                   //#debug
                   toDLog().pFlow("STATE_0_ON", this, PulseThread.class, "run", LVL_05_FINE, true);
-                  ec.sendNewEvent(producerID, IEventsCore.PID_5_THREAD_1_PULSE_ON, this);
+                  ec.sendNewEvent(producerID, IEventsCore.PID_05_THREAD_1_PULSE_ON, this);
                   state = STATE_1_OFF;
                   pulseSleep = pulseSleepOn;
                   numPulsesCount++;
@@ -130,7 +130,7 @@ public class PulseThread extends Thread implements IStringable, ITechThread {
                case STATE_1_OFF:
                   //#debug
                   toDLog().pFlow("STATE_1_OFF", this, PulseThread.class, "run", LVL_05_FINE, true);
-                  ec.sendNewEvent(producerID, IEventsCore.PID_5_THREAD_2_PULSE_OFF, this);
+                  ec.sendNewEvent(producerID, IEventsCore.PID_05_THREAD_2_PULSE_OFF, this);
                   if (numPulses != 0 && numPulsesCount >= numPulses) {
                      state = STATE_2_SHUT_DOWN;
                   } else {
