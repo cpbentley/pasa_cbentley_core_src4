@@ -169,15 +169,12 @@ public abstract class ACtx implements ICtx {
       return null;
    }
 
-   public UCtx getUC() {
-      return uc;
-   }
 
    /**
     * 
     * @return
     */
-   public UCtx getUCtx() {
+   public UCtx getUC() {
       return uc;
    }
 

@@ -86,7 +86,7 @@ public class MathUtils {
     * <br>
     * @param y
     * @param x
-    * @return
+    * @return double value in radians
     */
    public static double aTan(double y, double x) {
       double coeff_1 = Math.PI / 4d;
