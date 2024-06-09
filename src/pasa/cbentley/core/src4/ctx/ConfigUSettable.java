@@ -25,6 +25,10 @@ public class ConfigUSettable implements IConfigU {
 
    private boolean          isIgnoreSettingsAll;
 
+   private boolean          isStatorRead;
+
+   private boolean          isStatorWrite;
+
    private ILogConfigurator logConfigurator;
 
    private int              toStringBytesOn1Line;
@@ -67,6 +71,14 @@ public class ConfigUSettable implements IConfigU {
       return isIgnoreSettingsAll;
    }
 
+   public boolean isStatorRead() {
+      return isStatorRead;
+   }
+
+   public boolean isStatorWrite() {
+      return isStatorWrite;
+   }
+
    public void setDefaultEncoding(String encoding) {
       this.encoding = encoding;
    }
@@ -99,6 +111,14 @@ public class ConfigUSettable implements IConfigU {
       this.logConfigurator = logConfigurator;
    }
 
+   public void setStatorRead(boolean isStatorRead) {
+      this.isStatorRead = isStatorRead;
+   }
+
+   public void setStatorWrite(boolean isStatorWrite) {
+      this.isStatorWrite = isStatorWrite;
+   }
+
    public void setToStringBytesOn1Line(int toStringBytesOn1Line) {
       this.toStringBytesOn1Line = toStringBytesOn1Line;
    }
@@ -113,10 +133,12 @@ public class ConfigUSettable implements IConfigU {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ConfigUSettable.class, 107);
+      dc.root(this, ConfigUSettable.class, 136);
       toStringPrivate(dc);
       dc.appendVarWithSpace("isEraseSettings", isEraseSettings);
       dc.appendVarWithSpace("isEraseSettingsAll", isEraseSettingsAll);
+      dc.appendVarWithSpace("isStatorRead", isStatorRead);
+      dc.appendVarWithSpace("isStatorWrite", isStatorWrite);
       dc.appendVarWithSpace("isForceExceptions", isForceExceptions);
       dc.appendVarWithSpace("isHardcoded", isHardcoded);
       dc.appendVarWithSpace("isIgnoreSettings", isIgnoreSettings);

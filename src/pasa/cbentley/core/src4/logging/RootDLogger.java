@@ -21,7 +21,7 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
     */
    private long                count;
 
-   private String name;
+   private String              name;
 
    /**
     * By default create a default {@link SystemOutAppender}
@@ -41,6 +41,22 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       uc.getAU().copy1stTo2nd(appenders, nappenders);
       appenders = nappenders;
       appenders[appenders.length - 1] = appender;
+   }
+
+   public ILogEntryAppender getAppender(int index) {
+      return appenders[index];
+   }
+
+   public boolean getTag(int tag) {
+      ILogEntryAppender ap = getAppender(0);
+      return ap.getConfig().hasFlagTag(tag);
+   }
+
+   public boolean toggleTag(int tag) {
+      ILogEntryAppender ap = getAppender(0);
+      boolean v = ap.getConfig().hasFlagTag(tag);
+      ap.getConfig().setFlagTag(tag, !v);
+      return !v;
    }
 
    /**
@@ -113,11 +129,10 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       }
       this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, devFlags);
    }
-   
+
    protected void ptPrintBig(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl) {
       this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, ITechDev.DEV_6_BIG);
    }
-
 
    protected synchronized void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, int flags) {
       //thread separation 

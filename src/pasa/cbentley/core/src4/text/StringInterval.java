@@ -6,8 +6,11 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntInterval;
 
 /**
- * A {@link StringInterval} is an {@link IntInterval} over a source string
+ * A {@link StringInterval} is an {@link IntInterval} over a source string defined by a {@link TextModel}
  * 
+ * <p>
+ * Potentially a type {@link StringInterval#getType()} for words, blob etc.
+ * </p>
  * 
  * @author Charles Bentley
  *

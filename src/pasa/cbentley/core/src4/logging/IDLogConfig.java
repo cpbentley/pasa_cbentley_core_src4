@@ -43,9 +43,13 @@ public interface IDLogConfig extends IStringable, ITechConfig {
     */
    public boolean hasFlagFormat(int flag);
 
-   public boolean hasFlagTag(int flag);
-   
    public boolean hasFlagMaster(int flag);
+
+   public boolean hasFlagTag(int flag);
+
+   public boolean isClassFullPostive(Class c);
+
+   public boolean isClassNegative(Class c);
 
    /**
     * 
@@ -95,7 +99,6 @@ public interface IDLogConfig extends IStringable, ITechConfig {
     */
    public void setFlagFormat(int flag, boolean b);
 
-
    /**
     * Config flags
     * <li> {@link ITechConfig#MASTER_FLAG_01_BLOCK_ALL_PRINT}
@@ -120,19 +123,19 @@ public interface IDLogConfig extends IStringable, ITechConfig {
    public void setFlagTag(int flag, boolean v);
 
    /**
+    * 
+    * @param flags
+    * @param v
+    */
+   public void setFlagTag(int[] flags, boolean v);
+
+   /**
     * When true, sets the Tag as a negative. The tag is then ignored if {@link ITechConfig#MASTER_FLAG_08_OPEN_ALL_BUT_FALSE}
     * is set.
     * @param flag
     * @param v
     */
    public void setFlagTagNeg(int flag, boolean v);
-
-   /**
-    * 
-    * @param flags
-    * @param v
-    */
-   public void setFlagTag(int[] flags, boolean v);
 
    /**
     * Only prints logs equal or above... globally.

@@ -325,11 +325,15 @@ public class CharMapper extends ObjectU {
    }
 
    public void opReplaceWith(int offset, String str) {
-      buff.addInt(OP_3_REPLACE_SEVERAL);
-      buff.addInt(this.offsetSrc + offset);
-      buff.addInt(str.length());
-      for (int i = 0; i < str.length(); i++) {
-         buff.addInt(str.charAt(i));
+      if (str.length() == 1) {
+         this.opReplaceChar(offset, str.charAt(0));
+      } else {
+         buff.addInt(OP_3_REPLACE_SEVERAL);
+         buff.addInt(this.offsetSrc + offset);
+         buff.addInt(str.length());
+         for (int i = 0; i < str.length(); i++) {
+            buff.addInt(str.charAt(i));
+         }
       }
    }
 

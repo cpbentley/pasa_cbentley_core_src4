@@ -323,6 +323,19 @@ public class IntToObjects implements IStringable {
       return null;
    }
 
+   /**
+    * Returns the index of the first int value.
+    * @param val
+    * @return
+    */
+   public int findIntFirstIndex(int val) {
+      for (int i = 0; i < nextempty; i++) {
+         if (ints[i] == val)
+            return i;
+      }
+      return -1;
+   }
+
    public int findObjectEquals(Object o) {
       for (int i = 0; i < nextempty; i++) {
          if (o.equals(objects[i])) {
@@ -333,10 +346,11 @@ public class IntToObjects implements IStringable {
    }
 
    /**
-    * Index [0-size[ of object reference.
+    * Returns the index of the first object whose reference == <code>o</code> .
+    * 
     * -1 if Object reference is not found
     * @param o
-    * @return
+    * @return [0-size[
     */
    public int findObjectRef(Object o) {
       for (int i = 0; i < nextempty; i++) {
@@ -345,6 +359,22 @@ public class IntToObjects implements IStringable {
          }
       }
       return -1;
+   }
+
+   /**
+    * Returns the integer value of the first object whose reference == <code>o</code> .
+    * 
+    * Integer.MAX if Object reference is not found
+    * @param o
+    * @return [0-size[
+    */
+   public int findObjectInt(Object o) {
+      for (int i = 0; i < nextempty; i++) {
+         if (objects[i] == o) {
+            return ints[i];
+         }
+      }
+      return Integer.MAX_VALUE;
    }
 
    /**

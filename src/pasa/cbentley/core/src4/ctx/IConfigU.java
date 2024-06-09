@@ -33,7 +33,7 @@ public interface IConfigU extends IConfig {
    public String getDefaultEncoding();
 
    /**
-    * When true, clean up everything upon start
+    * When true, clean up everything upon start..
     * @return
     */
    public boolean isEraseSettingsAll();
@@ -53,6 +53,18 @@ public interface IConfigU extends IConfig {
     * @return
     */
    public boolean isIgnoreSettingsAll();
+
+   /**
+    * Should the code write state from {@link CtxManager}
+    * @return
+    */
+   public boolean isStatorWrite();
+
+   /**
+    * Should the code read state into {@link CtxManager}
+    * @return
+    */
+   public boolean isStatorRead();
 
    //#mdebug
    /**

@@ -18,7 +18,6 @@ import pasa.cbentley.core.src4.logging.IStringable;
  */
 public interface IConfig extends IStringable {
 
-   
    /**
     * Ignores the saved settings. Don't erase them.
     * <br>
@@ -27,24 +26,24 @@ public interface IConfig extends IStringable {
     * @return
     */
    public boolean isIgnoreSettings();
-   
-   
+
    /**
     * When true, clean up settings of the Ctx.
-    * <br>
+    * 
+    * <p>
     * When true, this essentially erases anything the user has modified in the previous session.
-    * <br>
     * When something is corrupted.
+    * </p>
     * @return
     */
    public boolean isEraseSettings();
-   
+
+
    /**
     * When true, configures ctx to not change its settings.
     * They are hardcoded by this config and that's it.
     * @return
     */
    public boolean isHardcoded();
-   
-   
+
 }

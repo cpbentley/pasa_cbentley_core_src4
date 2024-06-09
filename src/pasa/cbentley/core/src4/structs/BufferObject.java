@@ -71,13 +71,32 @@ public class BufferObject extends ObjectU implements IStringable {
    }
 
    /**
-    * append String to the {@link BufferObject}
+    * append Object to the {@link BufferObject}
     * @param str
     */
    public void add(Object obj) {
       set(uc.getMem().ensureCapacity(objects, offset, count, increment));
       objects[offset + count] = obj;
       count += 1;
+   }
+
+   /**
+    * append Object to the {@link BufferObject} if not null.
+    * when null does nothing
+    * @param str
+    */
+   public void addNotNull(Object obj) {
+      if (obj != null) {
+         this.add(obj);
+      }
+   }
+
+   public void addNotNull(Object[] objs) {
+      if (objs != null) {
+         for (int i = 0; i < objs.length; i++) {
+            this.addNotNull(objs[i]);
+         }
+      }
    }
 
    public void add(Object[] objs) {
@@ -178,10 +197,16 @@ public class BufferObject extends ObjectU implements IStringable {
     * @return
     */
    public Object[] getClonedTrimmed() {
+      Object[] ar = new Object[count];
+      return getClonedTrimmed(ar);
+   }
+
+   public Object[] getClonedTrimmed(Object[] ar) {
       int size = count;
-      Object[] ar = new Object[size];
-      for (int i = offset; i < offset + count; i++) {
-         ar[i] = objects[i];
+      int index = 0;
+      for (int i = offset; i < offset + size; i++) {
+         ar[index] = objects[i];
+         index++;
       }
       return ar;
    }

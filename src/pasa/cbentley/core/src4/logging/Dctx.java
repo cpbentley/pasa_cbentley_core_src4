@@ -241,6 +241,11 @@ public class Dctx implements IToStringFlags {
       sb.append(string);
    }
 
+   public void appendClassLink(Class cl) {
+      String str = this.getClassSimpleName(cl);
+      appendClassLink(str, "40");
+   }
+
    public void append(String[] strs, int offset, int len, String sep) {
       for (int i = offset; i < offset + len; i++) {
          if (i != offset) {
@@ -431,6 +436,11 @@ public class Dctx implements IToStringFlags {
    }
 
    public void appendVarWithNewLine(String s, int[] ar, String sep, boolean size) {
+      this.nl();
+      debugAlone(s, ar, sep, size);
+   }
+
+   public void appendVarWithNewLine(String s, String[] ar, String sep, boolean size) {
       this.nl();
       debugAlone(s, ar, sep, size);
    }
@@ -644,6 +654,27 @@ public class Dctx implements IToStringFlags {
       sb.append(']');
    }
 
+   public void debugAlone(String title, String[] ar, String sep, boolean size) {
+      sb.append(title);
+      sb.append('=');
+      if (ar == null) {
+         sb.append("null");
+         return;
+      }
+      if (size) {
+         sb.append('#');
+         sb.append(ar.length);
+      }
+      sb.append('[');
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            append(sep);
+         }
+         append(ar[i]);
+      }
+      sb.append(']');
+   }
+
    private void doTitlePrefix() {
       if (titlePrefix != null) {
          sb.append(titlePrefix);
@@ -663,9 +694,7 @@ public class Dctx implements IToStringFlags {
 
    private String getClassSimpleName(Class cl) {
       StringUtils strU = uc.getStrU();
-      String name = cl.getName();
-      String str = strU.getStringAfterLastIndex(name, '.');
-      return str;
+      return strU.getNameClass(cl);
    }
 
    public int getCount() {
@@ -1645,12 +1674,7 @@ public class Dctx implements IToStringFlags {
       if (isClassLinks) {
          sb.append(getLevelStartChar());
          doTitlePrefix();
-         sb.append(' ');
-         sb.append('(');
-         append(str);
-         append(".java:");
-         append(line);
-         append(")");
+         appendClassLink(str, line);
       } else {
          sb.append(getLevelStartChar());
          doTitlePrefix();
@@ -1662,6 +1686,15 @@ public class Dctx implements IToStringFlags {
 
       tab();
 
+   }
+
+   private void appendClassLink(String str, String line) {
+      sb.append(' ');
+      sb.append('(');
+      append(str);
+      append(".java:");
+      append(line);
+      append(")");
    }
 
    public void root1Line(Object o, Class cl) {
@@ -1695,6 +1728,14 @@ public class Dctx implements IToStringFlags {
    }
 
    public void root1Line(Object o, String str, Class cl) {
+      this.root1Line(o, str, cl, "40");
+   }
+
+   public void root1Line(Object o, Class cl, int line) {
+      root1Line(o, null, cl, String.valueOf(line));
+   }
+
+   public void root1Line(Object o, String str, Class cl, String line) {
       if (hasFlag(FLAG_DATA_07_COLLAPSED)) {
          this.setFlag(FLAG_DATA_07_COLLAPSED, false);
          root1LineCollapsed(o, str, lineForCollapsed);
@@ -1702,10 +1743,8 @@ public class Dctx implements IToStringFlags {
          if (isClassLinks && cl != null) {
             sb.append(getLevelStartChar1Line());
             doTitlePrefix();
-            sb.append(' ');
-            sb.append('(');
-            append(str);
-            append(".java:40)");
+            String classSimpleName = getClassSimpleName(cl);
+            this.appendClassLink(classSimpleName, line);
             setCompact(true);
             doTitleSuffix();
          } else {

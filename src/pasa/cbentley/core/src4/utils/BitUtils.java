@@ -209,6 +209,9 @@ public class BitUtils {
     */
    public static int MASK_16_BITS = 0xFFFF;
 
+   /**
+    * 
+    */
    public static int MASK_24_BITS = 0xFFFFFF;
 
    public static boolean areBitsEqual(int val1, int val2, int bit) {
@@ -1237,10 +1240,10 @@ public class BitUtils {
       int count = 0;
       for (int i = offset; i < offset + len; i++) {
          byte v = ar[i];
-         if(v < 0) {
-            if(v < -99) {
+         if (v < 0) {
+            if (v < -99) {
                sb.append(v);
-            } else if(v < -10) {
+            } else if (v < -10) {
                sb.append(' ');
                sb.append(v);
             } else {
@@ -1249,13 +1252,13 @@ public class BitUtils {
                sb.append(v);
             }
          } else {
-            if(v == 0) {
+            if (v == 0) {
                sb.append("   0");
             } else {
-               if(v > 99) {
+               if (v > 99) {
                   sb.append(' ');
                   sb.append(v);
-               } else if(v > 10) {
+               } else if (v > 10) {
                   sb.append(' ');
                   sb.append(' ');
                   sb.append(v);
@@ -1267,11 +1270,11 @@ public class BitUtils {
                }
             }
          }
-         
+
          count++;
          if ((count % cols) == 0) {
             sb.nl();
-         } 
+         }
       }
    }
 

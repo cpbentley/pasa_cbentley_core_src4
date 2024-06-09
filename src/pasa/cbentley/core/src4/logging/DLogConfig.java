@@ -404,7 +404,16 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
          fullPositives.remove(c);
       }
    }
-
+   
+   public boolean isClassFullPostive(Class c) {
+      return fullPositives.contains(c);
+   }
+   
+   public boolean isClassNegative(Class c) {
+      return negatives.contains(c);
+   }
+   
+   
    public void setClassNegative(Class c, boolean v) {
       if (v) {
          negatives.put(c, c);

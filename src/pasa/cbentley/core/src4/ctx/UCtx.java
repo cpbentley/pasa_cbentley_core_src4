@@ -352,7 +352,8 @@ public class UCtx implements ICtx, IEventsCore {
       IDLogConfig configOfAppender = logAppender.getConfig();
       toStringLogConfigurator.apply(configOfAppender); //apply config
 
-      String message = "Very First Log Message; Using LogConfigurator:" + toStringLogConfigurator.getClass().getName();
+      //String message = "Very First Log Message; Using LogConfigurator:" + toStringLogConfigurator.getClass().getName();
+      String message = "Very First Log Message; Using ("+ stru.getNameClass(toStringLogConfigurator.getClass())+".java:40)";
       dlog.pAlways(message, null, UCtx.class, "[" + +this.hashCode() + "]");
       dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor");
       dlog.pAlways("IConfigU", config, UCtx.class, "constructor");
@@ -375,7 +376,7 @@ public class UCtx implements ICtx, IEventsCore {
       ctxManager.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringDIDs.A_DID_OFFSET_A_UC, IToStringDIDs.A_DID_OFFSET_Z_UC);
       didManager = new DIDManager(this);
       config.toStringSetDebugUCtx(this);
-      toDLog().pInit("Created", this, UCtx.class, "aInit", LVL_05_FINE, true);
+      toDLog().pInit("Created", this, UCtx.class, "aInit@378", LVL_05_FINE, true);
       //#enddebug
    }
 

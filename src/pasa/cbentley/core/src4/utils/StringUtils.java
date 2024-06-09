@@ -1779,6 +1779,18 @@ public class StringUtils {
       return modChar;
    }
 
+   public String getNameObjectClass(Object object) {
+      String name = object.getClass().getName();
+      String str = this.getStringAfterLastIndex(name, '.');
+      return str;
+   }
+
+   public String getNameClass(Class cl) {
+      String name = cl.getName();
+      String str = this.getStringAfterLastIndex(name, '.');
+      return str;
+   }
+
    /**
     * Returns an array of String from String str
     * 
@@ -1842,6 +1854,24 @@ public class StringUtils {
             sb.append(separator);
          }
          sb.append(ar[i]);
+      }
+      return sb.toString();
+   }
+
+   public String getString(String data, int times) {
+      return getString(data, times, null);
+   }
+
+   public String getString(String data, int times, String separator) {
+      if (data == null) {
+         return "null";
+      }
+      StringBBuilder sb = new StringBBuilder(uc);
+      for (int i = 0; i < times; i++) {
+         if (separator != null && i != 0) {
+            sb.append(separator);
+         }
+         sb.append(data);
       }
       return sb.toString();
    }

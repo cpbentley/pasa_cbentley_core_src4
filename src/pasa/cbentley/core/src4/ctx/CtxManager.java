@@ -445,8 +445,7 @@ public class CtxManager implements IStringable, IStatorOwner {
             if (module.getCtxID() == ctxID) {
                //StringUtils.
                StringUtils strU = uc.getStrU();
-               String name = module.getClass().getName();
-               String str = strU.getStringAfterLastIndex(name, '.');
+               String str = strU.getNameObjectClass(module);
                return str;
             }
          }

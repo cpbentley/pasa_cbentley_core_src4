@@ -8,6 +8,12 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.ILogConfigurator;
 import pasa.cbentley.core.src4.logging.LogConfiguratorAllFinest;
 
+/**
+ * Default implementation of the {@link IConfigU} config.
+ * 
+ * @author Charles Bentley
+ *
+ */
 public class ConfigUDef implements IConfigU {
 
    private ILogConfigurator logConfigurator;
@@ -39,6 +45,14 @@ public class ConfigUDef implements IConfigU {
 
    public boolean isIgnoreSettings() {
       return false;
+   }
+
+   public boolean isStatorWrite() {
+      return true;
+   }
+
+   public boolean isStatorRead() {
+      return true;
    }
 
    public boolean isIgnoreSettingsAll() {
@@ -87,6 +101,8 @@ public class ConfigUDef implements IConfigU {
       dc.appendVarWithSpace("isIgnoreSettingsAll", isIgnoreSettingsAll());
       dc.appendVarWithSpace("isEraseSettingsAll", isEraseSettingsAll());
       dc.appendVarWithSpace("isEraseSettings", isEraseSettings());
+      dc.appendVarWithSpace("isStatorRead", isStatorRead());
+      dc.appendVarWithSpace("isStatorWrite", isStatorWrite());
       dc.appendVarWithSpace("isForceExceptions", isForceExceptions());
    }
 

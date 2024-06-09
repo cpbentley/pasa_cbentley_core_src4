@@ -24,6 +24,10 @@ public abstract class ConfigAbstract implements IConfig {
 
    protected boolean        isIgnoreSettings;
 
+   protected boolean        isStatorRead;
+
+   protected boolean        isStatorWrite;
+
    protected UCtx           uc;
 
    private ILogConfigurator logConfigurator;
@@ -48,6 +52,22 @@ public abstract class ConfigAbstract implements IConfig {
     */
    public boolean isHardcoded() {
       return false;
+   }
+
+   /**
+    * Sets to false to stop state writing when exiting 
+    * @return
+    */
+   public boolean isStatorWrite() {
+      return isStatorWrite;
+   }
+
+   /**
+    * Sets to false to stop state reading 
+    * @return
+    */
+   public boolean isStatorRead() {
+      return isStatorRead;
    }
 
    /**
@@ -86,6 +106,16 @@ public abstract class ConfigAbstract implements IConfig {
    public void toString(Dctx dc) {
       dc.root(this, ConfigAbstract.class, 54);
       toStringPrivate(dc);
+      
+      dc.appendVarWithNewLine("isStatorRead", isStatorRead);
+      dc.appendVarWithSpace("isStatorWrite", isStatorWrite);
+      
+      dc.nl();
+      if(logConfigurator == null) {
+         dc.append("LogConfigurator is null");
+      } else {
+         dc.append("LogConfigurator is ("+ uc.getStrU().getNameClass(logConfigurator.getClass())+".java:40)");
+      }
    }
 
    public String toString1Line() {
