@@ -17,24 +17,164 @@ import pasa.cbentley.core.src4.structs.IntIntervals;
  */
 public class StringUtils {
 
+   /**
+    * sad →
+    */
+   public static final char   ARROW_RIGHT              = '\u2192';
+
+   public static final char   BACKSPACE                = '\u0008';
+
+   /**
+    * [■] alt+254 ▉
+    */
+   public static final char   BLACK_SQUARE             = '\u25A0';
+
+   /**
+    * [▉]
+    */
+   public static final char   BLOCK_7_OF_8             = '\u2589';
+
+   /**
+    * u2581 = [▁]
+    */
+   public static final char   BLOCK_BOT_1_OF_8         = '\u2581';
+
+   /**
+    * [█]
+    */
+   public static final char   BLOCK_FULL               = '\u2588';
+
+   /**
+    * u258F = [▏] [▏▔▏]
+    */
+   public static final char   BLOCK_LEFT_1_OF_8        = '\u2594';
+
+   /**
+    * u2595 = [▕] [▕▔]
+    */
+   public static final char   BLOCK_RIGHT_1_OF_8       = '\u2595';
+
+   /**
+    * u2594 = [▔]
+    */
+   public static final char   BLOCK_TOP_1_OF_8         = '\u2594';
+
+   public static final char   BOTTOM_SQUARE_BRACKET    = '\u23B5';
+
+   /**
+    * Newline that might not be recognized by some editor
+    */
+   public static final char   BREAK_PARAGRAPH          = '\u2029';
+
+   /**
+    * Chars that usually seperates words in usual latin text
+    */
+   public static final char[] CHARS_SEPARATORS_PUNC    = { ' ', ',', ':', ';' };
+
+   /**
+    * [°] 
+    * <p>
+    * DEGREE SIGN, representing a non-breaking space (NBSP) character
+    * </p>
+    */
+   public static final char   DEGREE                   = '\u00B0';
+
+   /**
+    * «—» [—][-][+]
+    * Le tiret long ou « tiret cadratin 
+    * <p>
+    * Il est utilisé en français et dans plusieurs autres langues européennes pour introduire les répliques des dialogues.
+    * — Bonjour, monsieur.
+    * </p>
+    */
+   public static final char   EM_DASH                  = '\u2014';
+
+   public static final char   EM_QUAD                  = '\u2001';
+
+   public static final char   EM_SPACE                 = '\u2003';
+
+   /**
+    * «–» [–][-][+]
+    * Le tiret moyen ou « tiret demi‑cadratin » ou « tiret semi‑cadratin » ou « demi‑tiret »
+    * 
+    */
+   public static final char   EN_DASH                  = '\u2013';
+
    public static final int    EN_PAD                   = 0;
+
+   public static final char   EN_QUAD                  = '\u2000';
+
+   public static final char   EN_SPACE                 = '\u2002';
+
+   public static final char   END_TEXT                 = '\u0003';
+
+   public static final char   END_TRANSMISSION         = '\u0004';
 
    /**
     * 
     */
    public static final char   ENGLISH_SPACE            = ' ';
 
-   public static final char   NULL_CHAR                = '\u0000';
+   public static final char   ESCAPE_CHAR              = '\\';
 
-   public static final char   START_HEADING            = '\u0001';
+   /**
+    * Size of a digit
+    */
+   public static final char   FIGURE_SPACE             = '\u2007';
 
-   public static final char   START_TEXT               = '\u0002';
+   public static final char   FORM_FEED                = '\u000C';
 
-   public static final char   END_TEXT                 = '\u0003';
+   public static final char   FORM_FEED_F              = '\f';
 
-   public static final char   END_TRANSMISSION         = '\u0004';
+   public static final char   FOUR_PER_EM_SPACE        = '\u2005';
 
-   public static final char   NO_BREAKING_SPACE        = '\u00A0';
+   /**
+    * 2641 = ♁ 
+    */
+   public static final char   GENDER_EARTH             = '\u2641';
+
+   /**
+    * 2640 = ♀
+    */
+   public static final char   GENDER_FEMALE            = '\u2640';
+
+   /**
+    * 2642 = ♂
+    */
+   public static final char   GENDER_MALE              = '\u2642';
+
+   /**
+    * 263C = ☼ 
+    */
+   public static final char   GENDER_SUN               = '\u263C';
+
+   /**
+    * 263A = ☺
+    */
+   public static final char   GENDER_WHITE_SMILEY      = '\u263A';
+
+   /**
+    *  00B7 = ·
+    */
+   public static final char   INTER_PUNCT              = '\u00B7';
+
+   /**
+    *  21B5 = ↵
+    */
+   public static final char   LINE_BREAK_RETURN        = '\u21B5';
+
+   /**
+    * '\u000A' is illegal because compiler interprets it as a \n
+    */
+   public static final char   LINE_FEED                = '\n';
+
+   /**
+    * Might not be supported.. act like a line break
+    * Similar to \u2029
+    */
+   public static final char   LINE_SEPARATOR           = '\u2028';
+
+   public static final String mushroom                 = "\uD83C\uDF44";
 
    /**
     * Zero width in Swing.
@@ -52,101 +192,16 @@ public class StringUtils {
     */
    public static final char   NEW_LINE_CARRIAGE_RETURN = '\r';
 
-   public static final char   FORM_FEED                = '\u000C';
+   public static final char   NO_BREAKING_SPACE        = '\u00A0';
 
-   public static final char   FORM_FEED_F              = '\f';
+   public static final char   NULL_CHAR                = '\u0000';
 
-   /**
-    * Newline that might not be recognized by some editor
-    */
-   public static final char   BREAK_PARAGRAPH          = '\u2029';
-
-   public static final char   BACKSPACE                = '\u0008';
-
-   public static final char   EM_QUAD                  = '\u2001';
-
-   public static final char   EN_QUAD                  = '\u2000';
-
-   public static final char   EM_SPACE                 = '\u2003';
-
-   public static final char   EN_SPACE                 = '\u2002';
-
-   public static final char   THREE_PER_EM_SPACE       = '\u2004';
-
-   public static final char   FOUR_PER_EM_SPACE        = '\u2005';
-
-   public static final char   SIX_PER_EM_SPACE         = '\u2006';
+   public static final char   PUA_END                  = '\uF8FF';
 
    /**
-    * 2640 = ♀
+    * 
     */
-   public static final char   GENDER_FEMALE            = '\u2640';
-
-   /**
-    * 2642 = ♂
-    */
-   public static final char   GENDER_MALE              = '\u2642';
-
-   /**
-    * 2641 = ♁ 
-    */
-   public static final char   GENDER_EARTH             = '\u2641';
-
-   /**
-    * 263C = ☼ 
-    */
-   public static final char   GENDER_SUN               = '\u263C';
-
-   /**
-    * 263A = ☺
-    */
-   public static final char   GENDER_WHITE_SMILEY      = '\u263A';
-
-   /**
-    * [█]
-    */
-   public static final char   BLOCK_FULL               = '\u2588';
-
-   /**
-    * [▉]
-    */
-   public static final char   BLOCK_7_OF_8             = '\u2589';
-
-   /**
-    * u2581 = [▁]
-    */
-   public static final char   BLOCK_BOT_1_OF_8         = '\u2581';
-
-   /**
-    * u2594 = [▔]
-    */
-   public static final char   BLOCK_TOP_1_OF_8         = '\u2594';
-
-   /**
-    * u258F = [▏] [▏▔▏]
-    */
-   public static final char   BLOCK_LEFT_1_OF_8        = '\u2594';
-
-   /**
-    * u2595 = [▕] [▕▔]
-    */
-   public static final char   BLOCK_RIGHT_1_OF_8       = '\u2595';
-
-   /**
-    * [■] alt+254 ▉
-    */
-   public static final char   BLACK_SQUARE             = '\u25A0';
-
-   /**
-    * Size of a digit
-    */
-   public static final char   FIGURE_SPACE             = '\u2007';
-
-   /**
-    * Might not be supported.. act like a line break
-    * Similar to \u2029
-    */
-   public static final char   LINE_SEPARATOR           = '\u2028';
+   public static final char   PUA_START                = '\uE000';
 
    /**
     * Byte for russian characters in UTF-8
@@ -154,35 +209,6 @@ public class StringUtils {
    public static final int    RU_PAD                   = 4;
 
    public static final char   RU_SPACE                 = ' ';
-
-   public static final char   TAB                      = '\t';
-
-   /**
-    * vertical tabulation Alt+011  
-    */
-   public static final char   TAB_LINE                 = '\u000B';
-
-   /**
-    * '\u000A' is illegal because compiler interprets it as a \n
-    */
-   public static final char   LINE_FEED                = '\n';
-
-   /**
-    * «—» [—][-][+]
-    * Le tiret long ou « tiret cadratin 
-    * <p>
-    * Il est utilisé en français et dans plusieurs autres langues européennes pour introduire les répliques des dialogues.
-    * — Bonjour, monsieur.
-    * </p>
-    */
-   public static final char   EM_DASH                  = '\u2014';
-
-   /**
-    * «–» [–][-][+]
-    * Le tiret moyen ou « tiret demi‑cadratin » ou « tiret semi‑cadratin » ou « demi‑tiret »
-    * 
-    */
-   public static final char   EN_DASH                  = '\u2013';
 
    /**
     * «‐» [‐]     asdsad 
@@ -194,14 +220,13 @@ public class StringUtils {
     */
    public static final char   SIGN_MINUS               = '\u2212';
 
-   public static final char   TAB_CHAR                 = '\u0009';
+   public static final char   SIX_PER_EM_SPACE         = '\u2006';
 
-   /**
-    *  00B7 = ·
-    */
-   public static final char   INTER_PUNCT              = '\u00B7';
+   public static final char   START_HEADING            = '\u0001';
 
-   public static final char   BOTTOM_SQUARE_BRACKET    = '\u23B5';
+   public static final char   START_TEXT               = '\u0002';
+
+   public static final char   SYMBOL_FOR_SPACE         = '\u2420';
 
    /**
     *    23CE = ⏎ 
@@ -209,38 +234,16 @@ public class StringUtils {
     */
    public static final char   SYMBOL_RETURN            = '\u23CE';
 
-   /**
-    *  21B5 = ↵
-    */
-   public static final char   LINE_BREAK_RETURN        = '\u21B5';
+   public static final char   TAB                      = '\t';
 
-   public static final char   ESCAPE_CHAR              = '\\';
+   public static final char   TAB_CHAR                 = '\u0009';
 
    /**
-    * sad →
+    * vertical tabulation Alt+011  
     */
-   public static final char   ARROW_RIGHT              = '\u2192';
+   public static final char   TAB_LINE                 = '\u000B';
 
-   public static final char   PUA_START                = '\uE000';
-
-   public static final char   PUA_END                  = '\uF8FF';
-
-   public static final String mushroom                 = "\uD83C\uDF44";
-
-   /**
-    * [°] 
-    * <p>
-    * DEGREE SIGN, representing a non-breaking space (NBSP) character
-    * </p>
-    */
-   public static final char   DEGREE                   = '\u00B0';
-
-   public static final char   SYMBOL_FOR_SPACE         = '\u2420';
-
-   /**
-    * Chars that usually seperates words in usual latin text
-    */
-   public static final char[] CHARS_SEPARATORS_PUNC    = { ' ', ',', ':', ';' };
+   public static final char   THREE_PER_EM_SPACE       = '\u2004';
 
    /**
     * 
@@ -248,6 +251,50 @@ public class StringUtils {
    public static final String UTF8_BOM                 = "\uFEFF";
 
    public static char         UTF8_BOM_CHAR            = '\uFEFF';
+
+   /**
+    * https://unicode-explorer.com/c/FFFE
+    */
+   public static char         UTF8_NOT_A_CHARACTER     = '\uFFFE';
+
+   /**
+   
+    * 
+    * \u200B : A​A
+    * 
+    * Copy with ctrl+c : A​A keeps it alive.
+    * 
+    * <p>
+    * A zero width space (ZWSP) does everything a ZWNJ does, but it also creates opportunities for line breaks. 
+    * Very good for displaying file paths and long URLs, but beware that it might screw up copy pasting.
+    * </p>
+    */
+   public static final char   ZERO_WIDTH_SPACE         = '\u200B';
+
+   /**
+    * \u200C : A‍‌A
+    * <p>
+    *  request that two adjacent characters be rendered without a ligature
+    * have no effect on word or line break boundaries
+    * </p>
+    * 
+    * <p>
+    * 123 zero-width-non-joiner 456 is one number (123456) with no ligature between 3 and 4. 
+    * There wouldn't normally be a ligature there so its use is redundant in that example. 
+    * </p>
+    */
+   public static final char   ZERO_WIDTH_NON_JOINER    = '\u200C';
+
+   /**
+    * Joiner "zwidge".
+    * 
+    * \u200D : A‍A ‍‍
+    * <p>
+    * have no effect on word or line break boundaries.
+    * It requests that two adjacent characters be rendered with a ligature
+    * </p>
+    */
+   public static final char   ZERO_WIDTH_JOINER        = '\u200D';
 
    /**
     * Append the byte values to the string builder
@@ -1779,14 +1826,14 @@ public class StringUtils {
       return modChar;
    }
 
-   public String getNameObjectClass(Object object) {
-      String name = object.getClass().getName();
+   public String getNameClass(Class cl) {
+      String name = cl.getName();
       String str = this.getStringAfterLastIndex(name, '.');
       return str;
    }
 
-   public String getNameClass(Class cl) {
-      String name = cl.getName();
+   public String getNameObjectClass(Object object) {
+      String name = object.getClass().getName();
       String str = this.getStringAfterLastIndex(name, '.');
       return str;
    }
@@ -1840,24 +1887,6 @@ public class StringUtils {
       return sb.toString();
    }
 
-   public String getString(String[] ar, char separator) {
-      return getString(ar, String.valueOf(separator));
-   }
-
-   public String getString(String[] ar, String separator) {
-      if (ar == null) {
-         return "null";
-      }
-      StringBBuilder sb = new StringBBuilder(uc);
-      for (int i = 0; i < ar.length; i++) {
-         if (i != 0) {
-            sb.append(separator);
-         }
-         sb.append(ar[i]);
-      }
-      return sb.toString();
-   }
-
    public String getString(String data, int times) {
       return getString(data, times, null);
    }
@@ -1872,6 +1901,24 @@ public class StringUtils {
             sb.append(separator);
          }
          sb.append(data);
+      }
+      return sb.toString();
+   }
+
+   public String getString(String[] ar, char separator) {
+      return getString(ar, String.valueOf(separator));
+   }
+
+   public String getString(String[] ar, String separator) {
+      if (ar == null) {
+         return "null";
+      }
+      StringBBuilder sb = new StringBBuilder(uc);
+      for (int i = 0; i < ar.length; i++) {
+         if (i != 0) {
+            sb.append(separator);
+         }
+         sb.append(ar[i]);
       }
       return sb.toString();
    }
@@ -2211,6 +2258,22 @@ public class StringUtils {
          char c = str.charAt(i);
          CharUtils.writeShortBE(data, index, c);
          index += 2;
+      }
+   }
+
+   public void checkValid(char[] data, int offset, int len) {
+      if (data == null) {
+         throw new NullPointerException();
+      }
+      if (offset < 0 || offset >= data.length) {
+         //#debug
+         uc.toDLog().pNull("out of range offset=" + offset + " len:" + len + " for " + new String(data), null, StringUtils.class, "checkValid");
+         throw new IllegalArgumentException();
+      }
+      if(offset + len > data.length) {
+         //#debug
+         uc.toDLog().pNull("out of range length offset=" + offset + " len:" + len + " for " + new String(data) + " size="+data.length, null, StringUtils.class, "checkValid");
+         throw new IllegalArgumentException();
       }
    }
 }

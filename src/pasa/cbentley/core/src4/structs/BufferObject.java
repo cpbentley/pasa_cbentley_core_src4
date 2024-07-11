@@ -108,6 +108,10 @@ public class BufferObject extends ObjectU implements IStringable {
       count += nums;
    }
 
+   private void ensureCapacityForNewLoad(int sizeLoad) {
+      set(uc.getMem().ensureCapacity(objects, offset, count + sizeLoad, increment + sizeLoad));
+   }
+
    public void add(Object obj1, Object obj2) {
       set(uc.getMem().ensureCapacity(objects, offset, count + 2, increment));
       objects[offset + count] = obj1;
@@ -324,6 +328,47 @@ public class BufferObject extends ObjectU implements IStringable {
       count -= size;
    }
 
+   public BufferObject removeAllForIndex(int index) {
+      if (index > count) {
+         throw new IllegalArgumentException("index=" + index + " > count=" + count);
+      }
+      int size = count - index;
+      return removeAllForIndex(index, size);
+   }
+
+   /**
+    * Unsafe. no array array check
+    * @param index
+    * @param size
+    * @param bo
+    * @param destIndex
+    */
+   public void copyFromTo(int index, int size, BufferObject bo, int destIndex) {
+      for (int i = 0; i < size; i++) {
+         int offsetSrc = this.offset + index + i;
+         Object toAdd = this.objects[offsetSrc];
+         bo.objects[destIndex + i] = toAdd;
+      }
+      bo.count += size;
+   }
+
+   /**
+    * Removes all object from index
+    * @param index
+    * @param size
+    * @return
+    */
+   public BufferObject removeAllForIndex(int index, int size) {
+      BufferObject bo = new BufferObject(uc, size);
+      this.copyFromTo(index, size, bo, 0);
+      //effectively remve them
+      for (int i = offset + index; i < offset + count; i++) {
+         this.objects[i] = null;
+      }
+      count -= size;
+      return bo;
+   }
+
    /**
     * Gets object at index and removes it.
     * @param index
@@ -331,7 +376,7 @@ public class BufferObject extends ObjectU implements IStringable {
     */
    public Object removeAtIndex(int index) {
       Object v = get(index);
-      removeAtIndex(index);
+      removeAtIndexFor(index, 1);
       return v;
    }
 
@@ -342,6 +387,7 @@ public class BufferObject extends ObjectU implements IStringable {
    public Object removeFirst() {
       if (count != 0) {
          Object v = objects[offset];
+         objects[offset] = null;
          offset += 1;
          count--;
          return v;
@@ -365,8 +411,9 @@ public class BufferObject extends ObjectU implements IStringable {
     */
    public Object removeLast() {
       if (count != 0) {
-         Object v = objects[offset + count - 1];
-         objects[offset + count] = null;
+         int index = offset + count - 1;
+         Object v = objects[index];
+         objects[index] = null;
          count--;
          return v;
       } else {

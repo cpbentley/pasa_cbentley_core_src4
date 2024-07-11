@@ -6,7 +6,6 @@ package pasa.cbentley.core.src4.utils;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 
-
 /**
  * Escape Sequence  Description
  * <li> \t  Insert a tab in the text at this point.
@@ -43,24 +42,6 @@ public class CharUtils {
       for (int i = 0; i < bys.length; i++) {
          int ch1 = padding << 8;
          int ch2 = (bys[i] << 0) & 0xFF;
-         chars[i] = (char) (ch1 + ch2);
-      }
-      return chars;
-   }
-
-   /**
-    * 
-    * @param bys
-    * @param padding 0x04 for russian chars
-    * @return
-    */
-   public char[] getCharsIntLong(byte[] data, int offset) {
-      int numChars = IntUtils.readIntBE(data, offset);
-      char[] chars = uc.getMem().createCharArray(numChars);
-      int index = offset + 4;
-      for (int i = 0; i < numChars; i++) {
-         int ch1 = data[index++] << 8;
-         int ch2 = data[index++] & 0xFF;
          chars[i] = (char) (ch1 + ch2);
       }
       return chars;
@@ -128,6 +109,38 @@ public class CharUtils {
    }
 
    /**
+    * 
+    * @param ar
+    * @param c
+    * @return true if c is inside the array
+    */
+   public static boolean contains(char[] ar, char c) {
+      for (int i = ar.length - 1; i >= 0; i--) {
+         if (c == ar[i]) {
+            return true;
+         }
+      }
+      return false;
+   }
+
+   /**
+    * Fills array [start,end] with filler
+    * @param ar
+    * @param filler
+    * @param start
+    * @param end
+    */
+   public static void fill(char[] ar, char filler, int start, int end) {
+      for (int i = start; i <= end; i++) {
+         ar[i] = filler;
+      }
+   }
+
+   public static int getFirstIndex(char c, char[] chars) {
+      return getFirstIndex(c, chars, 0, chars.length);
+   }
+
+   /**
     * Returns the index of first occurence of char.
     * <br>
     * Index is absolute. if value is at offset, it returns offset.
@@ -147,107 +160,6 @@ public class CharUtils {
 
    public static int getFirstIndex(String str, char[] chars) {
       return getFirstIndex(str, chars, 0, chars.length);
-   }
-
-   /**
-    * shift only if start < end
-    * @param ar
-    * @param shiftsize <0 for shifting down
-    * @param start index value starts at 0. inclusive
-    * @param end index value inclusive
-    * @param erase pad the hole with 0s
-    */
-   public static void shiftChar(char[] ar, int shiftsize, int start, int end) {
-      if (start > end) {
-         return;
-      }
-      if (shiftsize < 0) {
-         shiftCharDown(ar, 0 - shiftsize, start, end);
-      } else {
-         shiftCharUp(ar, shiftsize, start, end);
-      }
-   }
-
-   /**
-    * 
-    * Dumb shifts, erases data in the shift destination.
-    * 
-    * Used by buffers where its known that data above the end point is not relevant
-    * 
-    * @param ar
-    * @param shiftsize number of jumps up in the array. MUST be positive
-    * @param start included in the shift
-    * @param end included in the shift
-    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
-    */
-   public static void shiftCharUp(char[] ar, int shiftsize, int start, int end) {
-      for (int i = end; i >= start; i--) {
-         if (i + shiftsize < ar.length) {
-            ar[i + shiftsize] = ar[i];
-         }
-      }
-   }
-
-   /**
-    * 
-    * Dumb shifts down, erases data in the shift destination.
-    * 
-    * Used by buffers where its known that data above the end point is not relevant
-    * 
-    * @param ar
-    * @param shiftsize number of jumps up in the array
-    * @param start included in the shift
-    * @param end included in the shift
-    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
-    */
-   public static void shiftCharDown(char[] ar, int shiftsize, int start, int end) {
-      for (int i = start; i <= end; i++) {
-         if (i - shiftsize >= 0) {
-            ar[i - shiftsize] = ar[i];
-         }
-      }
-   }
-
-   /**
-    * Fills array [start,end] with filler
-    * @param ar
-    * @param filler
-    * @param start
-    * @param end
-    */
-   public static void fill(char[] ar, char filler, int start, int end) {
-      for (int i = start; i <= end; i++) {
-         ar[i] = filler;
-      }
-   }
-
-   /**
-    * 
-    * @param ar
-    * @param c
-    * @return true if c is inside the array
-    */
-   public static boolean contains(char[] ar, char c) {
-      for (int i = ar.length - 1; i >= 0; i--) {
-         if (c == ar[i]) {
-            return true;
-         }
-      }
-      return false;
-   }
-
-   public static boolean isEqual(char[] c, char[] b) {
-      return isEqual(c, 0, c.length, b);
-   }
-
-   public static boolean isEqual(char[] src, int srcoffset, int srclen, char[] b) {
-      if (srclen != b.length)
-         return false;
-      for (int i = 0; i < b.length; i++) {
-         if (src[srcoffset + i] != b[i])
-            return false;
-      }
-      return true;
    }
 
    public static int getFirstIndex(String str, char[] chars, int offset) {
@@ -294,16 +206,26 @@ public class CharUtils {
       return indexC0;
    }
 
-   public static int getFirstIndex(char c, char[] chars) {
-      return getFirstIndex(c, chars, 0, chars.length);
-   }
-
    public static int getPlane(char c) {
       return (c >>> 8) & 0xFF;
    }
 
    public static int getV(char c) {
       return c & 0xFF;
+   }
+
+   public static boolean isEqual(char[] c, char[] b) {
+      return isEqual(c, 0, c.length, b);
+   }
+
+   public static boolean isEqual(char[] src, int srcoffset, int srclen, char[] b) {
+      if (srclen != b.length)
+         return false;
+      for (int i = 0; i < b.length; i++) {
+         if (src[srcoffset + i] != b[i])
+            return false;
+      }
+      return true;
    }
 
    /**
@@ -335,6 +257,66 @@ public class CharUtils {
    }
 
    /**
+    * shift only if start < end
+    * @param ar
+    * @param shiftsize <0 for shifting down
+    * @param start index value starts at 0. inclusive
+    * @param end index value inclusive
+    * @param erase pad the hole with 0s
+    */
+   public static void shiftChar(char[] ar, int shiftsize, int start, int end) {
+      if (start > end) {
+         return;
+      }
+      if (shiftsize < 0) {
+         shiftCharDown(ar, 0 - shiftsize, start, end);
+      } else {
+         shiftCharUp(ar, shiftsize, start, end);
+      }
+   }
+
+   /**
+    * 
+    * Dumb shifts down, erases data in the shift destination.
+    * 
+    * Used by buffers where its known that data above the end point is not relevant
+    * 
+    * @param ar
+    * @param shiftsize number of jumps up in the array
+    * @param start included in the shift
+    * @param end included in the shift
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
+    */
+   public static void shiftCharDown(char[] ar, int shiftsize, int start, int end) {
+      for (int i = start; i <= end; i++) {
+         int j = i - shiftsize;
+         if (j >= 0) {
+            ar[j] = ar[i];
+         }
+      }
+   }
+
+   /**
+    * 
+    * Dumb shifts, erases data in the shift destination.
+    * 
+    * Used by buffers where its known that data above the end point is not relevant
+    * 
+    * @param ar
+    * @param shiftsize number of jumps up in the array. MUST be positive
+    * @param start included in the shift
+    * @param end included in the shift
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough for end+ shiftsize
+    */
+   public static void shiftCharUp(char[] ar, int shiftsize, int start, int end) {
+      for (int i = end; i >= start; i--) {
+         if (i + shiftsize < ar.length) {
+            ar[i + shiftsize] = ar[i];
+         }
+      }
+   }
+
+   /**
     * Big Endian : high byte first, low byte last.
     * @param ar
     * @param index
@@ -353,38 +335,6 @@ public class CharUtils {
       }
    }
 
-   public static void writeShortLE(byte[] ar, int index, char[] cs) {
-      for (int i = 0; i < cs.length; i++) {
-         char c = cs[i];
-         ar[index++] = (byte) (c >>> 0);
-         ar[index++] = (byte) (c >>> 8);
-      }
-   }
-
-   public byte[] getByteCharsIntLong(char[] cs, int coffset, int clen) {
-      byte[] data = new byte[4 + clen * 2];
-      writeCharsIntLong(data, 0, cs, coffset, clen);
-      return data;
-   }
-
-   /**
-    * Read by {@link CharUtils#getCharsIntLong(byte[], int)}
-    * @param cs
-    * @param coffset
-    * @param clen
-    * @param data
-    * @param offset
-    */
-   public void writeCharsIntLong(byte[] data, int offset, char[] cs, int coffset, int clen) {
-      IntUtils.writeIntBE(data, offset, clen);
-      int index = offset + 4;
-      for (int i = 0; i < clen; i++) {
-         char c = cs[coffset + i];
-         CharUtils.writeShortBE(data, index, c);
-         index += 2;
-      }
-   }
-
    /**
     * Little Endian : low byte first, high byte last.
     * @param ar
@@ -394,6 +344,14 @@ public class CharUtils {
    public static void writeShortLE(byte[] ar, int index, char c) {
       ar[index++] = (byte) (c >>> 0);
       ar[index++] = (byte) (c >>> 8);
+   }
+
+   public static void writeShortLE(byte[] ar, int index, char[] cs) {
+      for (int i = 0; i < cs.length; i++) {
+         char c = cs[i];
+         ar[index++] = (byte) (c >>> 0);
+         ar[index++] = (byte) (c >>> 8);
+      }
    }
 
    private char[] cyrChar;
@@ -487,6 +445,30 @@ public class CharUtils {
       return 0;
    }
 
+   public byte[] getByteCharsIntLong(char[] cs, int coffset, int clen) {
+      byte[] data = new byte[4 + clen * 2];
+      writeCharsIntLong(data, 0, cs, coffset, clen);
+      return data;
+   }
+
+   /**
+    * 
+    * @param bys
+    * @param padding 0x04 for russian chars
+    * @return
+    */
+   public char[] getCharsIntLong(byte[] data, int offset) {
+      int numChars = IntUtils.readIntBE(data, offset);
+      char[] chars = uc.getMem().createCharArray(numChars);
+      int index = offset + 4;
+      for (int i = 0; i < numChars; i++) {
+         int ch1 = data[index++] << 8;
+         int ch2 = data[index++] & 0xFF;
+         chars[i] = (char) (ch1 + ch2);
+      }
+      return chars;
+   }
+
    public char[] getCyrillicChar() {
       if (cyrChar == null) {
          cyrChar = new char[33];
@@ -502,7 +484,6 @@ public class CharUtils {
       }
       return cyrChar;
    }
-
 
    /**
     * Returns a non accentuated char.
@@ -693,6 +674,24 @@ public class CharUtils {
             //case EN_PAD:
             // a = 97  z=122
             return CharUtils.charFromLowByteInt(v + 97, plane);
+      }
+   }
+
+   /**
+    * Read by {@link CharUtils#getCharsIntLong(byte[], int)}
+    * @param cs
+    * @param coffset
+    * @param clen
+    * @param data
+    * @param offset
+    */
+   public void writeCharsIntLong(byte[] data, int offset, char[] cs, int coffset, int clen) {
+      IntUtils.writeIntBE(data, offset, clen);
+      int index = offset + 4;
+      for (int i = 0; i < clen; i++) {
+         char c = cs[coffset + i];
+         CharUtils.writeShortBE(data, index, c);
+         index += 2;
       }
    }
 

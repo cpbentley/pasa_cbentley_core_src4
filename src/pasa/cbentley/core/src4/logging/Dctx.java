@@ -964,11 +964,33 @@ public class Dctx implements IToStringFlags {
          sb.append(title + " is null");
       } else {
          sb.append(title);
-         this.nl();
          this.tab();
+         this.nl();
          int count = 0;
          for (int j = 0; j < ints.length; j++) {
             sb.append(ints[j]);
+            sb.append(" ");
+            count++;
+            if (count == numIntPerLine) {
+               count = 0;
+               this.nl();
+            }
+         }
+         this.tabRemove();
+      }
+   }
+   
+   public void nlLvl(String title, char[] cs, int numIntPerLine) {
+      nl();
+      if (cs == null) {
+         sb.append(title + " is null");
+      } else {
+         sb.append(title);
+         this.nl();
+         this.tab();
+         int count = 0;
+         for (int j = 0; j < cs.length; j++) {
+            sb.append(cs[j]);
             sb.append(" ");
             count++;
             if (count == numIntPerLine) {
