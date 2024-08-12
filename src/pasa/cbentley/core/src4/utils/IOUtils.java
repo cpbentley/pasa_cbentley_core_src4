@@ -13,7 +13,7 @@ import java.io.UnsupportedEncodingException;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.interfaces.IFileCallBack;
-import pasa.cbentley.core.src4.interfaces.IKernelHost;
+import pasa.cbentley.core.src4.interfaces.IHost;
 import pasa.cbentley.core.src4.io.BAByteOS;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -23,8 +23,6 @@ import pasa.cbentley.core.src4.structs.IntToStrings;
 public class IOUtils implements IStringable {
 
    private final int   BOM_SIZE  = 4;
-
-   private IKernelHost kernelHost;
 
    /**
     * Field must be initialized for reading {@link InputStream} with the method {@link Class#getResourceAsStream(String)}
@@ -107,9 +105,7 @@ public class IOUtils implements IStringable {
       return is;
    }
 
-   public IKernelHost getKernelHost() {
-      return kernelHost;
-   }
+  
 
    /**
     * TODO UConfig tells us if / is required for path names
@@ -134,6 +130,7 @@ public class IOUtils implements IStringable {
       fileName = getResourcePath(fileName);
       Class c = getClass(o);
       InputStream is = null;
+      IHost kernelHost = uc.getHost();
       if (kernelHost == null) {
          is = c.getResourceAsStream(fileName);
       } else {
@@ -486,18 +483,7 @@ public class IOUtils implements IStringable {
       }
    }
 
-   /**
-    * Sets the {@link IKernelHost}
-    * 
-    * {@link IOUtils} can work without one.
-    * 
-    * But some platform will implement {@link IKernelHost#getResourceAsStream(String)}
-    * more efficiently
-    * @param kernelHost
-    */
-   public void setKernelHost(IKernelHost kernelHost) {
-      this.kernelHost = kernelHost;
-   }
+
 
    public byte[] streamToByte(InputStream is) throws IOException {
       return convert(is).toByteArray();

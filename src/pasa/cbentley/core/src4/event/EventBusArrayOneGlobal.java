@@ -31,7 +31,7 @@ import pasa.cbentley.core.src4.utils.ArrayUtils;
  * @author Charles Bentley
  *
  */
-public class EventBusArray2 extends ObjectU implements IEventBus, IEventConsumer {
+public class EventBusArrayOneGlobal extends ObjectU implements IEventBus, IEventConsumer {
 
    /**
     * cannot be null
@@ -73,7 +73,7 @@ public class EventBusArray2 extends ObjectU implements IEventBus, IEventConsumer
     * Length of array - 1 is the number of Producer types 
     * 
     */
-   public EventBusArray2(UCtx uc, ICtx contextOwner, int[] producersNumEvents) {
+   public EventBusArrayOneGlobal(UCtx uc, ICtx contextOwner, int[] producersNumEvents) {
       super(uc);
 
       //#mdebug
@@ -255,7 +255,7 @@ public class EventBusArray2 extends ObjectU implements IEventBus, IEventConsumer
          ex.printStackTrace();
          if (ex.getId() == UCtxException.EVENT_MATCH_EX) {
             //#debug
-            uc.toDLog().pEventSevere(ex.getMessage(), e, EventBusArray2.class, "doConsumer");
+            uc.toDLog().pEventSevere(ex.getMessage(), e, EventBusArrayOneGlobal.class, "doConsumer");
          }
       } catch (Exception exe) {
          //we cannot throw it here. we might be in a thread. TODO log it in a visual interface
@@ -264,9 +264,9 @@ public class EventBusArray2 extends ObjectU implements IEventBus, IEventConsumer
       //#mdebug
       if (!e.hasFlag(BusEvent.FLAG_1_ACTED)) {
          //send warning. event was not acted
-         uc.toDLog().pEventWarn("BusEvent not consumed", e, EventBusArray2.class, "doConsumer");
+         uc.toDLog().pEventWarn("BusEvent not consumed", e, EventBusArrayOneGlobal.class, "doConsumer");
       } else {
-         uc.toDLog().pEventFiner("BusEvent was consumed", e, EventBusArray2.class, "doConsumer");
+         uc.toDLog().pEventFiner("BusEvent was consumed", e, EventBusArrayOneGlobal.class, "doConsumer");
       }
       //#enddebug
    }
@@ -338,9 +338,9 @@ public class EventBusArray2 extends ObjectU implements IEventBus, IEventConsumer
       if (eventID >= allConsumersForPID.nextempty) {
          String msg = "eventID " + eventID + " is not valid for the number of registered event types for producerID " + producerID;
          //#debug
-         uc.toDLog().pAlways("Exception with BusEvent", be, EventBusArray2.class, "putOnBus", ITechLvl.LVL_04_FINER, false);
+         uc.toDLog().pAlways("Exception with BusEvent", be, EventBusArrayOneGlobal.class, "putOnBus", ITechLvl.LVL_04_FINER, false);
          //#debug
-         uc.toDLog().pAlways(eventID + ">=" + allConsumersForPID.nextempty + ". Invalid eventID", this, EventBusArray2.class, "putOnBus", ITechLvl.LVL_04_FINER, false);
+         uc.toDLog().pAlways(eventID + ">=" + allConsumersForPID.nextempty + ". Invalid eventID", this, EventBusArrayOneGlobal.class, "putOnBus", ITechLvl.LVL_04_FINER, false);
          throw new IllegalArgumentException(msg);
       }
       if (eventID == 0) {
@@ -403,7 +403,7 @@ public class EventBusArray2 extends ObjectU implements IEventBus, IEventConsumer
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, EventBusArray2.class, 410);
+      dc.root(this, EventBusArrayOneGlobal.class, 410);
       dc.nlLvl1Line(contextOwner);
       dc.nl();
       dc.append("Listeners To All Events");
@@ -467,7 +467,7 @@ public class EventBusArray2 extends ObjectU implements IEventBus, IEventConsumer
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, EventBusArray2.class);
+      dc.root1Line(this, EventBusArrayOneGlobal.class);
    }
 
    public UCtx toStringGetUCtx() {

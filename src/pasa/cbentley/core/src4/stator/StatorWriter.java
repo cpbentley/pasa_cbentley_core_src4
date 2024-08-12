@@ -38,6 +38,8 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  */
 public class StatorWriter extends ObjectU implements IStringable, ITechStator {
 
+   private int          flags;
+
    private Stator       stator;
 
    private IntToInts    table;
@@ -51,8 +53,6 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
 
    private IntToObjects writtenObjects;
 
-   private int          flags;
-
    public StatorWriter(Stator stator, int type) {
       super(stator.getUC());
       this.stator = stator;
@@ -62,20 +62,12 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       writer = uc.createNewBADataOS();
    }
 
-   /**
-    * Current position, so continue to write
-    * @return
-    */
-   public BADataOS getWriter() {
-      return writer;
+   public int getBytesWritten() {
+      return writer.size();
    }
 
-   public void writeInt(int v) {
-      writer.writeInt(v);
-   }
-
-   public void setFlag(int flag, boolean b) {
-      flags = BitUtils.setFlag(flags, flag, b);
+   public int getNumWrittenObject() {
+      return writtenObjects.getSize();
    }
 
    /**
@@ -86,16 +78,20 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       return stator.getPrefsWriter();
    }
 
-   public int getNumWrittenObject() {
-      return writtenObjects.getSize();
-   }
-
    public Stator getStator() {
       return stator;
    }
 
    public int getType() {
       return type;
+   }
+
+   /**
+    * Current position, so continue to write
+    * @return
+    */
+   public BADataOS getWriter() {
+      return writer;
    }
 
    /**
@@ -116,16 +112,6 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
     * Inverse of {@link StatorReader#init(BADataIS)}
     * @param out
     */
-   public void serializeWhole(BADataOS out) {
-      out.writeInt(MAGIC_WORD_WRITER); //magic
-      out.writeInt(type); //type so unwrap can create it
-      serializeData(out);
-   }
-
-   /**
-    * Inverse of {@link StatorReader#init(BADataIS)}
-    * @param out
-    */
    public void serializeData(BADataOS out) {
       //we need to know its length
       int sizeObjects = writtenObjects.getSize();
@@ -139,11 +125,46 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       }
    }
 
-   public int getBytesWritten() {
-      return writer.size();
+   /**
+    * Inverse of {@link StatorReader#init(BADataIS)}
+    * @param out
+    */
+   public void serializeWhole(BADataOS out) {
+      out.writeInt(MAGIC_WORD_WRITER); //magic
+      out.writeInt(type); //type so unwrap can create it
+      serializeData(out);
+   }
+
+   public void setFlag(int flag, boolean b) {
+      flags = BitUtils.setFlag(flags, flag, b);
    }
 
    //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, StatorWriter.class, "@line170");
+      toStringPrivate(dc);
+
+      dc.nlLvl(writtenObjects, "writtenObjects");
+      dc.nlLvl(writer, "writer");
+      dc.nlLvl(stator, "stator");
+   }
+
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, StatorWriter.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("type", type);
+   }
+   //#enddebug
+   
+   
+   public void writeInt(int v) {
+      writer.writeInt(v);
+   }
 
    /**
     * Called when a {@link IStatorable} asks its {@link IStatorable} children to writeselves.
@@ -178,8 +199,8 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
             int classID = statorable.getStatorableClassID();
             //sanity check if factory supports that class
             IStatorFactory statorFactory = ctxOwner.getStatorFactory();
-            if(statorFactory == null) {
-               throw new IllegalArgumentException("No Factory for "+ statorable.getClass().getName() + " Ctx:" + ctxOwner.getClass().getName());
+            if (statorFactory == null) {
+               throw new IllegalArgumentException("No Factory for " + statorable.getClass().getName() + " Ctx:" + ctxOwner.getClass().getName());
             }
             if (!statorFactory.isSupported(statorable)) {
                throw new IllegalArgumentException("Bad getCtxOwner for " + statorable.getClass().getName() + " != " + statorFactory.getClass().getName());
@@ -196,29 +217,10 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       }
    }
 
-   public void toString(Dctx dc) {
-      dc.root(this, StatorWriter.class, "@line170");
-      toStringPrivate(dc);
-
-      dc.nlLvl(writtenObjects, "writtenObjects");
-      dc.nlLvl(writer, "writer");
-      dc.nlLvl(stator, "stator");
-   }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, StatorWriter.class);
-      toStringPrivate(dc);
-      super.toString1Line(dc.sup1Line());
-   }
-
-   private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("type", type);
-   }
-
    public void writeStartIndex(int len) {
       writer.writeInt(len);
    }
 
-   //#enddebug
+
 
 }

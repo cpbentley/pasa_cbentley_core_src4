@@ -22,7 +22,12 @@ public interface IExecutor extends ITechThread, IStringable {
    public void executeWorker(Runnable run);
 
    /**
-    * Executes the {@link Runnable} the main UI thread right now synchronously if on the main thread.
+    * True if call is inside the main UI thread.
+    * @return
+    */
+   public boolean isMainThread();
+   /**
+    * Executes the {@link Runnable} the main UI thread right now synchronously if called from the main thread.
     * @param run
     */
    public void executeMainNow(Runnable run);

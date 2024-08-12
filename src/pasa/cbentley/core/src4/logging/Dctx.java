@@ -347,6 +347,18 @@ public class Dctx implements IToStringFlags {
       }
    }
 
+   public void appendVarPretty(String var, float value, int numDecimals) {
+      sb.append(var);
+      sb.append('=');
+      String str = uc.getStrU().prettyFloat(value, numDecimals);
+      sb.append(str);
+   }
+
+   public void appendPretty(float value, int numDecimals) {
+      String str = uc.getStrU().prettyFloat(value, numDecimals);
+      append(str);
+   }
+
    public void appendPretty(String val, int value, int max) {
       int numChars = String.valueOf(max).length();
       String pretty = uc.getStrU().prettyInt0Padd(value, numChars);
@@ -378,7 +390,7 @@ public class Dctx implements IToStringFlags {
          int count = 0;
          for (int i = 0; i < array.length; i++) {
             if (count == columnSize) {
-               sb.nl();
+               this.nl();
                count = 0;
             }
             sb.append(String.valueOf(array[i]));
@@ -580,7 +592,7 @@ public class Dctx implements IToStringFlags {
    }
 
    public void appendWithNewLine(String string) {
-      sb.nl();
+      this.nl();
       sb.append(string);
    }
 
@@ -848,7 +860,7 @@ public class Dctx implements IToStringFlags {
    }
 
    public void nlArrayRaw(Object[] param, String string) {
-      sb.nl();
+      this.nl();
       if (param == null) {
          sb.append(string + " is null");
       } else {
@@ -979,7 +991,7 @@ public class Dctx implements IToStringFlags {
          this.tabRemove();
       }
    }
-   
+
    public void nlLvl(String title, char[] cs, int numIntPerLine) {
       nl();
       if (cs == null) {
@@ -1659,7 +1671,12 @@ public class Dctx implements IToStringFlags {
    public void root(Object o, Class cl, int line) {
       String str = getClassSimpleName(cl);
       this.root(o, str, String.valueOf(line));
+   }
 
+   public void root(Object o, Class title, Class cl, int line) {
+      String str = getClassSimpleName(title);
+      String classLink = getClassSimpleName(cl);
+      this.root(o, str, classLink, String.valueOf(line));
    }
 
    /**
@@ -1680,14 +1697,7 @@ public class Dctx implements IToStringFlags {
       this.root(o, str, defaultLine);
    }
 
-   /**
-    * Displays a root. 
-    * <br>
-    * Link Str to IStringable
-    * @param o when null, print that
-    * @param str
-    */
-   public void root(Object o, String str, String line) {
+   public void root(Object o, String str, String classLink, String line) {
       if (isLineNumbers && numLines.getCount() == 0) {
          numLines.increment();
          String strLine = uc.getStrU().prettyIntPaddStr(numLines.getCount(), 4, " ");
@@ -1696,7 +1706,7 @@ public class Dctx implements IToStringFlags {
       if (isClassLinks) {
          sb.append(getLevelStartChar());
          doTitlePrefix();
-         appendClassLink(str, line);
+         appendClassLink(classLink, line);
       } else {
          sb.append(getLevelStartChar());
          doTitlePrefix();
@@ -1707,7 +1717,17 @@ public class Dctx implements IToStringFlags {
       processedObjectsMulti.addUnique(o, numLines.getCount());
 
       tab();
+   }
 
+   /**
+    * Displays a root. 
+    * <br>
+    * Link Str to IStringable
+    * @param o when null, print that
+    * @param str
+    */
+   public void root(Object o, String str, String line) {
+      this.root(o, str, str, line);
    }
 
    private void appendClassLink(String str, String line) {
@@ -1910,7 +1930,7 @@ public class Dctx implements IToStringFlags {
       int index = flagsData.findObjectRef(ctx);
       if (index == -1) {
          //not even there
-         index = flagsData.addReturn(ctx, ctx.toStringGetToStringFlags());
+         index = flagsData.addReturnIndex(ctx, ctx.toStringGetToStringFlags());
       }
       flagsData.setIntFlag(index, flag, b);
       //enable ctx to set other flags linked to this flag.. but invisible

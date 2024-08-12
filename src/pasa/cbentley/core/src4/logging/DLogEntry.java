@@ -24,6 +24,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  *
  */
 public class DLogEntry implements ITechLvl {
+
    private Class       classL;
 
    private Class       classStringable;
@@ -39,7 +40,6 @@ public class DLogEntry implements ITechLvl {
 
    private String      method;
 
-   //#mdebug
    private String      msg;
 
    private String      name;
@@ -145,6 +145,7 @@ public class DLogEntry implements ITechLvl {
          if (stringable == null) {
             string1Line = "";
          } else {
+            //#debug
             string1Line = stringable.toString1Line();
          }
       }
@@ -160,6 +161,7 @@ public class DLogEntry implements ITechLvl {
          if (stringable == null) {
             stringFull = "";
          } else {
+            //#debug
             stringFull = stringable.toString();
          }
       }
@@ -255,5 +257,4 @@ public class DLogEntry implements ITechLvl {
       this.throwable = throwable;
    }
 
-   //#enddebug
 }

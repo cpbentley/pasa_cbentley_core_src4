@@ -4,7 +4,6 @@
  */
 package pasa.cbentley.core.src4.logging;
 
-//#mdebug
 public class LogConfiguratorAllFinest implements ILogConfigurator {
 
    public void apply(IDLogConfig log) {
@@ -13,4 +12,3 @@ public class LogConfiguratorAllFinest implements ILogConfigurator {
    }
 
 }
-//#enddebug

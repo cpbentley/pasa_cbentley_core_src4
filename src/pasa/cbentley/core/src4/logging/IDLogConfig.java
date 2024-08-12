@@ -19,7 +19,6 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  */
 public interface IDLogConfig extends IStringable, ITechConfig {
 
-   //#mdebug
 
    /**
     * Compute {@link ITechConfig} flags of the {@link DLogEntry}.
@@ -92,8 +91,14 @@ public interface IDLogConfig extends IStringable, ITechConfig {
    public void setClassPositives(Class c, boolean v);
 
    /**
-    * Set Config flags
+    * Set Config flags for formatting
+    * 
+    * <li> {@link ITechConfig#FORMAT_FLAG_01_ACCEPTED}
+    * <li> {@link ITechConfig#FORMAT_FLAG_02_1LINE}
+    * <li> {@link ITechConfig#FORMAT_FLAG_03_STACK}
     * <li> {@link ITechConfig#FORMAT_FLAG_04_THREAD}
+    * <li> {@link ITechConfig#FORMAT_FLAG_05_TIMESTAMP}
+    * <li> {@link ITechConfig#FORMAT_FLAG_06_BIG}
     * @param flag
     * @param b
     */
@@ -183,5 +188,4 @@ public interface IDLogConfig extends IStringable, ITechConfig {
     */
    public void setStackTraced(int type, Class c, boolean b);
 
-   //#enddebug
 }

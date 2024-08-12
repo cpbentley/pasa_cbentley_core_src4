@@ -7,7 +7,6 @@ package pasa.cbentley.core.src4.stator;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.interfaces.IPrefsReader;
-import pasa.cbentley.core.src4.io.BAByteIS;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -60,13 +59,152 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
       this.type = type;
    }
 
+   public void checkInt(int v) {
+      int i = readInt();
+      if (i != v) {
+         throw new IllegalArgumentException(v + "!=" + i);
+      }
+   }
+
+   public int getNumObjects() {
+      return mapMax;
+   }
+
+   public Object getObject(int objectID) {
+      if (objectID < map.getSize()) {
+         return map.getObjectAtIndex(objectID);
+      }
+      return null;
+   }
+
    /**
-    * Faster link with {@link ICtx}
-    * @param ctx
+    * Add key-value data to this {@link StatorWriter}
     * @return
     */
-   public Object readObject(ICtx ctx) {
-      return readObject(ctx, null);
+   public IPrefsReader getPrefs() {
+      return stator.getPrefsReader();
+   }
+
+   /**
+    * 
+    * @return
+    */
+   public BADataIS getReader() {
+      return reader;
+   }
+
+   /**
+    * The byte array being used by this {@link StatorReader}.
+    * @return
+    */
+   public byte[] getReaderByte() {
+      return this.reader.getArray();
+   }
+
+   /**
+    * Current reader position. Will change when reader is read
+    * @return
+    */
+   public int getReaderByteOffset() {
+      return this.reader.getPosition();
+   }
+
+   public Stator getStator() {
+      return stator;
+   }
+
+   public long getTimestamp() {
+      return timestamp;
+   }
+
+   public int getType() {
+      return type;
+   }
+
+   /**
+    * Reader flags
+    * 
+    * @param flag
+    * @return
+    */
+   public boolean hasFlag(int flag) {
+      return BitUtils.hasFlag(flags, flag);
+   }
+
+   public boolean hasMore() {
+      return reader.hasMore();
+   }
+
+   /**
+    * One way to init it
+    * called by {@link Stator}
+    * 
+    * Inverse of {@link StatorWriter#serializeData(BADataOS)}
+    * @param reader
+    */
+   public void init(BADataIS dis) {
+      mapMax = dis.readInt();
+      map = new IntToObjects(uc, mapMax);
+      int ctrlInt = dis.read();
+      //now the actual reader
+      if (ctrlInt == 1) {
+         this.reader = dis.readIs();
+      } else {
+         //badly constructed
+         throw new IllegalArgumentException("bad ctrl byte");
+      }
+
+      initSub(dis);
+   }
+
+   protected void initSub(BADataIS dis) {
+
+   }
+
+   private void manageErrorNullFactory(int ctxID, int classID, ICtx ctx) {
+      //because of
+      String msg = "Could not create Factory for ctxID=" + ctxID + " " + ctx.getClass().getName();
+      //#debug
+      toDLog().pNull(msg, null, StatorReader.class, "readObject");
+      throw new IllegalArgumentException(msg);
+   }
+
+   private void manageErrorNullObject(int ctxID, int classID, ICtx ctx, IStatorFactory fac) {
+      //because of
+      //#debug
+      toDLog().pNull("Could not create object ", this, StatorReader.class, "readObject", LVL_05_FINE, true);
+      throw new IllegalArgumentException("Class ID not supported " + classID + " for " + fac.getClass());
+   }
+
+   /**
+    * When null, cannot do anything
+    * 
+    * <p>
+    * Inverse of {@link StatorWriter#writerToStatorable(IStatorable)}
+    * </p>
+    * @param statorable
+    */
+   public void readerToStatorable(IStatorable statorable) {
+      int magicToken = getReader().readInt();
+      if (magicToken == MAGIC_WORD_OBJECT) {
+         //read object ID and put it in the map
+         int objectID = getReader().readInt();
+         int ctxID = getReader().readInt();
+         int classID = getReader().readInt();
+         map.setObject(statorable, objectID);
+         statorable.stateReadFrom(this);
+      } else if (magicToken == MAGIC_WORD_OBJECT_POINTER) {
+         int objectID = getReader().readInt();
+         //already read. .nothing
+      } else if (magicToken == MAGIC_WORD_OBJECT_NULL) {
+      } else {
+         throw new IllegalArgumentException();
+      }
+
+   }
+
+   public int readInt() {
+      return getReader().readInt();
    }
 
    public Object readObject() {
@@ -74,12 +212,12 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
    }
 
    /**
-    * Finds the ctx thx to the ctx id written
-    * @param currentInstance
+    * Faster link with {@link ICtx}
+    * @param ctx
     * @return
     */
-   public Object readObject(Object currentInstance) {
-      return readObject(null, currentInstance);
+   public Object readObject(ICtx ctx) {
+      return readObject(ctx, null);
    }
 
    /**
@@ -152,145 +290,17 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
       }
    }
 
-   private void manageErrorNullFactory(int ctxID, int classID, ICtx ctx) {
-      //because of
-      String msg = "Could not create Factory for ctxID=" + ctxID + " " + ctx.getClass().getName();
-      //#debug
-      toDLog().pNull(msg, null, StatorReader.class, "readObject");
-      throw new IllegalArgumentException(msg);
-   }
-
-   private void manageErrorNullObject(int ctxID, int classID, ICtx ctx, IStatorFactory fac) {
-      //because of
-      //#debug
-      toDLog().pNull("Could not create object ", this, StatorReader.class, "readObject", LVL_05_FINE, true);
-      throw new IllegalArgumentException("Class ID not supported " + classID + " for " + fac.getClass());
-   }
-
-   public int getNumObjects() {
-      return mapMax;
-   }
-
-   public Object getObject(int objectID) {
-      if (objectID < map.getSize()) {
-         return map.getObjectAtIndex(objectID);
-      }
-      return null;
-   }
-
    /**
-    * Add key-value data to this {@link StatorWriter}
+    * Finds the ctx thx to the ctx id written
+    * @param currentInstance
     * @return
     */
-   public IPrefsReader getPrefs() {
-      return stator.getPrefsReader();
+   public Object readObject(Object currentInstance) {
+      return readObject(null, currentInstance);
    }
 
-   /**
-    * 
-    * @return
-    */
-   public BADataIS getReader() {
-      return reader;
-   }
-
-   public Stator getStator() {
-      return stator;
-   }
-
-   public long getTimestamp() {
-      return timestamp;
-   }
-
-   public int getType() {
-      return type;
-   }
-
-   /**
-    * Reader flags
-    * 
-    * @param flag
-    * @return
-    */
-   public boolean hasFlag(int flag) {
-      return BitUtils.hasFlag(flags, flag);
-   }
-
-   public boolean hasMore() {
-      return reader.hasMore();
-   }
-
-   /**
-    * One way to init it
-    * called by {@link Stator}
-    * 
-    * Inverse of {@link StatorWriter#serializeData(BADataOS)}
-    * @param reader
-    */
-   public void init(BADataIS dis) {
-      mapMax = dis.readInt();
-      map = new IntToObjects(uc, mapMax);
-      int ctrlInt = dis.read();
-      //now the actual reader
-      if (ctrlInt == 1) {
-         this.reader = dis.readIs();
-      } else {
-         //badly constructed
-         throw new IllegalArgumentException("bad ctrl byte");
-      }
-
-      initSub(dis);
-   }
-
-   /**
-    * Current reader position. Will change when reader is read
-    * @return
-    */
-   public int getReaderByteOffset() {
-      return this.reader.getPosition();
-   }
-
-   /**
-    * The byte array being used by this {@link StatorReader}.
-    * @return
-    */
-   public byte[] getReaderByte() {
-      return this.reader.getArray();
-   }
-
-   protected void initSub(BADataIS dis) {
-
-   }
-
-   /**
-    * When null, cannot do anything
-    * 
-    * <p>
-    * Inverse of {@link StatorWriter#writerToStatorable(IStatorable)}
-    * </p>
-    * @param statorable
-    */
-   public void readerToStatorable(IStatorable statorable) {
-      int magicToken = getReader().readInt();
-      if (magicToken == MAGIC_WORD_OBJECT) {
-         //read object ID and put it in the map
-         int objectID = getReader().readInt();
-         int ctxID = getReader().readInt();
-         int classID = getReader().readInt();
-         map.setObject(statorable, objectID);
-         statorable.stateReadFrom(this);
-      } else if (magicToken == MAGIC_WORD_OBJECT_POINTER) {
-         int objectID = getReader().readInt();
-         //already read. .nothing
-      } else if (magicToken == MAGIC_WORD_OBJECT_NULL) {
-      } else {
-         throw new IllegalArgumentException();
-      }
-
-   }
-
-   public int readInt() {
-      return getReader().readInt();
+   public int readStartIndex() {
+      return reader.readInt();
    }
 
    public void setFlag(int flag, boolean b) {
@@ -332,17 +342,6 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("type", type);
       dc.appendVarWithSpace("mapMax", mapMax);
-   }
-
-   public int readStartIndex() {
-      return reader.readInt();
-   }
-
-   public void checkInt(int v) {
-      int i = readInt();
-      if (i != v) {
-         throw new IllegalArgumentException(v + "!=" + i);
-      }
    }
 
    //#enddebug

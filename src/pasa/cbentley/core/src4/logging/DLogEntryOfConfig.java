@@ -19,7 +19,6 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  *
  */
 public class DLogEntryOfConfig implements ITechLvl {
-   //#mdebug
 
    private IDLogConfig   config;
 
@@ -66,5 +65,4 @@ public class DLogEntryOfConfig implements ITechLvl {
       formatFlags = BitUtils.setFlag(formatFlags, flag, v);
    }
 
-   //#enddebug
 }

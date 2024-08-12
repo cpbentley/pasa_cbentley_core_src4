@@ -23,7 +23,9 @@ public class LogAdapter implements IDLog {
    public long getCount() {
       return 0;
    }
-
+   public void pInit(String msg, IStringable str, Class c, String method, int lvl, int flags) {
+      throw new RuntimeException("not implemented yet");
+   }
    public ILogEntryAppender getDefault() {
       throw new RuntimeException("not implemented yet");
    }
@@ -75,6 +77,10 @@ public class LogAdapter implements IDLog {
    }
 
    public void pBusiness(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
+      throw new RuntimeException("not implemented yet");
+   }
+
+   public void pBusiness(String msg, IStringable str, Class c, String method, int lvl, int flags) {
       throw new RuntimeException("not implemented yet");
    }
 
@@ -352,6 +358,11 @@ public class LogAdapter implements IDLog {
    }
 
    private void toStringPrivate(Dctx dc) {
+
+   }
+
+   public void pSoundEvent(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
 
    }
 

@@ -5,7 +5,7 @@ import pasa.cbentley.core.src4.event.ILifeListener;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
- * <br>
+ * All method use serviceID to differentiate services calls within a class implementing different services.
  * 
  * @author Charles Bentley
  *
@@ -13,6 +13,8 @@ import pasa.cbentley.core.src4.logging.IStringable;
 public interface IAPIService extends IStringable, ILifeListener {
 
    /**
+    * Sets the {@link ACtx} after the construction. Because src4 cannot instantiate a class from its name 
+    * using parameters in the constructor.
     * 
     * @param context
     * @throws IllegalArgumentException if context type is not expected
@@ -21,14 +23,14 @@ public interface IAPIService extends IStringable, ILifeListener {
 
    /**
     * 
-    * @param id ID for the service
+    * @param id ID for the service. Differentiate from different services within a single class implementing different services
+    * @param param possibly null param. It depends on the service
     * @return
     */
-   public boolean startService(int id);
+   public boolean startService(int serviceID, Object param);
 
-   public boolean isServiceRunning(int id);
+   public boolean isServiceRunning(int serviceID, Object param);
 
-   public boolean stopService(int id);
-
+   public boolean stopService(int serviceID, Object param);
 
 }

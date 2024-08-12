@@ -14,8 +14,8 @@ import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.helpers.UserLogJournal;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
-import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.interfaces.C;
+import pasa.cbentley.core.src4.interfaces.IHost;
 import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.core.src4.io.BAByteIS;
@@ -230,6 +230,8 @@ public class UCtx implements ICtx, IEventsCore {
 
    public static final int  CTX_ID = 1;
 
+   private ApiManager       apiManager;
+
    private ArrayUtils       au;
 
    private BitUtils         bu;
@@ -242,12 +244,18 @@ public class UCtx implements ICtx, IEventsCore {
 
    private CharUtils        cu;
 
+   private DIDManager       didManager;
+
    //#debug
    private IDLog            dlog;
+
+   private String           encoding;
 
    private EventBusArray    eventBusRoot;
 
    private Geo2dUtils       geo2dU;
+
+   private IHost            host;
 
    private IOUtils          iou;
 
@@ -259,9 +267,13 @@ public class UCtx implements ICtx, IEventsCore {
 
    private IMemory          mem;
 
+   private String           name;
+
    private Random           random = null;
 
    private int              registrationID;
+
+   private StatorFactoryUC  statorFactoryUC;
 
    private IStrComparator   strc;
 
@@ -277,23 +289,13 @@ public class UCtx implements ICtx, IEventsCore {
    //#debug
    private int              toStringFlags;
 
+   private ILogConfigurator toStringLogConfigurator;
+
    private URLUtils         urlu;
 
    private IUserLog         userLog;
 
    private WorkerThread     workerThread;
-
-   private String           encoding;
-
-   private DIDManager       didManager;
-
-   private StatorFactoryUC  statorFactoryUC;
-
-   private ApiManager       apiManager;
-
-   private String           name;
-
-   private ILogConfigurator toStringLogConfigurator;
 
    /**
     * Assume a simple Java Host 
@@ -338,7 +340,7 @@ public class UCtx implements ICtx, IEventsCore {
       au = new ArrayUtils(this);
       iou = new IOUtils(this);
 
-      //#debug
+      //#mdebug
       BaseDLogger dlog = new BaseDLogger(this);
       if (name != null) {
          dlog.setName(name);
@@ -353,10 +355,11 @@ public class UCtx implements ICtx, IEventsCore {
       toStringLogConfigurator.apply(configOfAppender); //apply config
 
       //String message = "Very First Log Message; Using LogConfigurator:" + toStringLogConfigurator.getClass().getName();
-      String message = "Very First Log Message; Using ("+ stru.getNameClass(toStringLogConfigurator.getClass())+".java:40)";
+      String message = "Very First Log Message; Using (" + stru.getNameClass(toStringLogConfigurator.getClass()) + ".java:40)";
       dlog.pAlways(message, null, UCtx.class, "[" + +this.hashCode() + "]");
-      dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor");
-      dlog.pAlways("IConfigU", config, UCtx.class, "constructor");
+      dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor@360");
+      dlog.pAlways("IConfigU", config, UCtx.class, "constructor@361");
+      //#enddebug
 
       //this is not for debug purposes. its the application log for the application user.
       this.userLog = new UserLogSystemOut(this);
@@ -390,13 +393,6 @@ public class UCtx implements ICtx, IEventsCore {
       return dis;
    }
 
-   public ApiManager getApiManager() {
-      if (apiManager == null) {
-         apiManager = new ApiManager(this);
-      }
-      return apiManager;
-   }
-
    public BADataIS createNewBADataIS(byte[] data, int offset) {
       BAByteIS bis = new BAByteIS(this, data, offset, data.length);
       BADataIS dis = new BADataIS(this, bis);
@@ -413,6 +409,13 @@ public class UCtx implements ICtx, IEventsCore {
       BAByteOS bos = new BAByteOS(this);
       BADataOS bada = new BADataOS(this, bos);
       return bada;
+   }
+
+   public ApiManager getApiManager() {
+      if (apiManager == null) {
+         apiManager = new ApiManager(this);
+      }
+      return apiManager;
    }
 
    public ArrayUtils getAU() {
@@ -437,13 +440,6 @@ public class UCtx implements ICtx, IEventsCore {
 
    public IConfigU getConfigU() {
       return config;
-   }
-
-   public void setConfigU(IConfigU configU) {
-      if (configU == null) {
-         throw new NullPointerException();
-      }
-      this.config = configU;
    }
 
    public int getCtxID() {
@@ -501,13 +497,14 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    /**
-    * By default no factory for Ctx
+    * Null unless set with {@link UCtx#setHost(IHost)}
+    * @return
     */
-   public IStatorFactory getStatorFactory() {
-      if (statorFactoryUC == null) {
-         statorFactoryUC = new StatorFactoryUC(this);
+   public IHost getHost() {
+      if (host == null) {
+         throw new NullPointerException("Host must be set externaly with setHost(IHost)");
       }
-      return statorFactoryUC;
+      return host;
    }
 
    public IOUtils getIOU() {
@@ -531,6 +528,12 @@ public class UCtx implements ICtx, IEventsCore {
 
    public IMemory getMem() {
       return mem;
+   }
+
+   public IEventBus getOrCreateEventBus(ICtx ctx, int sidA, int sidZ, int[] topo) {
+      //depending on configuration. use one or several buses
+      EventBusArray bus = new EventBusArray(this, ctx, topo, sidA);
+      return bus;
    }
 
    /**
@@ -561,6 +564,16 @@ public class UCtx implements ICtx, IEventsCore {
    public int getStaticKeyRegistrationID(int type, int key) {
       // TODO Auto-generated method stub
       return 0;
+   }
+
+   /**
+    * By default no factory for Ctx
+    */
+   public IStatorFactory getStatorFactory() {
+      if (statorFactoryUC == null) {
+         statorFactoryUC = new StatorFactoryUC(this);
+      }
+      return statorFactoryUC;
    }
 
    public IStrComparator getStrComparator() {
@@ -615,13 +628,33 @@ public class UCtx implements ICtx, IEventsCore {
       return workerThread;
    }
 
-   //#mdebug
-   public void toStringSetDLog(IDLog log) {
-      if (log != null) {
-         dlog = log;
+   public void setConfigU(IConfigU configU) {
+      if (configU == null) {
+         throw new NullPointerException();
       }
+      this.config = configU;
    }
-   //#enddebug
+
+   /**
+    * 
+    * @param encoding
+    */
+   public void setDefaultEncoding(String encoding) {
+      this.encoding = encoding;
+   }
+
+   /**
+    * Sets the {@link IHost}
+    * 
+    * {@link IOUtils} can work without one.
+    * 
+    * But some platform will implement {@link IHost#getResourceAsStream(String)}
+    * more efficiently
+    * @param host
+    */
+   public void setHost(IHost host) {
+      this.host = host;
+   }
 
    public void setRandom(Random rnd) {
       random = rnd;
@@ -637,14 +670,6 @@ public class UCtx implements ICtx, IEventsCore {
     */
    public void setStrComparator(IStrComparator c) {
       this.strc = c;
-   }
-
-   /**
-    * 
-    * @param encoding
-    */
-   public void setDefaultEncoding(String encoding) {
-      this.encoding = encoding;
    }
 
    public void setStringProducer(IStringProducer stringProducer) {
@@ -694,10 +719,6 @@ public class UCtx implements ICtx, IEventsCore {
       }
    }
 
-   public DIDManager toStringGetDIDManager() {
-      return didManager;
-   }
-
    public String toString() {
       return Dctx.toString(this);
    }
@@ -719,7 +740,8 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public boolean toString(Dctx dctx, Object o) {
-      // TODO Auto-generated method stub
+      //we don't have any unknown object from this code module
+      //all our objects implements IStringable
       return false;
    }
 
@@ -755,19 +777,6 @@ public class UCtx implements ICtx, IEventsCore {
    public void toStringCheckNull(Object o) {
       if (o == null) {
          throw new NullPointerException();
-      }
-   }
-
-   public String toStringStaticID(int staticID) {
-      switch (staticID) {
-         case IStaticIDs.SID_STRINGS:
-            return "Strings";
-         case IStaticIDs.SID_EVENTS:
-            return "Events";
-         case IStaticIDs.SID_DIDS:
-            return "DIDs";
-         default:
-            return null;
       }
    }
 
@@ -839,6 +848,22 @@ public class UCtx implements ICtx, IEventsCore {
       }
    }
 
+   public void toStringFlagSetOn(int flag, boolean b, Dctx dctx) {
+      //we don't do anything by default
+   }
+
+   public DIDManager toStringGetDIDManager() {
+      return didManager;
+   }
+
+   public ILogConfigurator toStringGetLogConfigurator() {
+      return toStringLogConfigurator;
+   }
+
+   public int toStringGetToStringFlags() {
+      return toStringFlags;
+   }
+
    public UCtx toStringGetUCtx() {
       return this;
    }
@@ -861,10 +886,6 @@ public class UCtx implements ICtx, IEventsCore {
       dc.appendVarWithSpace("encoding", encoding);
    }
 
-   public ILogConfigurator toStringGetLogConfigurator() {
-      return toStringLogConfigurator;
-   }
-
    public String toStringProducerID(int pid) {
       switch (pid) {
          case PID_00_ANY:
@@ -884,8 +905,10 @@ public class UCtx implements ICtx, IEventsCore {
       }
    }
 
-   public void toStringFlagSetOn(int flag, boolean b, Dctx dctx) {
-      //we don't do anything by default
+   public void toStringSetDLog(IDLog log) {
+      if (log != null) {
+         dlog = log;
+      }
    }
 
    /**
@@ -897,8 +920,17 @@ public class UCtx implements ICtx, IEventsCore {
       toStringFlags = BitUtils.setFlag(toStringFlags, flag, v);
    }
 
-   public int toStringGetToStringFlags() {
-      return toStringFlags;
+   public String toStringStaticID(int staticID) {
+      switch (staticID) {
+         case IStaticIDs.SID_STRINGS:
+            return "Strings";
+         case IStaticIDs.SID_EVENTS:
+            return "Events";
+         case IStaticIDs.SID_DIDS:
+            return "DIDs";
+         default:
+            return null;
+      }
    }
 
    //#enddebug

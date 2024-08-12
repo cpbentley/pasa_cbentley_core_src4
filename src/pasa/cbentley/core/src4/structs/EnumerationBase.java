@@ -31,23 +31,28 @@ public class EnumerationBase extends ObjectU implements Enumeration {
       return ar[currentIndex++];
    }
 
+
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, EnumerationBase.class, "@line5");
+      dc.root(this, EnumerationBase.class, 37);
       toStringPrivate(dc);
       super.toString(dc.sup());
-   }
-
-   private void toStringPrivate(Dctx dc) {
-
+      
+      dc.nlArrayRaw(ar, "array");
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, EnumerationBase.class);
+      dc.root1Line(this, EnumerationBase.class, 37);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
 
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("num", num);
+      dc.appendVarWithSpace("currentIndex", currentIndex);
+   }
    //#enddebug
+   
+
 
 }

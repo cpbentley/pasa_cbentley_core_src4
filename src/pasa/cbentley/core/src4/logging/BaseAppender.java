@@ -9,7 +9,6 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 
 public abstract class BaseAppender extends ObjectU implements ILogEntryAppender {
 
-   //#mdebug
    protected IDLogConfig config;
 
    public BaseAppender(UCtx uc) {
@@ -43,9 +42,6 @@ public abstract class BaseAppender extends ObjectU implements ILogEntryAppender 
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
-
-   //#enddebug
-
    //#enddebug
 
 }

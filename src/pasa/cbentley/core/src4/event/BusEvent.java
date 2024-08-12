@@ -5,6 +5,7 @@
 package pasa.cbentley.core.src4.event;
 
 import pasa.cbentley.core.src4.ctx.ICtx;
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.ex.UCtxException;
 import pasa.cbentley.core.src4.interfaces.ITechThread;
@@ -46,7 +47,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class BusEvent implements IStringable, ITechThread {
+public class BusEvent extends ObjectU implements IStringable, ITechThread {
 
    /**
     * An event can be parsed by several {@link IEventConsumer} but not acted upon.
@@ -98,8 +99,6 @@ public class BusEvent implements IStringable, ITechThread {
 
    private int             producerID;
 
-   private UCtx            uc;
-
    /**
     * 
     * @param uc
@@ -108,7 +107,7 @@ public class BusEvent implements IStringable, ITechThread {
     * @param eid
     */
    public BusEvent(UCtx uc, IEventBus busOwner, int pid, int eid) {
-      this.uc = uc;
+      super(uc);
       this.busOwner = busOwner;
       this.producerID = pid;
       this.eventID = eid;
@@ -259,21 +258,25 @@ public class BusEvent implements IStringable, ITechThread {
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, BusEvent.class,263);
+      dc.root(this, BusEvent.class, 262);
       toStringPrivate(dc);
+      super.toString(dc.sup());
       dc.nlLvl1Line(busOwner.getCtxOwner());
       dc.nlLvlObject("ParamObject1", paramO1);
       dc.nlLvlObject("ParamObject2", paramO2);
       dc.nlLvlObject("Producer", producer);
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, BusEvent.class, 262);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+      dc.nlLvl1Line(busOwner.getCtxOwner());
+      toStringPrivate(dc);
+      if (producer != null) {
+         dc.append("by " + producer.getClass().getName());
+      }
    }
 
    private void toStringPrivate(Dctx dc) {
@@ -288,19 +291,9 @@ public class BusEvent implements IStringable, ITechThread {
       dc.appendVarWithSpace("param1", getParam1());
       dc.appendVarWithSpace("param2", getParam2());
    }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BusEvent");
-      dc.nlLvl1Line(busOwner.getCtxOwner());
-      toStringPrivate(dc);
-      if (producer != null) {
-         dc.append("by " + producer.getClass().getName());
-      }
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
    //#enddebug
+   
+
+
 
 }

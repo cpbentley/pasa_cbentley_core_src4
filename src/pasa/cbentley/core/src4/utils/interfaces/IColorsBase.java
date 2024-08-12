@@ -1,5 +1,10 @@
 package pasa.cbentley.core.src4.utils.interfaces;
 
+/**
+ * 
+ * @author Charles Bentley
+ *
+ */
 public interface IColorsBase {
    public static final int BASE_00_BLACK         = 0x000000;
 

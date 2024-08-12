@@ -57,7 +57,6 @@ public class EventBusArray extends ObjectU implements IEventBus, IEventConsumer 
     */
    private IntToObjects[] producerIDToConsumerArray;
 
-
    /**
     * Static topology is events
     */
@@ -168,7 +167,9 @@ public class EventBusArray extends ObjectU implements IEventBus, IEventConsumer 
          //should never happen in production code
          //#mdebug
          if (producerID >= producerIDToConsumerArray.length) {
-            throw new IllegalArgumentException("ProducerID " + producerID + " is not valid");
+            //#debug
+            toDLog().pNull("This should never happen in production code", this, EventBusArray.class, "addConsumer", LVL_05_FINE, false);
+            throw new IllegalArgumentException("Wrong bus for ProducerID " + producerID + " is not valid. eventID=" + eventID);
          }
          //#enddebug
          IntToObjects consumersForPID = producerIDToConsumerArray[producerID];
@@ -228,6 +229,10 @@ public class EventBusArray extends ObjectU implements IEventBus, IEventConsumer 
       return e;
    }
 
+   public void addCtxEvents(ICtx ctx) {
+      
+   }
+   
    private void doConsumer(final IEventConsumer eventConsumer, final BusEvent e, int threadMode) {
       if (executor == null || threadMode == THREAD_MODE_0_POST_NOW) {
          doConsumer2(eventConsumer, e);
@@ -415,9 +420,6 @@ public class EventBusArray extends ObjectU implements IEventBus, IEventConsumer 
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
 
    public void toString(Dctx dc) {
       dc.root(this, EventBusArray.class, 410);
@@ -479,16 +481,9 @@ public class EventBusArray extends ObjectU implements IEventBus, IEventConsumer 
       }
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, EventBusArray.class);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
+      dc.root1Line(this, EventBusArray.class,482);
    }
 
    //#enddebug

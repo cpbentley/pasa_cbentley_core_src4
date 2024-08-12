@@ -31,7 +31,6 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  */
 public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITechConfig {
 
-   //#mdebug
 
    private Hashtable all                 = new Hashtable();
 
@@ -94,6 +93,10 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       int flags = 0;
       entryOfConf.setConfigResFlag(FORMAT_FLAG_01_ACCEPTED, isAccepted(type));
 
+      if(this.hasFlagFormat(FORMAT_FLAG_04_THREAD)) {
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
+      }
+      
       //dev flags override the config?
       if (type.hasDevFlag(DEV_2_1LINE)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_02_1LINE, true);
@@ -115,6 +118,8 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       if (type.hasDevFlag(DEV_4_THREAD)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
       }
+      
+      
 
       return entryOfConf;
    }
@@ -520,6 +525,7 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       positivesTraceClass.put(c, Boolean.TRUE);
    }
 
+   //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, DLogConfig.class, "@line490");
 
@@ -656,7 +662,6 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       }
       dc.tabRemove();
    }
-
    //#enddebug
 
 }

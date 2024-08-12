@@ -25,7 +25,6 @@ package pasa.cbentley.core.src4.logging;
  */
 public interface ILogEntryAppender extends IStringable {
 
-   //#mdebug
    
    /**
     * Current configuration of Appender
@@ -54,6 +53,5 @@ public interface ILogEntryAppender extends IStringable {
     */
    public void setConfig(IDLogConfig c);
    
-   //#enddebug
    
 }

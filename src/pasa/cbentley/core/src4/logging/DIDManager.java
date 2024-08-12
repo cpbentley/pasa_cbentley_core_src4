@@ -7,12 +7,12 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 
 public class DIDManager extends ObjectU implements IDebugStringable, IToStringDIDs {
 
+   private IDebugStringable[] diders;
+
    /**
     * Hosts the dynamics DID
     */
    private String[][]         dynamicDID = new String[IToStringDIDs.DID_DYNAMIC_MAX_VALUE + 1][];
-
-   private IDebugStringable[] diders;
 
    private int                nextEmpty;
 
@@ -25,6 +25,7 @@ public class DIDManager extends ObjectU implements IDebugStringable, IToStringDI
       diders[nextEmpty] = dider;
    }
 
+   //#mdebug
    public String toStringGetDIDString(int did, int value) {
       if (did <= IToStringDIDs.DYN_9) {
          if (dynamicDID[did] != null) {
@@ -68,5 +69,5 @@ public class DIDManager extends ObjectU implements IDebugStringable, IToStringDI
    public void toStringSetDynamicDID(int did, String[] strings) {
       dynamicDID[did] = strings;
    }
-
+   //#enddebug
 }

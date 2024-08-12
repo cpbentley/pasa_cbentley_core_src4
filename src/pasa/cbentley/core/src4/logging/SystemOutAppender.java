@@ -10,7 +10,6 @@ import pasa.cbentley.core.src4.utils.StringUtils;
 
 public class SystemOutAppender extends BaseAppender {
 
-   //#mdebug
    private int    outputCounter = 0;
 
    private String previousStr   = "";
@@ -56,7 +55,7 @@ public class SystemOutAppender extends BaseAppender {
       StringBBuilder sb = new StringBBuilder(uc, 500);
 
       int count = sb.getCount();
-      if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
+      if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_08_OWNER_NAME)) {
          sb.append(entry.getNameOwner());
          sb.append('\t');
       }
@@ -139,6 +138,8 @@ public class SystemOutAppender extends BaseAppender {
             }
             //sbnl.append('\t');
             String objnl = sbnl.toString(); //the newline tab for the DCtx of the Stringable
+            
+            //#mdebug
             Dctx dc = new Dctx(uc, objnl);
             stringable.toString(dc);
             dc.toStringCtx();
@@ -147,6 +148,7 @@ public class SystemOutAppender extends BaseAppender {
                sb.append(objnl);
                sb.append(str);
             }
+            //#enddebug
          }
       }
       String nl = "\n";
@@ -218,6 +220,7 @@ public class SystemOutAppender extends BaseAppender {
       }
    }
 
+   //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, SystemOutAppender.class, "@line166");
       toStringPrivate(dc);
@@ -232,8 +235,6 @@ public class SystemOutAppender extends BaseAppender {
 
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("outputCounter", outputCounter);
-      ;
    }
-
    //#enddebug
 }

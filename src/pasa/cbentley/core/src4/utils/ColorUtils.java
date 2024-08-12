@@ -19,7 +19,7 @@ import pasa.cbentley.core.src4.utils.interfaces.ITechColor;
  * @author Charles Bentley
  *
  */
-public class ColorUtils implements IColors, IStringable {
+public class ColorUtils  implements IColors, IStringable {
 
    private static float convertHueToRGB(float p, float q, float h) {
       if (h < 0) {
@@ -549,9 +549,7 @@ public class ColorUtils implements IColors, IStringable {
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "ColorUtils");
    }
-   //#enddebug
 
-   //#mdebug
    public void toStringColor(Dctx sb, int c) {
       sb.append("(");
       sb.append(((c >> 24) & 0xFF));
@@ -563,7 +561,6 @@ public class ColorUtils implements IColors, IStringable {
       sb.append(((c >> 0) & 0xFF));
       sb.append(")");
    }
-   //#enddebug
 
    /**
     * Returns a String such as (a,r,g,b)
@@ -631,5 +628,6 @@ public class ColorUtils implements IColors, IStringable {
    public UCtx toStringGetUCtx() {
       return uc;
    }
+   //#enddebug
 
 }

@@ -106,15 +106,15 @@ public abstract class ConfigAbstract implements IConfig {
    public void toString(Dctx dc) {
       dc.root(this, ConfigAbstract.class, 54);
       toStringPrivate(dc);
-      
+
       dc.appendVarWithNewLine("isStatorRead", isStatorRead);
       dc.appendVarWithSpace("isStatorWrite", isStatorWrite);
-      
+
       dc.nl();
-      if(logConfigurator == null) {
+      if (logConfigurator == null) {
          dc.append("LogConfigurator is null");
       } else {
-         dc.append("LogConfigurator is ("+ uc.getStrU().getNameClass(logConfigurator.getClass())+".java:40)");
+         dc.append("LogConfigurator is (" + uc.getStrU().getNameClass(logConfigurator.getClass()) + ".java:40)");
       }
    }
 
@@ -123,7 +123,7 @@ public abstract class ConfigAbstract implements IConfig {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "ConfigAbstract");
+      dc.root1Line(this, ConfigAbstract.class, 126);
       toStringPrivate(dc);
    }
 

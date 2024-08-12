@@ -15,8 +15,6 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  */
 public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
 
-   //#mdebug
-
    public BaseDLogger(UCtx uc) {
       super(uc);
    }
@@ -43,6 +41,10 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
 
    public void pBusiness(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_12_BUSINESS, ITechTags.FLAG_12_PRINT_BUSINESS, lvl, oneLine);
+   }
+
+   public void pBusiness(String msg, IStringable str, Class c, String method, int lvl, int flags) {
+      super.ptPrint(msg, str, c, method, ITechTags.STRING_12_BUSINESS, ITechTags.FLAG_12_PRINT_BUSINESS, lvl, flags);
    }
 
    public void pBusiness1(String msg, IStringable str, Class c, String method) {
@@ -171,6 +173,10 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_20_INIT, ITechTags.FLAG_20_PRINT_INIT, lvl, oneLine);
    }
 
+   public void pInit(String msg, IStringable str, Class c, String method, int lvl, int flags) {
+      super.ptPrint(msg, str, c, method, ITechTags.STRING_20_INIT, ITechTags.FLAG_20_PRINT_INIT, lvl, flags);
+   }
+
    public void pInit1(String msg, IStringable str, Class c, String method) {
       pInit(msg, str, c, method, getLevelDefault(), true);
    }
@@ -224,6 +230,13 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       pSound(msg, str, c, method, getLevelDefault(), true);
    }
 
+   public void pSoundEvent(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
+      int tagId = ITechTags.FLAG_13_PRINT_SOUND | ITechTags.FLAG_07_PRINT_EVENT;
+      String tagStr = ITechTags.STRING_13_SOUND + ITechTags.STRING_07_EVENT;
+      super.ptPrint(msg, str, c, method, tagStr, tagId, lvl, oneLine);
+
+   }
+
    public void pState(String msg, IStringable str, Class c, String method) {
       pState(msg, str, c, method, getLevelDefault(), false);
    }
@@ -268,6 +281,7 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrint(msg, str, c, method, ITechTags.STRING_06_WORK, ITechTags.FLAG_06_PRINT_WORK, lvl, oneLine);
    }
 
+   //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, BaseDLogger.class, 250);
       toStringPrivate(dc);
@@ -283,7 +297,5 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    private void toStringPrivate(Dctx dc) {
 
    }
-
    //#enddebug
-
 }

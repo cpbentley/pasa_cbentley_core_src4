@@ -10,6 +10,9 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 
 public class ApiManager extends ObjectU implements ILifeListener {
 
+   /**
+    * ID to {@link ServiceCtx}.
+    */
    private IntToObjects services;
 
    public ApiManager(UCtx uc) {
@@ -18,75 +21,71 @@ public class ApiManager extends ObjectU implements ILifeListener {
    }
 
    /**
-    * Returns a class implementing the given API id.
-    * <li> {@link ITechHost#SUP_ID_38_GAMEPADS}
-    * @param id
-    * @return
-    */
-   /**
-    * Retursn null if no APIService can be found or created for this ID.
-    * <br>
-    * <br>
+    * Returns null if no APIService can be found or created for this ID.
     * 
     * <br>
     * TODO unregisters service
     */
    public IAPIService getAPIService(int id) {
       //#debug
-      toDLog().pFlow("id=" + id + " services ->", services, ApiManager.class, "getAPIService", LVL_05_FINE, false);
+      toDLog().pFlow("param id=" + id + " services ->", services, ApiManager.class, "getAPIService@31", LVL_05_FINE, false);
 
       //look up registered service providers
       int index = services.findInt(id);
       if (index != -1) {
-         ServiceCtx o = (ServiceCtx) services.getObjectAtIndex(index);
-         if (o.service instanceof String) {
-            //try loading the class
-            try {
-               String className = (String) o.service;
-               Class c = Class.forName(className);
-               //#debug
-               toDLog().pBridge1("Init " + className + " for ID=" + id, this, ApiManager.class, "getAPIService");
-               //api services such a GamePAD JInput
-               IAPIService apiService = (IAPIService) c.newInstance();
-               apiService.setCtx(o.context);
-               services.setObject(apiService, index); //set the apiservice to later uses
-               return apiService;
-            } catch (ClassNotFoundException e) {
-               e.printStackTrace();
-               return null;
-            } catch (InstantiationException e) {
-               e.printStackTrace();
-            } catch (IllegalAccessException e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
+         Object obj = services.getObjectAtIndex(index);
+         if (obj == null) {
+            throw new NullPointerException();
+         }
+         if (obj instanceof ServiceCtx) {
+            ServiceCtx serviceCtx = (ServiceCtx) obj;
+            if (serviceCtx.service instanceof String) {
+               //try loading the class
+               try {
+                  String className = (String) serviceCtx.service;
+                  ACtx ctx = serviceCtx.context;
+                  Class c = Class.forName(className);
+                  //#debug
+                  toDLog().pBridge1("Init " + className + " for ID=" + id, this, ApiManager.class, "getAPIService");
+                  //api services such a GamePAD JInput
+                  IAPIService apiService = (IAPIService) c.newInstance();
+                  apiService.setCtx(ctx);
+
+                  services.setObject(apiService, index); //set the apiservice to later uses
+                  return apiService;
+               } catch (ClassNotFoundException e) {
+                  e.printStackTrace();
+                  return null;
+               } catch (InstantiationException e) {
+                  e.printStackTrace();
+               } catch (IllegalAccessException e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+               }
             }
-         } else if (o instanceof IAPIService) {
-            return (IAPIService) o;
+         } else if (obj instanceof IAPIService) {
+            return (IAPIService) obj;
          }
       }
       return null;
    }
 
    /**
-    * Overrides any object at given id
-    */
-   public boolean registerServiceProvider(Object service, int id) {
-      services.add(id, service);
-      return true;
-   }
-
-   /**
-    * When service is not defined/null, the host will register default service 
-    * <br>
+    * When service is not defined/null, the host will register default service.
+    * 
+    * <p>
+    * 
     * If a host has gamepad functionalities, it will register the
     * class name with {@link ITechHostCore#SUP_ID_38_GAMEPADS} id
+    * </p>
+    * 
     * @param service force the driver to use the given class
     * @param id 
-    * <br>
     * @return true when host managed to find the given service
     */
    public boolean setAPIService(int id, Object service, ACtx serviceContext) {
-      services.add(id, new ServiceCtx(service, serviceContext));
+      ServiceCtx serviceCtx = new ServiceCtx(service, serviceContext);
+      services.add(id, serviceCtx);
       return true;
    }
 
@@ -109,7 +108,12 @@ public class ApiManager extends ObjectU implements ILifeListener {
    }
 
    public void lifeStarted(ILifeContext context) {
-
+      for (int i = 0; i < services.getSize(); i++) {
+         Object o = services.getObjectAtIndex(i);
+         if (o instanceof IAPIService) {
+            ((IAPIService) o).lifeStarted(context);
+         }
+      }
    }
 
    public void lifeStopped(ILifeContext context) {

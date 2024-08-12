@@ -12,7 +12,6 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  *
  */
 public abstract class RootDLogger extends ObjectU implements IDLog {
-   //#mdebug
 
    private ILogEntryAppender[] appenders;
 
@@ -180,8 +179,6 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("count", count);
    }
-
-   //#enddebug
 
    //#enddebug
 

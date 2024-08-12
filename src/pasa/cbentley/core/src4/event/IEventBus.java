@@ -208,4 +208,5 @@ public interface IEventBus extends IStringable, ITechThread {
     * @param executor
     */
    public void setExecutor(IExecutor executor);
+
 }

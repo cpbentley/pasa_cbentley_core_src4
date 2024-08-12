@@ -4,6 +4,9 @@
  */
 package pasa.cbentley.core.src4.structs;
 
+import java.util.Enumeration;
+
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 
 import pasa.cbentley.core.src4.interfaces.IStrComparator;
@@ -26,23 +29,19 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * @author Charles Bentley
  *
  */
-public class IntToObjects implements IStringable {
+public class IntToObjects extends ObjectU implements IStringable {
 
-   public int[]       ints;
+   public int[]    ints;
 
-   public int         nextempty = 0;
+   public int      nextempty = 0;
 
    /**
     * Cannot be null
     */
-   public Object[]    objects;
-
-   private final UCtx uc;
+   public Object[] objects;
 
    public IntToObjects(UCtx uc) {
-      this.uc = uc;
-      objects = new Object[5];
-      ints = new int[5];
+      this(uc, 5);
    }
 
    /**
@@ -51,9 +50,7 @@ public class IntToObjects implements IStringable {
     * @param i
     */
    public IntToObjects(UCtx uc, int i) {
-      this.uc = uc;
-      ints = new int[i];
-      objects = new Object[i];
+      this(uc, i, false);
    }
 
    /**
@@ -63,24 +60,27 @@ public class IntToObjects implements IStringable {
     * @param fixed when true, structure is given the initialCapacity in length
     */
    public IntToObjects(UCtx uc, int initialCapacity, boolean emptyFill) {
-      this.uc = uc;
-      ints = new int[initialCapacity];
+      super(uc);
       objects = new Object[initialCapacity];
+      ints = new int[initialCapacity];
       if (emptyFill) {
          nextempty = initialCapacity;
       }
    }
 
+   /**
+    * 
+    * @param uc
+    * @param os
+    */
    public IntToObjects(UCtx uc, Object[] os) {
-      this.uc = uc;
+      super(uc);
       if (os == null) {
-         objects = new Object[5];
-         ints = new int[5];
-      } else {
-         objects = os;
-         nextempty = os.length;
-         ints = new int[os.length];
+         throw new NullPointerException();
       }
+      objects = os;
+      nextempty = os.length;
+      ints = new int[os.length];
    }
 
    public void add(int i, int o) {
@@ -96,19 +96,12 @@ public class IntToObjects implements IStringable {
       this.add(o, i);
    }
 
-   public int addReturn(Object o, int value) {
-      this.add(o, value);
-      return nextempty - 1;
-   }
-
    public void add(Object o) {
       this.add(o, 0);
    }
 
    /**
     * Appends object and its int value
-    * <br>
-    * <br>
     * 
     * @param o
     * @param i
@@ -133,21 +126,20 @@ public class IntToObjects implements IStringable {
    }
 
    /**
-    * Appends object and its int value
-    * <br>
-    * <br>
-    * @param o
-    * @param i
+    * Appends object and its int value.
+    * 
+    * @param obj
+    * @param value
     * @return the index of the object added
     */
-   public int addR(Object o, int i) {
+   public int addReturnIndex(Object obj, int value) {
       nextempty++; //atomic. thread safety
       int index = nextempty - 1; //atomic. no 
       if (index >= ints.length) {
          growArray();
       }
-      ints[index] = i;
-      objects[index] = o;
+      ints[index] = value;
+      objects[index] = obj;
       return index;
    }
 
@@ -467,6 +459,12 @@ public class IntToObjects implements IStringable {
       return nextempty;
    }
 
+   public Enumeration getEnumeration() {
+      EnumerationBase eb = new EnumerationBase(uc);
+      eb.setArray(objects, nextempty);
+      return eb;
+   }
+
    /**
     * Starts at 0 and copies objects to array starting at offset
     * @param ar
@@ -693,16 +691,10 @@ public class IntToObjects implements IStringable {
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
-   /**
-    * 
-    */
    public void toString(Dctx dc) {
-      dc.root(this, IntToObjects.class, "@line656");
-      dc.appendVarWithSpace("size", nextempty);
+      dc.root(this, IntToObjects.class, 691);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
 
       for (int i = 0; i < nextempty; i++) {
          dc.nl();
@@ -734,17 +726,14 @@ public class IntToObjects implements IStringable {
       }
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
-
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, IntToObjects.class);
-      dc.append(" [size=" + nextempty + "]");
+      dc.root1Line(this, IntToObjects.class, 691);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("size", nextempty);
    }
 
    public void toStringForLine(Dctx dc) {

@@ -42,13 +42,17 @@ public class FiFoQueue implements IStringable {
     * @return null if none
     */
    public Object getHead() {
-      to = objects[getIndex];
-      objects[getIndex] = null;
-      getIndex++;
-      if (getIndex == objects.length) {
-         getIndex = 0;
+      if (putIndex != getIndex) {
+         to = objects[getIndex];
+         objects[getIndex] = null;
+         getIndex++;
+         if (getIndex == objects.length) {
+            getIndex = 0;
+         }
+         return to;
+      } else {
+         return null;
       }
-      return to;
    }
 
    /**

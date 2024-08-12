@@ -4,19 +4,18 @@
  */
 package pasa.cbentley.core.src4.ctx;
 
+import java.util.Enumeration;
+
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.stator.IStatorOwner;
 import pasa.cbentley.core.src4.stator.ITechStator;
 import pasa.cbentley.core.src4.stator.Stator;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntBuffer;
-import pasa.cbentley.core.src4.structs.IntToInts;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.StringUtils;
 
@@ -43,7 +42,7 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * @author Charles Bentley
  *
  */
-public class CtxManager implements IStringable, IStatorOwner {
+public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
 
    /**
     * Number of static known ids.
@@ -52,6 +51,20 @@ public class CtxManager implements IStringable, IStatorOwner {
     * Afterwards
     */
    public static final int STATIC_DEFINED = 10;
+
+   private byte[]       dataCtx;
+
+   private int          dataCtxOffset;
+
+   /**
+    * Loading 
+    */
+   private IntToObjects dataOffsets;
+
+   /**
+    * The first stator
+    */
+   private Stator       firstStator;
 
    /**
     * 
@@ -67,13 +80,17 @@ public class CtxManager implements IStringable, IStatorOwner {
     */
    private IntToObjects    intos;
 
-   private UCtx            uc;
-
    public CtxManager(UCtx uc) {
-      this.uc = uc;
+      super(uc);
       intos = new IntToObjects(uc);
       ids = new IntBuffer(uc, 5);
       dataOffsets = new IntToObjects(uc);
+   }
+
+   public void deleteStartData() {
+      firstStator = null;
+      dataCtx = null;
+      dataOffsets.clear();
    }
 
    public ICtx getCtx(int ctxID) {
@@ -100,36 +117,6 @@ public class CtxManager implements IStringable, IStatorOwner {
    }
 
    /**
-    * Loading 
-    */
-   private IntToObjects dataOffsets;
-
-   private byte[]       dataCtx;
-
-   private int          dataCtxOffset;
-
-   /**
-    * The first stator
-    */
-   private Stator       firstStator;
-
-   public Stator getStatorInitFor(ICtx ctx) {
-      if (firstStator == null) {
-         return null;
-      } else {
-         int ctxID = ctx.getCtxID();
-         int[] ar = (int[]) dataOffsets.findIntObject(ctxID);
-         if (ar != null) {
-            firstStator.setActiveReaderWith(dataCtx, ar[0], ar[1]);
-            return firstStator;
-         } else {
-            return null;
-         }
-      }
-
-   }
-
-   /**
     * Return an integer array with triplets
     * 
     */
@@ -147,6 +134,22 @@ public class CtxManager implements IStringable, IStatorOwner {
          }
       }
       return id.getIntsClonedTrimmed();
+   }
+
+   public Stator getStatorInitFor(ICtx ctx) {
+      if (firstStator == null) {
+         return null;
+      } else {
+         int ctxID = ctx.getCtxID();
+         int[] ar = (int[]) dataOffsets.findIntObject(ctxID);
+         if (ar != null) {
+            firstStator.setActiveReaderWith(dataCtx, ar[0], ar[1]);
+            return firstStator;
+         } else {
+            return null;
+         }
+      }
+
    }
 
    private void rangeOverlap(int modID, int staticID, int first, int last, int firstV, int lastV) {
@@ -333,18 +336,12 @@ public class CtxManager implements IStringable, IStatorOwner {
 
    }
 
-
    //#mdebug
-   public IDLog toDLog() {
-      return uc.toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, CtxManager.class, 309);
+      dc.root(this, CtxManager.class, 407);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+
       dc.nlVar("StaticIDs counter", STATIC_DEFINED);
 
       //set flag to prevent make onelines at lvl2
@@ -405,35 +402,30 @@ public class CtxManager implements IStringable, IStatorOwner {
             }
          }
       }
-
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "CtxManager");
-   }
-
-   public String toStringEventID(int producerID, int eventID) {
-      int size = intos.nextempty;
-      for (int i = 0; i < size; i++) {
-         Object o = intos.objects[i];
-         if (o instanceof ICtx) {
-            ICtx module = (ICtx) o;
-            String producer = module.toStringEventID(producerID, eventID);
-            if (producer != null) {
-               return producer;
+   //#mdebug
+   public boolean toString(Dctx dc, Object o) {
+      Enumeration e = intos.getEnumeration();
+      while (e.hasMoreElements()) {
+         Object c = e.nextElement();
+         if (c != null) {
+            if (c instanceof ICtx) {
+               ICtx ctx = (ICtx) c;
+               boolean found = ctx.toString(dc, o);
+               if (found) {
+                  return true;
+               }
             }
          }
       }
-      return null;
+      return false;
    }
-   //#enddebug
 
-   public UCtx toStringGetUCtx() {
-      return uc;
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, CtxManager.class, 407);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    public String toStringCtxID(int ctxID) {
@@ -451,6 +443,25 @@ public class CtxManager implements IStringable, IStatorOwner {
          }
       }
       return null;
+   }
+
+   public String toStringEventID(int producerID, int eventID) {
+      int size = intos.nextempty;
+      for (int i = 0; i < size; i++) {
+         Object o = intos.objects[i];
+         if (o instanceof ICtx) {
+            ICtx module = (ICtx) o;
+            String producer = module.toStringEventID(producerID, eventID);
+            if (producer != null) {
+               return producer;
+            }
+         }
+      }
+      return null;
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
    }
 
    public String toStringProducerID(int producerID) {
@@ -482,11 +493,6 @@ public class CtxManager implements IStringable, IStatorOwner {
       }
       return null;
    }
-
-   public void deleteStartData() {
-      firstStator = null;
-      dataCtx = null;
-      dataOffsets.clear();
-   }
+   //#enddebug
 
 }

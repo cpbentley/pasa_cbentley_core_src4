@@ -58,7 +58,10 @@ public interface IDLog extends IStringable {
    public void pBridge(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
 
    public void pBridge1(String msg, IStringable str, Class c, String method);
+
    public void pBusiness(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pBusiness(String msg, IStringable str, Class c, String method, int lvl, int flags);
 
    public void pBusiness1(String msg, IStringable str, Class c, String method);
 
@@ -84,10 +87,21 @@ public interface IDLog extends IStringable {
 
    public void pEvent(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
 
+   /**
+    * 
+    * @param msg
+    * @param str
+    * @param c
+    * @param method
+    * @param lvl
+    * @param oneLine
+    */
+   public void pSoundEvent(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+
    public boolean getTag(int tag);
-   
+
    public boolean toggleTag(int tag);
-   
+
    /**
     * Flag override the 1st level config
     * @param msg
@@ -144,6 +158,8 @@ public interface IDLog extends IStringable {
    public void pInitBig(String msg, IStringable str, Class c, String method);
 
    public void pInit(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pInit(String msg, IStringable str, Class c, String method, int lvl, int flags);
 
    public void pInit1(String msg, IStringable str, Class c, String method);
 

@@ -1232,6 +1232,7 @@ public class BitUtils {
       return sb.toString();
    }
 
+   //#mdebug
    public String toStringBytes(byte[] ar, int cols) {
       return toStringBytes(ar, 0, ar.length, cols);
    }
@@ -1317,4 +1318,5 @@ public class BitUtils {
    public String toStringBytes(byte[] ar, String sep) {
       return toStringBytes(ar, 0, sep);
    }
+   //#enddebug
 }

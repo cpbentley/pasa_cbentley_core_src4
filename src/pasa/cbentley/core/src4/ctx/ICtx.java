@@ -101,7 +101,7 @@ public interface ICtx extends IStringable {
     * @param o
     * @return
     */
-   public boolean toString(Dctx dctx, Object o);
+   public boolean toString(Dctx dc, Object o);
 
    /**
     * Finds a toString match for the instance of Object.

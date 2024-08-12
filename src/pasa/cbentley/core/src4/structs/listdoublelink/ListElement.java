@@ -6,6 +6,7 @@ package pasa.cbentley.core.src4.structs.listdoublelink;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -100,24 +101,36 @@ public class ListElement implements IStringable {
    }
 
    //#mdebug
+   public IDLog toDLog() {
+      return toStringGetUCtx().toDLog();
+   }
+
    public String toString() {
       return Dctx.toString(this);
+   }
+
+   public void toString(Dctx dc) {
+      dc.root(this, ListElement.class, 113);
+      toStringPrivate(dc);
    }
 
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }
 
-   public void toString(Dctx dc) {
-      dc.root(this, ListElement.class,108);
+   private void toStringPrivate(Dctx dc) {
+
    }
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ListElement.class);
+      toStringPrivate(dc);
    }
 
    public UCtx toStringGetUCtx() {
       return list.toStringGetUCtx();
    }
+
    //#enddebug
+
 }
