@@ -36,6 +36,9 @@ public abstract class ConfigAbstract implements IConfig {
       this.uc = uc;
    }
 
+   public ConfigAbstract() {
+   }
+
    /**
     * When true, clean up everything upon start.
     * 

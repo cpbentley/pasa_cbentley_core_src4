@@ -149,7 +149,7 @@ public interface IDLog extends IStringable {
     */
    public void pFlowBig(String msg, IStringable str, Class c, String method);
 
-   public void pFlow(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pFlow(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
    public void pFlow(String msg, IStringable str, Class c, String method, int lvl, int flags);
 

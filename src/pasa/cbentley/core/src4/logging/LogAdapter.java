@@ -366,5 +366,10 @@ public class LogAdapter implements IDLog {
 
    }
 
+   public void pFlow(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
    //#enddebug
 }
