@@ -58,6 +58,8 @@ public interface ITechTags extends ITech {
 
    public static final int    FLAG_24_PRINT_DRAW      = 1 << 23;
 
+   public static final int    FLAG_25_PRINT_CREATE    = 1 << 24;
+
    /**
     * Message that should not occur, generating a NPE if not catching
     */
@@ -108,6 +110,8 @@ public interface ITechTags extends ITech {
    public static final String STRING_23_ANIM          = "Anim  ";
 
    public static final String STRING_24_DRAW          = "Draw  ";
+
+   public static final String STRING_25_CREATE        = "Create";
 
    public static final String STRING_02_NULL          = "Null";
 

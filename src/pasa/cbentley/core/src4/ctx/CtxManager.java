@@ -422,6 +422,24 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
       return false;
    }
 
+   public boolean toString1Line(Dctx dc, Object o) {
+      Enumeration e = intos.getEnumeration();
+      while (e.hasMoreElements()) {
+         Object c = e.nextElement();
+         if (c != null) {
+            if (c instanceof ICtx) {
+               ICtx ctx = (ICtx) c;
+               boolean found = ctx.toString1Line(dc, o);
+               if (found) {
+                  return true;
+               }
+            }
+         }
+      }
+      return false;
+   }
+
+   
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, CtxManager.class, 407);
       toStringPrivate(dc);

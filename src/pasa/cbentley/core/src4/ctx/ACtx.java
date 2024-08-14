@@ -221,6 +221,10 @@ public abstract class ACtx implements ICtx {
    public boolean toString(Dctx dctx, Object o) {
       return false;
    }
+   
+   public boolean toString1Line(Dctx dctx, Object o) {
+      return false;
+   }
 
    public boolean toString(Dctx dc, Object o, String title) {
       return false;

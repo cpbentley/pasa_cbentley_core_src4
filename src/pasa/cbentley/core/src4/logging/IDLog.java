@@ -45,47 +45,47 @@ public interface IDLog extends IStringable {
     */
    public ILogEntryAppender getDefault();
 
-   public void pAlways(String msg, IStringable str, Class c, String method);
+   public void pAlways(String msg, Object str, Class c, String method);
 
-   public void pAlways(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pAlways(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pAnim(String msg, IStringable str, Class c, String method);
+   public void pAnim(String msg, Object str, Class c, String method);
 
-   public void pAnim(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pAnim(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pBridge(String msg, IStringable str, Class c, String method);
+   public void pBridge(String msg, Object str, Class c, String method);
 
-   public void pBridge(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pBridge(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pBridge1(String msg, IStringable str, Class c, String method);
+   public void pBridge1(String msg, Object str, Class c, String method);
 
-   public void pBusiness(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pBusiness(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pBusiness(String msg, IStringable str, Class c, String method, int lvl, int flags);
+   public void pBusiness(String msg, Object str, Class c, String method, int lvl, int flags);
 
-   public void pBusiness1(String msg, IStringable str, Class c, String method);
+   public void pBusiness1(String msg, Object str, Class c, String method);
 
-   public void pCmd(String msg, IStringable str, Class c, String method);
+   public void pCmd(String msg, Object str, Class c, String method);
 
-   public void pData(String msg, IStringable str, Class c, String method);
+   public void pData(String msg, Object str, Class c, String method);
 
-   public void pCmd(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pCmd(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pData(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pData(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pData(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine, Exception e);
+   public void pData(String msg, Object str, Class c, String method, int lvl, boolean oneLine, Exception e);
 
-   public void pDraw(String msg, IStringable str, Class c, String method);
+   public void pDraw(String msg, Object str, Class c, String method);
 
-   public void pDraw(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pDraw(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pStator(String msg, IStringable str, Class c, String method);
+   public void pStator(String msg, Object str, Class c, String method);
 
-   public void pStator(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pStator(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pEvent(String msg, IStringable str, Class c, String method);
+   public void pEvent(String msg, Object str, Class c, String method);
 
-   public void pEvent(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pEvent(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
    /**
     * 
@@ -96,7 +96,7 @@ public interface IDLog extends IStringable {
     * @param lvl
     * @param oneLine
     */
-   public void pSoundEvent(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pSoundEvent(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
    public boolean getTag(int tag);
 
@@ -111,21 +111,21 @@ public interface IDLog extends IStringable {
     * @param lvl
     * @param flags
     */
-   public void pEvent(String msg, IStringable str, Class c, String method, int lvl, int flags);
+   public void pEvent(String msg, Object str, Class c, String method, int lvl, int flags);
 
-   public void pEvent1(String msg, IStringable str, Class c, String method);
+   public void pEvent1(String msg, Object str, Class c, String method);
 
-   public void pEventFine(String msg, IStringable str, Class c, String method);
+   public void pEventFine(String msg, Object str, Class c, String method);
 
-   public void pEventFiner(String msg, IStringable str, Class c, String method);
+   public void pEventFiner(String msg, Object str, Class c, String method);
 
-   public void pEventFinest(String msg, IStringable str, Class c, String method);
+   public void pEventFinest(String msg, Object str, Class c, String method);
 
-   public void pEventInfo(String msg, IStringable str, Class c, String method);
+   public void pEventInfo(String msg, Object str, Class c, String method);
 
-   public void pEventSevere(String msg, IStringable str, Class c, String method);
+   public void pEventSevere(String msg, Object str, Class c, String method);
 
-   public void pEventWarn(String msg, IStringable str, Class c, String method);
+   public void pEventWarn(String msg, Object str, Class c, String method);
 
    /**
     * When there is an exception
@@ -134,11 +134,11 @@ public interface IDLog extends IStringable {
     * @param c
     * @param method
     */
-   public void pEx(String msg, IStringable str, Class c, String method, Exception e);
+   public void pEx(String msg, Object str, Class c, String method, Exception e);
 
-   public void pFlag(int flag, String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pFlag(int flag, String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pFlow(String msg, IStringable str, Class c, String method);
+   public void pFlow(String msg, Object str, Class c, String method);
 
    /**
     * We know its big chunk of data. Only printed if {@link ITechConfig}
@@ -147,63 +147,65 @@ public interface IDLog extends IStringable {
     * @param c
     * @param method
     */
-   public void pFlowBig(String msg, IStringable str, Class c, String method);
+   public void pFlowBig(String msg, Object str, Class c, String method);
 
    public void pFlow(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pFlow(String msg, IStringable str, Class c, String method, int lvl, int flags);
+   public void pFlow(String msg, Object str, Class c, String method, int lvl, int flags);
 
-   public void pInit(String msg, IStringable str, Class c, String method);
+   public void pInit(String msg, Object str, Class c, String method);
 
-   public void pInitBig(String msg, IStringable str, Class c, String method);
+   public void pInitBig(String msg, Object str, Class c, String method);
 
-   public void pInit(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pInit(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pInit(String msg, IStringable str, Class c, String method, int lvl, int flags);
+   public void pCreate(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pInit1(String msg, IStringable str, Class c, String method);
+   public void pInit(String msg, Object str, Class c, String method, int lvl, int flags);
 
-   public void pMemory(String msg, IStringable str, Class c, String method);
+   public void pInit1(String msg, Object str, Class c, String method);
 
-   public void pMemory(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pMemory(String msg, Object str, Class c, String method);
 
-   public void pMemoryWarn(String msg, IStringable str, Class c, String method);
+   public void pMemory(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pModel1(String msg, IStringable str, Class c, String method);
+   public void pMemoryWarn(String msg, Object str, Class c, String method);
 
-   public void pModel(String msg, IStringable str, Class c, String method);
+   public void pModel1(String msg, Object str, Class c, String method);
 
-   public void pModel(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pModel(String msg, Object str, Class c, String method);
 
-   public void pNull(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pModel(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pNull(String msg, IStringable str, Class c, String method);
+   public void pNull(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pSound(String msg, IStringable str, Class c, String method);
+   public void pNull(String msg, Object str, Class c, String method);
 
-   public void pSound(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pSound(String msg, Object str, Class c, String method);
 
-   public void pSound1(String msg, IStringable str, Class c, String method);
+   public void pSound(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pState(String msg, IStringable str, Class c, String method);
+   public void pSound1(String msg, Object str, Class c, String method);
 
-   public void pState(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pState(String msg, Object str, Class c, String method);
 
-   public void pTest(String msg, IStringable str, Class c, String method);
+   public void pState(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pTest(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pTest(String msg, Object str, Class c, String method);
 
-   public void pTest1(String msg, IStringable str, Class c, String method);
+   public void pTest(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pUI(String msg, IStringable str, Class c, String method);
+   public void pTest1(String msg, Object str, Class c, String method);
 
-   public void pUI(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pUI(String msg, Object str, Class c, String method);
 
-   public void pWork(String msg, IStringable str, Class c, String method);
+   public void pUI(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pWork(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine);
+   public void pWork(String msg, Object str, Class c, String method);
 
-   public void pCmd1(String msg, IStringable str, Class c, String method);
+   public void pWork(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pCmd1(String msg, Object str, Class c, String method);
 
    /**
     * Number of printed statements

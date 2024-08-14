@@ -46,18 +46,6 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       return appenders[index];
    }
 
-   public boolean getTag(int tag) {
-      ILogEntryAppender ap = getAppender(0);
-      return ap.getConfig().hasFlagTag(tag);
-   }
-
-   public boolean toggleTag(int tag) {
-      ILogEntryAppender ap = getAppender(0);
-      boolean v = ap.getConfig().hasFlagTag(tag);
-      ap.getConfig().setFlagTag(tag, !v);
-      return !v;
-   }
-
    /**
     * Array of non null appenders
     * @return
@@ -82,34 +70,9 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       return name;
    }
 
-   /**
-    * This is used for quick debugging without having to change configuration of the logger.
-    * <br>
-    * The call should always be changed back to something else
-    * @param msg
-    * @param str
-    * @param c
-    * @param method
-    */
-   public void pAlways(String msg, IStringable str, Class c, String method) {
-      ptPrint(msg, str, c, method, ITechTags.STRING_01_ALWAYS, ITechTags.FLAG_01_PRINT_ALWAYS, getLevelDefault(), false);
-   }
-
-   public void pAlways(String msg, IStringable str, Class c, String method, int lvl, boolean oneLine) {
-      ptPrint(msg, str, c, method, ITechTags.STRING_01_ALWAYS, ITechTags.FLAG_01_PRINT_ALWAYS, lvl, oneLine);
-   }
-
-   /**
-    * 
-    * @param msg
-    * @param str
-    * @param c
-    * @param method
-    * @param m
-    * @param flag
-    */
-   public void ptPrint(String msg, IStringable str, Class c, String method, String m, int flag) {
-      ptPrint(msg, str, c, method, m, flag, getLevelDefault(), false);
+   public boolean getTag(int tag) {
+      ILogEntryAppender ap = getAppender(0);
+      return ap.getConfig().hasFlagTag(tag);
    }
 
    /**
@@ -127,10 +90,6 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
          devFlags = ITechConfig.FORMAT_FLAG_02_1LINE;
       }
       this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, devFlags);
-   }
-
-   protected void ptPrintBig(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl) {
-      this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, ITechDev.DEV_6_BIG);
    }
 
    protected synchronized void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, int flags) {
@@ -158,8 +117,19 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       }
    }
 
+   protected void ptPrintBig(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl) {
+      this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, ITechDev.DEV_6_BIG);
+   }
+
    public void setName(String name) {
       this.name = name;
+   }
+
+   public boolean toggleTag(int tag) {
+      ILogEntryAppender ap = getAppender(0);
+      boolean v = ap.getConfig().hasFlagTag(tag);
+      ap.getConfig().setFlagTag(tag, !v);
+      return !v;
    }
 
    //#mdebug

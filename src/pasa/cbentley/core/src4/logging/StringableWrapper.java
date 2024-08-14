@@ -35,7 +35,16 @@ public class StringableWrapper extends ObjectU implements IStringable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, StringableWrapper.class);
+      if (o instanceof IStringable) {
+         ((IStringable) o).toString1Line(dc);
+      } else {
+         //ask bo module man
+         boolean b = uc.getCtxManager().toString1Line(dc, o);
+         if (!b) {
+            String str = o.toString();
+            dc.append(str);
+         }
+      }
    }
    //#enddebug
 

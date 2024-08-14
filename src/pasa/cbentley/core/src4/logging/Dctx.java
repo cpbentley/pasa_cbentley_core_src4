@@ -17,7 +17,6 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.BitUtils;
-import pasa.cbentley.core.src4.utils.CharUtils;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.core.src4.utils.StringUtils;
 
@@ -72,6 +71,8 @@ public class Dctx implements IToStringFlags {
    private boolean        isExpand;
 
    private boolean        isLineNumbers   = true;
+
+   private int lineForCollapsed;
 
    private char[]         linesArray      = new char[] { '│', '↑', '║', '↓', '├' };
 
@@ -241,11 +242,6 @@ public class Dctx implements IToStringFlags {
       sb.append(string);
    }
 
-   public void appendClassLink(Class cl) {
-      String str = this.getClassSimpleName(cl);
-      appendClassLink(str, "40");
-   }
-
    public void append(String[] strs, int offset, int len, String sep) {
       for (int i = offset; i < offset + len; i++) {
          if (i != offset) {
@@ -259,6 +255,13 @@ public class Dctx implements IToStringFlags {
       this.append(strs, 0, strs.length, sep);
    }
 
+   public void appendBracketedWithSpace(boolean b) {
+      this.append(' ');
+      this.append('[');
+      this.append(String.valueOf(b));
+      this.append(']');
+   }
+
    public void appendBracketedWithSpace(String str) {
       this.append(' ');
       this.append('[');
@@ -266,11 +269,18 @@ public class Dctx implements IToStringFlags {
       this.append(']');
    }
 
-   public void appendBracketedWithSpace(boolean b) {
-      this.append(' ');
-      this.append('[');
-      this.append(String.valueOf(b));
-      this.append(']');
+   public void appendClassLink(Class cl) {
+      String str = this.getClassSimpleName(cl);
+      appendClassLink(str, "40");
+   }
+
+   private void appendClassLink(String str, String line) {
+      sb.append(' ');
+      sb.append('(');
+      append(str);
+      append(".java:");
+      append(line);
+      append(")");
    }
 
    public void appendColorRGB(int colorRGB) {
@@ -317,15 +327,15 @@ public class Dctx implements IToStringFlags {
       }
    }
 
+   public void appendFlagsNegative(int flags, String title, IntToStrings data) {
+      this.appendFlags(flags, title, data, false);
+   }
+
    public void appendFlagsNewLine(int flags, String title, IntToStrings data) {
       nl();
       appendFlagsPositive(flags, title, data);
       nl();
       appendFlagsNegative(flags, title, data);
-   }
-
-   public void appendFlagsNegative(int flags, String title, IntToStrings data) {
-      this.appendFlags(flags, title, data, false);
    }
 
    public void appendFlagsPositive(int flags, String title, IntToStrings data) {
@@ -345,13 +355,6 @@ public class Dctx implements IToStringFlags {
             sb.append(ch);
          }
       }
-   }
-
-   public void appendVarPretty(String var, float value, int numDecimals) {
-      sb.append(var);
-      sb.append('=');
-      String str = uc.getStrU().prettyFloat(value, numDecimals);
-      sb.append(str);
    }
 
    public void appendPretty(float value, int numDecimals) {
@@ -433,6 +436,13 @@ public class Dctx implements IToStringFlags {
       sb.append(v);
    }
 
+   public void appendVarPretty(String var, float value, int numDecimals) {
+      sb.append(var);
+      sb.append('=');
+      String str = uc.getStrU().prettyFloat(value, numDecimals);
+      sb.append(str);
+   }
+
    public void appendVarWithNewLine(String s, boolean v) {
       nl();
       sb.append(s);
@@ -452,16 +462,16 @@ public class Dctx implements IToStringFlags {
       debugAlone(s, ar, sep, size);
    }
 
-   public void appendVarWithNewLine(String s, String[] ar, String sep, boolean size) {
-      this.nl();
-      debugAlone(s, ar, sep, size);
-   }
-
    public void appendVarWithNewLine(String s, String v) {
       nl();
       sb.append(s);
       sb.append('=');
       sb.append(v);
+   }
+
+   public void appendVarWithNewLine(String s, String[] ar, String sep, boolean size) {
+      this.nl();
+      debugAlone(s, ar, sep, size);
    }
 
    public void appendVarWithSpace(String s, boolean v) {
@@ -586,13 +596,13 @@ public class Dctx implements IToStringFlags {
       sb.append(v);
    }
 
-   public void appendWithSpace(String string) {
-      sb.append(' ');
+   public void appendWithNewLine(String string) {
+      this.nl();
       sb.append(string);
    }
 
-   public void appendWithNewLine(String string) {
-      this.nl();
+   public void appendWithSpace(String string) {
+      sb.append(' ');
       sb.append(string);
    }
 
@@ -705,6 +715,9 @@ public class Dctx implements IToStringFlags {
    }
 
    private String getClassSimpleName(Class cl) {
+      if(cl == null) {
+         return null;
+      }
       StringUtils strU = uc.getStrU();
       return strU.getNameClass(cl);
    }
@@ -733,6 +746,10 @@ public class Dctx implements IToStringFlags {
 
    public StringBBuilder getSB() {
       return sb;
+   }
+
+   public boolean hasFlag(int flag) {
+      return BitUtils.hasFlag(flags, flag);
    }
 
    /**
@@ -964,6 +981,28 @@ public class Dctx implements IToStringFlags {
       nlLvl(title, is, 0, true, cl);
    }
 
+   public void nlLvl(String title, char[] cs, int numIntPerLine) {
+      nl();
+      if (cs == null) {
+         sb.append(title + " is null");
+      } else {
+         sb.append(title);
+         this.nl();
+         this.tab();
+         int count = 0;
+         for (int j = 0; j < cs.length; j++) {
+            sb.append(cs[j]);
+            sb.append(" ");
+            count++;
+            if (count == numIntPerLine) {
+               count = 0;
+               this.nl();
+            }
+         }
+         this.tabRemove();
+      }
+   }
+
    /**
     * 
     * @param title
@@ -981,28 +1020,6 @@ public class Dctx implements IToStringFlags {
          int count = 0;
          for (int j = 0; j < ints.length; j++) {
             sb.append(ints[j]);
-            sb.append(" ");
-            count++;
-            if (count == numIntPerLine) {
-               count = 0;
-               this.nl();
-            }
-         }
-         this.tabRemove();
-      }
-   }
-
-   public void nlLvl(String title, char[] cs, int numIntPerLine) {
-      nl();
-      if (cs == null) {
-         sb.append(title + " is null");
-      } else {
-         sb.append(title);
-         this.nl();
-         this.tab();
-         int count = 0;
-         for (int j = 0; j < cs.length; j++) {
-            sb.append(cs[j]);
             sb.append(" ");
             count++;
             if (count == numIntPerLine) {
@@ -1046,16 +1063,8 @@ public class Dctx implements IToStringFlags {
       nlLvl(title, is, flags, isTitleSuffix, false);
    }
 
-   public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix, Class cl) {
-      nlLvl(title, is, flags, isTitleSuffix, false, cl);
-   }
-
    public void nlLvl(String title, IStringable is, int flags, boolean flip, boolean list) {
       nlLvl(title, is, flags, flip, list, true);
-   }
-
-   public void nlLvl(String title, IStringable is, int flags, boolean flip, boolean list, Class cl) {
-      nlLvl(title, is, flags, flip, list, true, cl);
    }
 
    public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix, boolean listNulls, boolean showTitleWhenNotNull) {
@@ -1125,6 +1134,14 @@ public class Dctx implements IToStringFlags {
             is.toString(dc);
          }
       }
+   }
+
+   public void nlLvl(String title, IStringable is, int flags, boolean flip, boolean list, Class cl) {
+      nlLvl(title, is, flags, flip, list, true, cl);
+   }
+
+   public void nlLvl(String title, IStringable is, int flags, boolean isTitleSuffix, Class cl) {
+      nlLvl(title, is, flags, isTitleSuffix, false, cl);
    }
 
    public void nlLvl1Line(IStringable is) {
@@ -1294,6 +1311,29 @@ public class Dctx implements IToStringFlags {
             sb.append(is[i].toString());
          }
          tabRemove();
+      }
+   }
+
+   public void nlLvlArrayBytes(String title, byte[] data) {
+      if (data == null) {
+         this.nl();
+         this.append(title);
+         this.append(" is null");
+      } else {
+         this.nl();
+         nlLvlArrayBytes(title, data, 0, data.length, 15);
+      }
+   }
+
+   public void nlLvlArrayBytes(String title, byte[] data, int offset, int len, int colSize) {
+      if (data == null) {
+         this.nl();
+         this.append(title);
+         this.append(" is null");
+      } else {
+         this.nl();
+         this.append(title);
+         uc.getBU().toStringBytes(this, data, offset, len, colSize);
       }
    }
 
@@ -1662,6 +1702,12 @@ public class Dctx implements IToStringFlags {
       this.root(o, str, defaultLine);
    }
 
+   public void root(Object o, Class title, Class cl, int line) {
+      String str = getClassSimpleName(title);
+      String classLink = getClassSimpleName(cl);
+      this.root(o, str, classLink, String.valueOf(line));
+   }
+
    public void root(Object o, Class cl, ICtx ctx) {
       String str = getClassSimpleName(cl);
       this.root(o, str, defaultLine);
@@ -1671,12 +1717,6 @@ public class Dctx implements IToStringFlags {
    public void root(Object o, Class cl, int line) {
       String str = getClassSimpleName(cl);
       this.root(o, str, String.valueOf(line));
-   }
-
-   public void root(Object o, Class title, Class cl, int line) {
-      String str = getClassSimpleName(title);
-      String classLink = getClassSimpleName(cl);
-      this.root(o, str, classLink, String.valueOf(line));
    }
 
    /**
@@ -1695,6 +1735,17 @@ public class Dctx implements IToStringFlags {
 
    public void root(Object o, String str) {
       this.root(o, str, defaultLine);
+   }
+
+   /**
+    * Displays a root. 
+    * <br>
+    * Link Str to IStringable
+    * @param o when null, print that
+    * @param str
+    */
+   public void root(Object o, String str, String line) {
+      this.root(o, str, str, line);
    }
 
    public void root(Object o, String str, String classLink, String line) {
@@ -1719,29 +1770,55 @@ public class Dctx implements IToStringFlags {
       tab();
    }
 
-   /**
-    * Displays a root. 
-    * <br>
-    * Link Str to IStringable
-    * @param o when null, print that
-    * @param str
-    */
-   public void root(Object o, String str, String line) {
-      this.root(o, str, str, line);
-   }
-
-   private void appendClassLink(String str, String line) {
-      sb.append(' ');
-      sb.append('(');
-      append(str);
-      append(".java:");
-      append(line);
-      append(")");
-   }
-
    public void root1Line(Object o, Class cl) {
       String str = getClassSimpleName(cl);
       this.root1Line(o, str, cl);
+   }
+
+   public void root1Line(Object o, Class title, Class cl, int line) {
+      String str = getClassSimpleName(title);
+      String classLink = getClassSimpleName(cl);
+      this.root1Line(o, str, classLink, String.valueOf(line));
+   }
+
+   public void root1Line(Object o, Class cl, int line) {
+      String str = getClassSimpleName(cl);
+      root1Line(o, str, str, String.valueOf(line));
+   }
+
+   public void root1Line(Object o, String str) {
+      root1Line(o, str, null);
+   }
+
+   public void root1Line(Object o, String str, Class cl) {
+      this.root1Line(o, str, cl, "40");
+   }
+   
+   public void root1Line(Object o, String str, String classSimpleName, String line) {
+      if (hasFlag(FLAG_DATA_07_COLLAPSED)) {
+         this.setFlag(FLAG_DATA_07_COLLAPSED, false);
+         root1LineCollapsed(o, str, lineForCollapsed);
+      } else {
+         if (isClassLinks && classSimpleName != null) {
+            sb.append(getLevelStartChar1Line());
+            doTitlePrefix();
+            this.appendClassLink(classSimpleName, line);
+            setCompact(true);
+            doTitleSuffix();
+            if(str != classSimpleName) {
+               sb.append(str);
+            }
+         } else {
+            sb.append(getLevelStartChar1Line());
+            doTitlePrefix();
+            sb.append(str);
+            setCompact(true);
+            doTitleSuffix();
+         }
+      }
+   }
+   public void root1Line(Object o, String str, Class cl, String line) {
+      this.root1Line(o, str, getClassSimpleName(cl), line);
    }
 
    public void root1LineCollapsed(Object o, String str, int line) {
@@ -1761,42 +1838,6 @@ public class Dctx implements IToStringFlags {
       }
       setCompact(true);
       doTitleSuffix();
-   }
-
-   private int lineForCollapsed;
-
-   public void root1Line(Object o, String str) {
-      root1Line(o, str, null);
-   }
-
-   public void root1Line(Object o, String str, Class cl) {
-      this.root1Line(o, str, cl, "40");
-   }
-
-   public void root1Line(Object o, Class cl, int line) {
-      root1Line(o, null, cl, String.valueOf(line));
-   }
-
-   public void root1Line(Object o, String str, Class cl, String line) {
-      if (hasFlag(FLAG_DATA_07_COLLAPSED)) {
-         this.setFlag(FLAG_DATA_07_COLLAPSED, false);
-         root1LineCollapsed(o, str, lineForCollapsed);
-      } else {
-         if (isClassLinks && cl != null) {
-            sb.append(getLevelStartChar1Line());
-            doTitlePrefix();
-            String classSimpleName = getClassSimpleName(cl);
-            this.appendClassLink(classSimpleName, line);
-            setCompact(true);
-            doTitleSuffix();
-         } else {
-            sb.append(getLevelStartChar1Line());
-            doTitlePrefix();
-            sb.append(str);
-            setCompact(true);
-            doTitleSuffix();
-         }
-      }
    }
 
    public void rootCtx(ICtx ctx, Class cl) {
@@ -1916,10 +1957,6 @@ public class Dctx implements IToStringFlags {
       flags = BitUtils.setFlag(flags, flag, v);
    }
 
-   public boolean hasFlag(int flag) {
-      return BitUtils.hasFlag(flags, flag);
-   }
-
    /**
     * Sets
     * @param ctx
@@ -2021,29 +2058,6 @@ public class Dctx implements IToStringFlags {
          ICtx ctx = (ICtx) trackedCtx.getObjectAtIndex(i);
          int refs = trackedCtx.getInt(i);
          this.nlLvl(ctx, "refs=" + refs);
-      }
-   }
-
-   public void nlLvlArrayBytes(String title, byte[] data) {
-      if (data == null) {
-         this.nl();
-         this.append(title);
-         this.append(" is null");
-      } else {
-         this.nl();
-         nlLvlArrayBytes(title, data, 0, data.length, 15);
-      }
-   }
-
-   public void nlLvlArrayBytes(String title, byte[] data, int offset, int len, int colSize) {
-      if (data == null) {
-         this.nl();
-         this.append(title);
-         this.append(" is null");
-      } else {
-         this.nl();
-         this.append(title);
-         uc.getBU().toStringBytes(this, data, offset, len, colSize);
       }
    }
 

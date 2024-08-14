@@ -103,6 +103,7 @@ public interface ICtx extends IStringable {
     */
    public boolean toString(Dctx dc, Object o);
 
+   public boolean toString1Line(Dctx dc, Object o);
    /**
     * Finds a toString match for the instance of Object.
     * If none is found inside the ctx, the {@link Dctx}

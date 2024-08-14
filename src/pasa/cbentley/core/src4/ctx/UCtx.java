@@ -355,7 +355,7 @@ public class UCtx implements ICtx, IEventsCore {
       toStringLogConfigurator.apply(configOfAppender); //apply config
 
       //String message = "Very First Log Message; Using LogConfigurator:" + toStringLogConfigurator.getClass().getName();
-      String message = "Very First Log Message; Using (" + stru.getNameClass(toStringLogConfigurator.getClass()) + ".java:40)";
+      String message = "Very First Log Message; Using (" + stru.getNameClass(toStringLogConfigurator.getClass()) + ".java:20)";
       dlog.pAlways(message, null, UCtx.class, "[" + +this.hashCode() + "]");
       dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor@360");
       dlog.pAlways("IConfigU", config, UCtx.class, "constructor@361");
@@ -379,7 +379,7 @@ public class UCtx implements ICtx, IEventsCore {
       ctxManager.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringDIDs.A_DID_OFFSET_A_UC, IToStringDIDs.A_DID_OFFSET_Z_UC);
       didManager = new DIDManager(this);
       config.toStringSetDebugUCtx(this);
-      toDLog().pInit("Created", this, UCtx.class, "aInit@378", LVL_05_FINE, true);
+      toDLog().pCreate("", this, UCtx.class, "Created@382", LVL_05_FINE, true);
       //#enddebug
    }
 
@@ -740,6 +740,12 @@ public class UCtx implements ICtx, IEventsCore {
    }
 
    public boolean toString(Dctx dctx, Object o) {
+      //we don't have any unknown object from this code module
+      //all our objects implements IStringable
+      return false;
+   }
+
+   public boolean toString1Line(Dctx dctx, Object o) {
       //we don't have any unknown object from this code module
       //all our objects implements IStringable
       return false;
