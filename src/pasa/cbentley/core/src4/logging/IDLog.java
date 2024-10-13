@@ -83,6 +83,8 @@ public interface IDLog extends IStringable {
 
    public void pStator(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
+   public void pConfig(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
    public void pEvent(String msg, Object str, Class c, String method);
 
    public void pEvent(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
@@ -99,6 +101,10 @@ public interface IDLog extends IStringable {
    public void pSoundEvent(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
    public boolean getTag(int tag);
+
+   public int levelIncrement();
+
+   public int levelDecrement();
 
    public boolean toggleTag(int tag);
 

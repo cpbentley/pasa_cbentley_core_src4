@@ -54,17 +54,6 @@ public interface IConfigU extends IConfig {
     */
    public boolean isIgnoreSettingsAll();
 
-   /**
-    * Should the code write state from {@link CtxManager}
-    * @return
-    */
-   public boolean isStatorWrite();
-
-   /**
-    * Should the code read state into {@link CtxManager}
-    * @return
-    */
-   public boolean isStatorRead();
 
    //#mdebug
    /**

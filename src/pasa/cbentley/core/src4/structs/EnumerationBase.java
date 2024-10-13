@@ -12,6 +12,8 @@ public class EnumerationBase extends ObjectU implements Enumeration {
 
    private int      num;
 
+   private int      offset;
+
    private int      currentIndex = 0;
 
    public EnumerationBase(UCtx uc) {
@@ -19,7 +21,12 @@ public class EnumerationBase extends ObjectU implements Enumeration {
    }
 
    public void setArray(Object[] ar, int size) {
+      this.setArray(ar, 0, size);
+   }
+
+   public void setArray(Object[] ar, int offset, int size) {
       this.ar = ar;
+      this.offset = offset;
       this.num = size;
    }
 
@@ -28,16 +35,15 @@ public class EnumerationBase extends ObjectU implements Enumeration {
    }
 
    public Object nextElement() {
-      return ar[currentIndex++];
+      return ar[offset + currentIndex++];
    }
-
 
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, EnumerationBase.class, 37);
       toStringPrivate(dc);
       super.toString(dc.sup());
-      
+
       dc.nlArrayRaw(ar, "array");
    }
 
@@ -48,11 +54,10 @@ public class EnumerationBase extends ObjectU implements Enumeration {
    }
 
    private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("offset", offset);
       dc.appendVarWithSpace("num", num);
       dc.appendVarWithSpace("currentIndex", currentIndex);
    }
    //#enddebug
-   
-
 
 }

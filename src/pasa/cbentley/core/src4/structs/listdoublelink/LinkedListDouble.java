@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.structs.listdoublelink;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -22,53 +23,49 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * <li>Head (oldest) -> next -> next -> Tail (newest) -> null
  * <li>Tail (newest -> previous -> previous -> Head -> null
  * 
- * Iterate from oldest to newest with
+ * <code><pre>   
+ *  //Iterate from oldest to newest with
  *  ListElement e = list.getHead();
-    while (e != null) {
-       ListElement next = e.getNext();
-       //do stuff even remove e
-       
-       e = next;
-    }
-    
- * Iterate from newest to oldest with
+ *  while (e != null) {
+ *      //do stuff here even remove e
+ *      
+ *      e = e.getNext();
+ *  }
+ *  
+ *  //Iterate from newest to oldest with
  *  ListElement e = list.getTail();
-    while (e != null) {
-       ListElement prev = e.getPrev();
-       //do stuff even remove e
-       
-       e = prev;
-    }
- * 
+ *  while (e != null) {
+ *      //do stuff on e even remove e
+ *      e = e.getPrev();
+ *  }
+ * </pre></code>
  * @author Charles Bentley
  *
  */
-public class LinkedListDouble implements IStringable {
+public class LinkedListDouble extends ObjectU implements IStringable {
 
-   ListElementHolder    empties;
+   ListElementHolder empties;
 
    /**
     * Next element is null
     * Previous element is newer
     */
-   ListElement          head;
+   ListElement       head;
 
-   int                  size;
+   int               size;
 
    /**
     * Next is older
     * Previous is null. Newest element
     */
-   ListElement          tail;
-
-   protected final UCtx uc;
+   ListElement       tail;
 
    /**
     * 
     * @param uc
     */
    public LinkedListDouble(UCtx uc) {
-      this.uc = uc;
+      super(uc);
    }
 
    /**
@@ -96,13 +93,18 @@ public class LinkedListDouble implements IStringable {
       }
    }
 
+   /**
+    * Adds an Object that is not a {@link ListElement}
+    * @param o
+    * @return
+    */
    public ListElementHolder addFreeHolder(Object o) {
       ListElementHolder leh = getFreeHolder();
       leh.setObject(o);
       return leh;
    }
 
-   public ListElementHolder getFreeHolder() {
+   private ListElementHolder getFreeHolder() {
       if (empties == null) {
          ListElementHolder leh = new ListElementHolder(this, null);
          leh.addToList();
@@ -175,6 +177,25 @@ public class LinkedListDouble implements IStringable {
       }
    }
 
+   public Object[] getArray() {
+      int size = this.getNumElements();
+      Object[] ar = new Object[size];
+      ListElement e = this.getHead();
+      int count = 0;
+      while (e != null) {
+          //do stuff even remove e
+          Object o = e;
+          if(e instanceof ListElementHolder) {
+             o = ((ListElementHolder)e).getObject();
+          }
+          ar[count]= o;
+          count++;
+          //iterate
+          e = (ListElement)e.getNext();
+      }
+
+      return ar;
+   }
    /**
     * Removes objects whose reference == object
     * @param le
@@ -220,18 +241,11 @@ public class LinkedListDouble implements IStringable {
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, LinkedListDouble.class, "@line229");
+      dc.root(this, LinkedListDouble.class, 223);
       toStringPrivate(dc);
-
+      super.toString(dc.sup());
+      
       ListElement le = getHead();
       int count = 0;
       while (le != null) {
@@ -252,23 +266,14 @@ public class LinkedListDouble implements IStringable {
       }
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, LinkedListDouble.class, 223);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("Size", size);
    }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, LinkedListDouble.class);
-      toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
-
    //#enddebug
-
 }

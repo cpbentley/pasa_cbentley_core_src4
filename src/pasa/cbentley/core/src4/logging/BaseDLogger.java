@@ -19,6 +19,19 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super(uc);
    }
 
+   private IStringable getStringable(Object str) {
+      if (str == null) {
+         return null;
+      }
+      if (str instanceof IStringable) {
+         return (IStringable) str;
+      } else {
+         return new StringableWrapper(uc, str);
+      }
+   }
+
+
+
    /**
     * This is used for quick debugging without having to change configuration of the logger.
     * <br>
@@ -51,23 +64,15 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    public void pBridge(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_19_BRIDGE, ITechTags.FLAG_19_PRINT_BRIDGE, lvl, oneLine);
    }
-
-   public void pCreate(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
-      super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_25_CREATE, ITechTags.FLAG_25_PRINT_CREATE, lvl, oneLine);
-   }
-
    public void pBridge1(String msg, Object str, Class c, String method) {
       pBridge(msg, getStringable(str), c, method, getLevelDefault(), true);
    }
-
    public void pBusiness(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_12_BUSINESS, ITechTags.FLAG_12_PRINT_BUSINESS, lvl, oneLine);
    }
-
    public void pBusiness(String msg, Object str, Class c, String method, int lvl, int flags) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_12_BUSINESS, ITechTags.FLAG_12_PRINT_BUSINESS, lvl, flags);
    }
-
    public void pBusiness1(String msg, Object str, Class c, String method) {
       pCmd(msg, getStringable(str), c, method, getLevelDefault(), true);
    }
@@ -82,6 +87,14 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
 
    public void pCmd1(String msg, Object str, Class c, String method) {
       pCmd(msg, getStringable(str), c, method, getLevelDefault(), true);
+   }
+
+   public void pConfig(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_26_CONFIG, ITechTags.FLAG_26_PRINT_CONFIG, lvl, oneLine);
+   }
+
+   public void pCreate(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_25_CREATE, ITechTags.FLAG_25_PRINT_CREATE, lvl, oneLine);
    }
 
    public void pData(String msg, Object str, Class c, String method) {
@@ -178,17 +191,6 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_09_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, oneLine);
    }
 
-   private IStringable getStringable(Object str) {
-      if (str == null) {
-         return null;
-      }
-      if (str instanceof IStringable) {
-         return (IStringable) str;
-      } else {
-         return new StringableWrapper(uc, str);
-      }
-   }
-
    public void pFlow(String msg, Object str, Class c, String method, int lvl, int flags) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_09_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, flags);
    }
@@ -215,6 +217,10 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
 
    public void pInitBig(String msg, Object str, Class c, String method) {
       super.ptPrintBig(msg, getStringable(str), c, method, ITechTags.STRING_20_INIT, ITechTags.FLAG_20_PRINT_INIT, getLevelDefault());
+   }
+
+   public void pLoop(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_28_LOOP, ITechTags.FLAG_28_PRINT_LOOP, lvl, oneLine);
    }
 
    public void pMemory(String msg, Object str, Class c, String method) {
@@ -248,6 +254,10 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
 
    public void pNull(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_02_NULL, ITechTags.FLAG_02_PRINT_NULL, lvl, oneLine);
+   }
+
+   public void pSimulation(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_27_SIMULATION, ITechTags.FLAG_27_PRINT_SIMULATION, lvl, oneLine);
    }
 
    public void pSound(String msg, Object str, Class c, String method) {

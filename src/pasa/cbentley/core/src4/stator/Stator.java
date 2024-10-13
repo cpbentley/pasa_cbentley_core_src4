@@ -18,38 +18,50 @@ import pasa.cbentley.core.src4.structs.IntToInts;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 
 /**
+ * Controls the reading and writing of application state.
+ * 
+ * <li> {@link StatorWriter} to write
+ * <li> {@link StatorReader} to read.
+ * 
+ * A single stator is used so that object references are not duplicated. Writers share the same {@link Stator}
  * 
  * @author Charles Bentley
  *
  */
 public class Stator extends ObjectU implements IStringable, ITechStator {
 
-   private StatorReader   activeReader;
+   private static final int MODE_0_ANY         = 0;
 
-   private StatorWriter   activeWriter;
+   private static final int MODE_1_ACTIVE_ONLY = 1;
 
-   private boolean        isFailed;
+   private StatorReader     activeReader;
 
-   private BasicPrefs     prefs;
+   private StatorWriter     activeWriter;
 
-   private StatorReader[] readers;
+   private boolean          isFailed;
+
+   private int              mode;
+
+   private BasicPrefs       prefs;
+
+   private StatorReader[]   readers;
 
    /**
     * Holds references of {@link IStatorable} 
     */
-   protected IntToObjects references;
+   protected IntToObjects   references;
 
    /**
     * 
     */
-   protected IntToInts    referencesPointers;
+   protected IntToInts      referencesPointers;
 
    /**
     * When it was created
     */
-   private long           timestamp;
+   private long             timestamp;
 
-   private StatorWriter[] writers;
+   private StatorWriter[]   writers;
 
    public Stator(UCtx uc) {
       super(uc);
@@ -82,7 +94,25 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
    }
 
    public StatorWriter getActiveWriter() {
+      if (activeWriter == null) {
+         //default writer is
+         getWriter(TYPE_0_MASTER);
+      }
       return activeWriter;
+   }
+
+   public void setActiveReader(StatorReader reader) {
+      if (reader.getStator() != this) {
+         throw new IllegalArgumentException();
+      }
+      this.activeReader = reader;
+   }
+
+   public void setActiveWriter(StatorWriter sw) {
+      if (sw.getStator() != this) {
+         throw new IllegalArgumentException();
+      }
+      this.activeWriter = sw;
    }
 
    private BasicPrefs getKeyValuePairs() {
@@ -249,7 +279,7 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
       }
    }
 
-   public void setActiveReaderWith(BADataIS dis) {
+   public void setTempActiveReaderWith(BADataIS dis) {
       StatorReader createReader = createReader(TYPE_5_TEMP_CONTAINER);
       createReader.init(dis);
       this.activeReader = createReader;
@@ -258,7 +288,7 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
    public void setActiveReaderWith(byte[] dataCtx, int offset, int length) {
       BAByteIS in = new BAByteIS(uc, dataCtx, offset, length);
       BADataIS dis = new BADataIS(uc, in);
-      setActiveReaderWith(dis);
+      setTempActiveReaderWith(dis);
    }
 
    /**
@@ -270,9 +300,29 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
       this.activeWriter = createWriter(TYPE_5_TEMP_CONTAINER);
    }
 
+   public StatorWriter setAndGetActiveWriteTemp() {
+      this.activeWriter = createWriter(TYPE_5_TEMP_CONTAINER);
+      return this.activeWriter;
+   }
+
+   public StatorReader setAndGetActiveReaderTemp() {
+
+      this.activeReader = createReader(TYPE_5_TEMP_CONTAINER);
+      return this.activeReader;
+   }
+
    public void setFailedTrue() {
       isFailed = true;
    }
+
+   public void setModeActiveOnly() {
+      mode = MODE_1_ACTIVE_ONLY;
+   }
+
+   public void setModeAny() {
+      mode = MODE_0_ANY;
+   }
+   //#enddebug
 
    public void setTimestamp(long timestamp) {
       this.timestamp = timestamp;
@@ -317,7 +367,5 @@ public class Stator extends ObjectU implements IStringable, ITechStator {
    private void toStringPrivate(Dctx dc) {
 
    }
-
-   //#enddebug
 
 }

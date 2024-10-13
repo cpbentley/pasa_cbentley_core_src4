@@ -67,8 +67,11 @@ public class SystemOutAppender extends BaseAppender {
       //first enter message. format is hard coded
       String tagString = entry.getTagString();
       sb.append(tagString);
+      if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_07_LEVEL)) {
+         sb.append(" " + entry.getLevel() + " ");
+      }
       if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
-         sb.append("[" + entry.getThreadName() + "]");
+         sb.append(" [" + entry.getThreadName() + "]");
       }
       int extraSpaces = sb.getCount() - count;
       sb.tab();

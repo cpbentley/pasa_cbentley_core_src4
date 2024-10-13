@@ -24,10 +24,6 @@ public abstract class ConfigAbstract implements IConfig {
 
    protected boolean        isIgnoreSettings;
 
-   protected boolean        isStatorRead;
-
-   protected boolean        isStatorWrite;
-
    protected UCtx           uc;
 
    private ILogConfigurator logConfigurator;
@@ -57,21 +53,6 @@ public abstract class ConfigAbstract implements IConfig {
       return false;
    }
 
-   /**
-    * Sets to false to stop state writing when exiting 
-    * @return
-    */
-   public boolean isStatorWrite() {
-      return isStatorWrite;
-   }
-
-   /**
-    * Sets to false to stop state reading 
-    * @return
-    */
-   public boolean isStatorRead() {
-      return isStatorRead;
-   }
 
    /**
     * Ignores the saved settings
@@ -107,18 +88,12 @@ public abstract class ConfigAbstract implements IConfig {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ConfigAbstract.class, 54);
+      dc.root(this, ConfigAbstract.class, 91);
       toStringPrivate(dc);
-
-      dc.appendVarWithNewLine("isStatorRead", isStatorRead);
-      dc.appendVarWithSpace("isStatorWrite", isStatorWrite);
-
-      dc.nl();
-      if (logConfigurator == null) {
-         dc.append("LogConfigurator is null");
-      } else {
-         dc.append("LogConfigurator is (" + uc.getStrU().getNameClass(logConfigurator.getClass()) + ".java:40)");
-      }
+      dc.appendVarWithNewLine("hashcode", this.hashCode());
+      dc.appendVarWithNewLine("isEraseSettings", isEraseSettings);
+      dc.appendVarWithNewLine("isIgnoreSettings", isIgnoreSettings);
+      dc.appendClassNameWithNewLine("logConfigurator", logConfigurator);
    }
 
    public String toString1Line() {
@@ -128,6 +103,8 @@ public abstract class ConfigAbstract implements IConfig {
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, ConfigAbstract.class, 126);
       toStringPrivate(dc);
+      dc.appendVarWithSpace("isEraseSettings", isEraseSettings);
+      dc.appendVarWithSpace("isIgnoreSettings", isIgnoreSettings);
    }
 
    public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {
@@ -151,8 +128,7 @@ public abstract class ConfigAbstract implements IConfig {
    }
 
    private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("isEraseSettings", isEraseSettings);
-      dc.appendVarWithSpace("isIgnoreSettings", isIgnoreSettings);
+    
    }
 
    //#enddebug

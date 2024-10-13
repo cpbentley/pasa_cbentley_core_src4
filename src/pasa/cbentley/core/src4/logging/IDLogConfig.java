@@ -50,6 +50,7 @@ public interface IDLogConfig extends IStringable, ITechConfig {
 
    public boolean isClassNegative(Class c);
 
+   public int getLevel();
    /**
     * 
     */
@@ -99,6 +100,7 @@ public interface IDLogConfig extends IStringable, ITechConfig {
     * <li> {@link ITechConfig#FORMAT_FLAG_04_THREAD}
     * <li> {@link ITechConfig#FORMAT_FLAG_05_TIMESTAMP}
     * <li> {@link ITechConfig#FORMAT_FLAG_06_BIG}
+    * <li> {@link ITechConfig#FORMAT_FLAG_07_LEVEL}
     * @param flag
     * @param b
     */

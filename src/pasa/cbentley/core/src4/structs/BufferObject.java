@@ -4,6 +4,8 @@
  */
 package pasa.cbentley.core.src4.structs;
 
+import java.util.Enumeration;
+
 import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -228,6 +230,12 @@ public class BufferObject extends ObjectU implements IStringable {
       }
       return null;
    }
+   
+   public Enumeration getEnumeration() {
+      EnumerationBase eb = new EnumerationBase(uc);
+      eb.setArray(objects, offset, count);
+      return eb;
+   }
 
    /**
     * Returns the reference to the integer array. This mean the int[0] still means the number of elements.
@@ -263,6 +271,11 @@ public class BufferObject extends ObjectU implements IStringable {
       return count;
    }
 
+   /**
+    * 
+    * @param o
+    * @return -1 if not found
+    */
    public int getObjectIndex(Object o) {
       int start = this.offset;
       int end = start + count;

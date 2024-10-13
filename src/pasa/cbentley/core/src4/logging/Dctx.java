@@ -72,7 +72,7 @@ public class Dctx implements IToStringFlags {
 
    private boolean        isLineNumbers   = true;
 
-   private int lineForCollapsed;
+   private int            lineForCollapsed;
 
    private char[]         linesArray      = new char[] { '│', '↑', '║', '↓', '├' };
 
@@ -481,6 +481,31 @@ public class Dctx implements IToStringFlags {
       sb.append(String.valueOf(v));
    }
 
+   public void appendVarWithNewLine(String s, Class cl) {
+      nl();
+      sb.append(s);
+      sb.append('=');
+      sb.append(getClassSimpleName(cl));
+   }
+   
+   public void appendClassNameWithNewLine(String s, Object cl) {
+      nl();
+      sb.append(s);
+      sb.append('=');
+      if(cl == null) {
+         sb.append("null");
+      } else {
+         sb.append(getClassSimpleName(cl.getClass()));
+      }
+   }
+
+   public void appendVarWithSpace(String s, Class cl) {
+      sb.append(' ');
+      sb.append(s);
+      sb.append('=');
+      sb.append(getClassSimpleName(cl));
+   }
+
    public void appendVarWithSpace(String s, double v) {
       sb.append(' ');
       sb.append(s);
@@ -715,7 +740,7 @@ public class Dctx implements IToStringFlags {
    }
 
    private String getClassSimpleName(Class cl) {
-      if(cl == null) {
+      if (cl == null) {
          return null;
       }
       StringUtils strU = uc.getStrU();
@@ -1793,7 +1818,7 @@ public class Dctx implements IToStringFlags {
    public void root1Line(Object o, String str, Class cl) {
       this.root1Line(o, str, cl, "40");
    }
-   
+
    public void root1Line(Object o, String str, String classSimpleName, String line) {
       if (hasFlag(FLAG_DATA_07_COLLAPSED)) {
          this.setFlag(FLAG_DATA_07_COLLAPSED, false);
@@ -1805,7 +1830,7 @@ public class Dctx implements IToStringFlags {
             this.appendClassLink(classSimpleName, line);
             setCompact(true);
             doTitleSuffix();
-            if(str != classSimpleName) {
+            if (str != classSimpleName) {
                sb.append(str);
             }
          } else {
@@ -1817,6 +1842,7 @@ public class Dctx implements IToStringFlags {
          }
       }
    }
+
    public void root1Line(Object o, String str, Class cl, String line) {
       this.root1Line(o, str, getClassSimpleName(cl), line);
    }

@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.structs;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
@@ -32,7 +33,7 @@ import pasa.cbentley.core.src4.utils.IntUtils;
  * @author Charles Bentley
  *
  */
-public class IntToInts implements IStringable {
+public class IntToInts extends ObjectU implements IStringable {
 
    public static final int GROW_INT_DEFAULT                   = 2;
 
@@ -66,8 +67,6 @@ public class IntToInts implements IStringable {
 
    private int             type                               = 0;
 
-   private UCtx            uc;
-
    /**
     * Returns {@link Integer#MAX_VALUE} when key not found.
     */
@@ -84,7 +83,7 @@ public class IntToInts implements IStringable {
    }
 
    public IntToInts(UCtx uc, int type, int growInt, boolean ex, int rv, int initBufSize) {
-      this.uc = uc;
+      super(uc);
       this.type = type;
       this.growInt = growInt;
       ints = new int[1 + initBufSize];
@@ -351,13 +350,11 @@ public class IntToInts implements IStringable {
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "IntToInts");
+      dc.root(this, IntToInts.class, 356);
       toStringPrivate(dc);
+      super.toString(dc.sup());
+      
       dc.append("Type=" + type);
       dc.append(" ");
       int len = ints[0] * 2 + 1;
@@ -370,22 +367,16 @@ public class IntToInts implements IStringable {
       }
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, IntToInts.class, 356);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("pairs=", ints[0]);
    }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "IntToInts");
-      toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
    //#enddebug
+   
 
 }

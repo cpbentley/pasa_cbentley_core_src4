@@ -9,20 +9,6 @@ import pasa.cbentley.core.src4.interfaces.ITech;
 
 public interface ITechConfig extends ITech {
 
-   public static final String STRING_F_01_ACCEPTED                  = "Accepted";
-
-   public static final String STRING_F_02_1LINE                     = "1line";
-
-   public static final String STRING_F_03_STACK                     = "Stack";
-
-   public static final String STRING_F_04_THREAD                    = "Thread";
-
-   public static final String STRING_F_05_TIMESTAMP                 = "Timestamp";
-
-   public static final String STRING_F_06_BIG                       = "Big";
-
-   public static final String STRING_F_08_OWNER_NAME                = "OwnerName";
-
    /**
     * ?
     */
@@ -49,16 +35,19 @@ public interface ITechConfig extends ITech {
     */
    public static final int    FORMAT_FLAG_05_TIMESTAMP              = 1 << 4;
 
+   public static final int    FORMAT_FLAG_06_BIG                    = 1 << 5;
+
+   /**
+    * Show the Log Level 
+    */
+   public static final int    FORMAT_FLAG_07_LEVEL                  = 1 << 6;
+
    /**
     * Shows in front before line number
     * 
     * usefull when several different {@link UCtx} writing to System.out
     */
    public static final int    FORMAT_FLAG_08_OWNER_NAME             = 1 << 7;
-
-   public static final int    FORMAT_FLAG_06_BIG                    = 1 << 5;
-
-   public static final int    FORMAT_FLAG_07_                       = 1 << 6;
 
    /**
     * Lever to block all print. Ignores all other flags except {@link IDLog#MASTER_FLAG_02_OPEN_ALL_PRINT}
@@ -124,6 +113,11 @@ public interface ITechConfig extends ITech {
    public static final int    MASTER_FLAG_08_OPEN_ALL_BUT_FALSE     = 1 << 7;
 
    /**
+    * Check the {@link IStringable} class for positives or negatives
+    */
+   public static final int    MASTER_FLAG_09_TREAT_STRINGABLE_CLASS = 1 << 8;
+
+   /**
     * Name of UCt in front
     */
    public static final int    MASTER_FLAG_10_OWNER_NAME_UC          = 1 << 9;
@@ -133,10 +127,21 @@ public interface ITechConfig extends ITech {
     */
    public static final int    MASTER_FLAG_11_IGNORES_BIGS           = 1 << 10;
 
-   /**
-    * Check the {@link IStringable} class for positives or negatives
-    */
-   public static final int    MASTER_FLAG_09_TREAT_STRINGABLE_CLASS = 1 << 8;
+   public static final String STRING_F_01_ACCEPTED                  = "Accepted";
+
+   public static final String STRING_F_02_1LINE                     = "1line";
+
+   public static final String STRING_F_03_STACK                     = "Stack";
+
+   public static final String STRING_F_04_THREAD                    = "Thread";
+
+   public static final String STRING_F_05_TIMESTAMP                 = "Timestamp";
+
+   public static final String STRING_F_06_BIG                       = "Big";
+
+   public static final String STRING_F_07_LEVEL                     = "Level";
+
+   public static final String STRING_F_08_OWNER_NAME                = "OwnerName";
 
    public static final String STRING_M_01_BLOCK_ALL_PRINT           = "BlockAll";
 

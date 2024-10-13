@@ -47,6 +47,57 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
    }
 
    /**
+    * Applied On all Appenders
+    * Applied on All Appenders that accept changes. Some appenders may be configured to keep everything.
+    */
+   public int levelDecrement() {
+      ILogEntryAppender[] appenders = getAppenders();
+      int max = LVL_10_SEVERE;
+      for (int i = 0; i < appenders.length; i++) {
+         ILogEntryAppender appender = appenders[i];
+         int newLevel = levelIncrement(appender);
+         if (newLevel < max) {
+            max = newLevel;
+         }
+      }
+      return max;
+   }
+
+   public int levelDecrement(ILogEntryAppender appender) {
+      int currentLevel = appender.getConfig().getLevel();
+      if (currentLevel > LVL_02_FINE_EXTRA) {
+         currentLevel--;
+         appender.getConfig().setLevelGlobal(currentLevel);
+      }
+      return currentLevel;
+   }
+
+   public int levelIncrement(ILogEntryAppender appender) {
+      int currentLevel = appender.getConfig().getLevel();
+      if (currentLevel < LVL_10_SEVERE) {
+         currentLevel++;
+         appender.getConfig().setLevelGlobal(currentLevel);
+      }
+      return currentLevel;
+   }
+
+   /**
+    * Applied on All Appenders that accept changes. Some appenders may be configured to keep everything.
+    */
+   public int levelIncrement() {
+      ILogEntryAppender[] appenders = getAppenders();
+      int minimum = LVL_02_FINE_EXTRA;
+      for (int i = 0; i < appenders.length; i++) {
+         ILogEntryAppender appender = appenders[i];
+         int newLevel = levelIncrement(appender);
+         if (newLevel > minimum) {
+            minimum = newLevel;
+         }
+      }
+      return minimum;
+   }
+
+   /**
     * Array of non null appenders
     * @return
     */

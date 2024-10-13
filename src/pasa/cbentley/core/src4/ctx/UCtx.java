@@ -30,6 +30,7 @@ import pasa.cbentley.core.src4.logging.IDLogConfig;
 import pasa.cbentley.core.src4.logging.ILogConfigurator;
 import pasa.cbentley.core.src4.logging.ILogEntryAppender;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.logging.IUserLog;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 import pasa.cbentley.core.src4.logging.UserLogSystemOut;
@@ -358,7 +359,7 @@ public class UCtx implements ICtx, IEventsCore {
       String message = "Very First Log Message; Using (" + stru.getNameClass(toStringLogConfigurator.getClass()) + ".java:20)";
       dlog.pAlways(message, null, UCtx.class, "[" + +this.hashCode() + "]");
       dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor@360");
-      dlog.pAlways("IConfigU", config, UCtx.class, "constructor@361");
+      dlog.pConfig("IConfigU", config, UCtx.class, "constructor@361", ITechLvl.LVL_05_FINE, false);
       //#enddebug
 
       //this is not for debug purposes. its the application log for the application user.

@@ -85,18 +85,25 @@ public abstract class ACtx implements ICtx {
 
    public ACtx(IConfig config, UCtx uc, CtxManager cm) {
       this.config = config;
+
+     
       this.uc = uc;
       this.cm = cm;
 
       id = cm.registerCtx(this);
-      
+
       //#mdebug
       ILogConfigurator logConfig = uc.toStringGetLogConfigurator();
-      if(logConfig instanceof ILogConfiguratorCtx) {
-         ((ILogConfiguratorCtx)logConfig).configureCtx(this);
+      if (logConfig instanceof ILogConfiguratorCtx) {
+         ((ILogConfiguratorCtx) logConfig).configureCtx(this);
       }
       //#enddebug
       
+      //#mdebug
+      String str = uc.getStrU().getNameObjectClass(this);
+      toDLog().pConfig("for (" + str+ ").java", config, ACtx.class, "ACtx@103", LVL_03_FINEST, false);
+      //#enddebug
+
    }
 
    public IConfig getConfig() {
@@ -159,7 +166,7 @@ public abstract class ACtx implements ICtx {
     * @param key.. a key
     */
    public int getStaticKeyRegistrationID(int type, int key) {
-      throw new RuntimeException("class must implement getStaticKeyRegistrationID "+ getClass().getName());
+      throw new RuntimeException("class must implement getStaticKeyRegistrationID " + getClass().getName());
    }
 
    /**
@@ -168,7 +175,6 @@ public abstract class ACtx implements ICtx {
    public IStatorFactory getStatorFactory() {
       return null;
    }
-
 
    /**
     * 
@@ -221,7 +227,7 @@ public abstract class ACtx implements ICtx {
    public boolean toString(Dctx dctx, Object o) {
       return false;
    }
-   
+
    public boolean toString1Line(Dctx dctx, Object o) {
       return false;
    }
@@ -239,7 +245,7 @@ public abstract class ACtx implements ICtx {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, ACtx.class);
+      dc.root1Line(this, ACtx.class, 248);
       toStringPrivate(dc);
    }
 

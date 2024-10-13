@@ -60,10 +60,126 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
    }
 
    public void checkInt(int v) {
-      int i = readInt();
+      int i = dataReadInt();
       if (i != v) {
          throw new IllegalArgumentException(v + "!=" + i);
       }
+   }
+
+   public int dataReadInt() {
+      return getReader().readInt();
+   }
+
+   public Object dataReadObject() {
+      return dataReadObject(null, null);
+   }
+
+   /**
+    * Faster link with {@link ICtx}
+    * @param ctx
+    * @return
+    */
+   public Object dataReadObject(ICtx ctx) {
+      return dataReadObject(ctx, null);
+   }
+
+   /**
+    * Inverse of {@link StatorWriter#dataWriterToStatorable(IStatorable)}
+    * @param ctx
+    * @param currentInstance
+    * @return
+    */
+   public Object dataReadObject(ICtx ctx, Object currentInstance) {
+      int magicToken = reader.readInt();
+      if (magicToken == MAGIC_WORD_OBJECT_NULL) {
+         return null;
+      } else if (magicToken == MAGIC_WORD_OBJECT_POINTER) {
+         //when pointer
+         int objectID = reader.readInt();
+         IStatorable o = (IStatorable) map.getObjectAtIndex(objectID);
+         if (o == null) {
+            throw new IllegalArgumentException("Could not find objectID" + objectID + " for");
+         }
+         //sanity check
+         if (currentInstance != null) {
+            //it must be euaql
+            if (currentInstance != map.getObjectAtIndex(objectID)) {
+               throw new IllegalArgumentException();
+            }
+         }
+         return o;
+      } else if (magicToken == MAGIC_WORD_OBJECT) {
+         //index written
+         int objectID = reader.readInt();
+         if (objectID >= mapMax) {
+            throw new IllegalArgumentException(" objectID " + objectID + " > mapMax " + mapMax);
+         }
+         int ctxID = reader.readInt();
+         int classID = reader.readInt();
+         IStatorable o = (IStatorable) map.getObjectAtIndex(objectID);
+         if (o != null) {
+            return o;
+         } else {
+            if (currentInstance != null) {
+               //no need to create it.. keep the same reference
+               ((IStatorable) currentInstance).stateReadFrom(this);
+               //set the index for future calls
+               map.setObject(currentInstance, objectID);
+               return currentInstance;
+            } else {
+               if (ctx == null) {
+                  ctx = stator.getUC().getCtxManager().getCtx(ctxID);
+                  if (ctx == null) {
+                     throw new IllegalArgumentException("No Ctx for ctxID=" + ctxID);
+                  }
+               }
+               IStatorFactory fac = ctx.getStatorFactory();
+               if (fac == null) {
+                  manageErrorNullFactory(ctxID, classID, ctx);
+               }
+               o = (IStatorable) fac.createObject(this, classID);
+               if (o == null) {
+                  manageErrorNullObject(ctxID, classID, ctx, fac);
+               }
+               //set it before reading because stateRead might need it because of a child parent link.
+               map.setObject(o, objectID);
+
+               o.stateReadFrom(this);
+               return o;
+            }
+         }
+      } else {
+         throw new IllegalArgumentException("Bad Magic Word when reading Object");
+      }
+   }
+
+   /**
+    * Finds the ctx thx to the ctx id written
+    * @param currentInstance
+    * @return
+    */
+   public Object dataReadObject(Object currentInstance) {
+      return dataReadObject(null, currentInstance);
+   }
+
+   public void dataReadStatorOwner(IStatorOwner statorOwner) {
+      // TODO Auto-generated method stub
+
+   }
+
+   /**
+    * Reads what was written with {@link StatorWriter#dataWriteStatorOwnerMono(IStatorOwner)}
+    * @param statorOwner
+    */
+   public void dataReadStatorOwnerMono(IStatorOwner statorOwner) {
+      //configure stator with a new active reader
+      int magic = reader.readInt();
+      if(magic != MAGIC_WORD_MONO) {
+         throw new IllegalArgumentException();
+      }
+      stator.setTempActiveReaderWith(reader);
+      //now tell the owner to read the data
+      statorOwner.stateOwnerRead(stator);
    }
 
    public int getNumObjects() {
@@ -144,10 +260,14 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
     */
    public void init(BADataIS dis) {
       mapMax = dis.readInt();
+      //we cannot trust any data
+      if (mapMax < 0 || mapMax > 1000) {
+         throw new IllegalArgumentException("bad mapMax=" + mapMax);
+      }
       map = new IntToObjects(uc, mapMax);
       int ctrlInt = dis.read();
       //now the actual reader
-      if (ctrlInt == 1) {
+      if (ctrlInt == MAGIC_1_WRITER) {
          this.reader = dis.readIs();
       } else {
          //badly constructed
@@ -180,7 +300,7 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
     * When null, cannot do anything
     * 
     * <p>
-    * Inverse of {@link StatorWriter#writerToStatorable(IStatorable)}
+    * Inverse of {@link StatorWriter#dataWriterToStatorable(IStatorable)}
     * </p>
     * @param statorable
     */
@@ -201,102 +321,6 @@ public class StatorReader extends ObjectU implements IStringable, ITechStator {
          throw new IllegalArgumentException();
       }
 
-   }
-
-   public int readInt() {
-      return getReader().readInt();
-   }
-
-   public Object readObject() {
-      return readObject(null, null);
-   }
-
-   /**
-    * Faster link with {@link ICtx}
-    * @param ctx
-    * @return
-    */
-   public Object readObject(ICtx ctx) {
-      return readObject(ctx, null);
-   }
-
-   /**
-    * Inverse of {@link StatorWriter#writerToStatorable(IStatorable)}
-    * @param ctx
-    * @param currentInstance
-    * @return
-    */
-   public Object readObject(ICtx ctx, Object currentInstance) {
-      int magicToken = reader.readInt();
-      if (magicToken == MAGIC_WORD_OBJECT_NULL) {
-         return null;
-      } else if (magicToken == MAGIC_WORD_OBJECT_POINTER) {
-         //when pointer
-         int objectID = reader.readInt();
-         IStatorable o = (IStatorable) map.getObjectAtIndex(objectID);
-         if (o == null) {
-            throw new IllegalArgumentException("Could not find objectID" + objectID + " for");
-         }
-         //sanity check
-         if (currentInstance != null) {
-            //it must be euaql
-            if (currentInstance != map.getObjectAtIndex(objectID)) {
-               throw new IllegalArgumentException();
-            }
-         }
-         return o;
-      } else if (magicToken == MAGIC_WORD_OBJECT) {
-         //index written
-         int objectID = reader.readInt();
-         if (objectID >= mapMax) {
-            throw new IllegalArgumentException(" objectID " + objectID + " > mapMax " + mapMax);
-         }
-         int ctxID = reader.readInt();
-         int classID = reader.readInt();
-         IStatorable o = (IStatorable) map.getObjectAtIndex(objectID);
-         if (o != null) {
-            return o;
-         } else {
-            if (currentInstance != null) {
-               //no need to create it.. keep the same reference
-               ((IStatorable) currentInstance).stateReadFrom(this);
-               //set the index for future calls
-               map.setObject(currentInstance, objectID);
-               return currentInstance;
-            } else {
-               if (ctx == null) {
-                  ctx = stator.getUC().getCtxManager().getCtx(ctxID);
-                  if (ctx == null) {
-                     throw new IllegalArgumentException("No Ctx for ctxID=" + ctxID);
-                  }
-               }
-               IStatorFactory fac = ctx.getStatorFactory();
-               if (fac == null) {
-                  manageErrorNullFactory(ctxID, classID, ctx);
-               }
-               o = (IStatorable) fac.createObject(this, classID);
-               if (o == null) {
-                  manageErrorNullObject(ctxID, classID, ctx, fac);
-               }
-               //set it before reading because stateRead might need it because of a child parent link.
-               map.setObject(o, objectID);
-
-               o.stateReadFrom(this);
-               return o;
-            }
-         }
-      } else {
-         throw new IllegalArgumentException();
-      }
-   }
-
-   /**
-    * Finds the ctx thx to the ctx id written
-    * @param currentInstance
-    * @return
-    */
-   public Object readObject(Object currentInstance) {
-      return readObject(null, currentInstance);
    }
 
    public int readStartIndex() {

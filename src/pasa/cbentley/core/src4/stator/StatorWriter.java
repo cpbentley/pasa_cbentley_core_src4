@@ -38,6 +38,8 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  */
 public class StatorWriter extends ObjectU implements IStringable, ITechStator {
 
+   private int          countBytesStart;
+
    private int          flags;
 
    private Stator       stator;
@@ -60,6 +62,105 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       table = new IntToInts(uc);
       writtenObjects = new IntToObjects(uc);
       writer = uc.createNewBADataOS();
+   }
+
+   public int countBytesEnd() {
+      int bytes = writer.size() - countBytesStart;
+      return bytes;
+   }
+
+   public void countBytesStart() {
+      countBytesStart = writer.size();
+   }
+
+   public void dataWriteByteArray(byte[] d) {
+      writer.write(d);
+   }
+
+   public void dataWriteInt(int v) {
+      writer.writeInt(v);
+   }
+
+   /**
+    * Called when a {@link IStatorable} asks its {@link IStatorable} children to writeselves.
+    * 
+    * The Parent knows which type of {@link StatorWriter} to use.
+    * Preferred method to use.. it also to deal with null and to see whether that object
+    * reference has already been written to this {@link StatorWriter}.
+    * <br>
+    * You should not use directly {@link IStatorable#stateWriteTo(StatorWriter)}
+    * 
+    * <p>
+    * Inverse of {@link StatorReader#readerToStatorable(IStatorable)}
+    * </p>
+    * @param statorable
+    */
+   public void dataWriterToStatorable(IStatorable statorable) {
+      BADataOS dataWriter = getWriter();
+      if (statorable == null) {
+         dataWriter.writeInt(MAGIC_WORD_OBJECT_NULL);
+      } else {
+         int index = writtenObjects.findObjectRef(statorable);
+         if (index == -1) {
+            getWriter().writeInt(MAGIC_WORD_OBJECT);
+
+            //create a new one
+            int objectID = writtenObjects.nextempty;
+            writtenObjects.add(statorable);
+            getWriter().writeInt(objectID);
+            ICtx ctxOwner = statorable.getCtxOwner();
+            int ctxID = ctxOwner.getCtxID();
+            getWriter().writeInt(ctxID);
+            int classID = statorable.getStatorableClassID();
+            //sanity check if factory supports that class
+            IStatorFactory statorFactory = ctxOwner.getStatorFactory();
+            if (statorFactory == null) {
+               throw new IllegalArgumentException("No Factory for " + statorable.getClass().getName() + " Ctx:" + ctxOwner.getClass().getName());
+            }
+            if (!statorFactory.isSupported(statorable)) {
+               throw new IllegalArgumentException("Bad getCtxOwner for " + statorable.getClass().getName() + " != " + statorFactory.getClass().getName());
+            }
+
+            getWriter().writeInt(classID);
+            //now ask the statorable to write its object and children
+            statorable.stateWriteTo(this);
+         } else {
+            //write object id
+            getWriter().writeInt(MAGIC_WORD_OBJECT_POINTER);
+            getWriter().writeInt(index);
+         }
+      }
+   }
+
+   public void dataWriteStartIndex(int len) {
+      writer.writeInt(len);
+   }
+
+
+
+   /**
+    * Write {@link IStatorOwner} as a unit to this writer.
+    * 
+    * So that it can be read by {@link StatorReader#dataReadStatorOwnerMono(IStatorOwner)}
+    * @param statorOwner
+    */
+   public void dataWriteStatorOwnerMono(IStatorOwner statorOwner) {
+      
+      //save active because we are replacing it witha temporary
+      StatorWriter activePrevious = stator.getActiveWriter();
+
+      activePrevious.dataWriteInt(MAGIC_WORD_MONO);
+      
+      //temporarily write
+      StatorWriter statorWriterTemp = stator.setAndGetActiveWriteTemp();
+      //stator flag that we need to compartimalize here
+      stator.setModeActiveOnly();
+      statorOwner.stateOwnerWrite(stator);
+      stator.setModeAny();
+      statorWriterTemp.serializeData(writer);
+      
+      
+      stator.setActiveWriter(activePrevious);
    }
 
    public int getBytesWritten() {
@@ -108,6 +209,7 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       return out.getByteCopy();
    }
 
+  
    /**
     * Inverse of {@link StatorReader#init(BADataIS)}
     * @param out
@@ -118,10 +220,10 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       out.writeInt(sizeObjects); //max number of objects
 
       if (writer != null) {
-         out.write(1);
+         out.write(MAGIC_1_WRITER);
          out.writeOS(writer);
       } else {
-         out.write(0);
+         out.write(MAGIC_0_NO_WRITER);
       }
    }
 
@@ -149,7 +251,6 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       dc.nlLvl(stator, "stator");
    }
 
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, StatorWriter.class);
       toStringPrivate(dc);
@@ -160,67 +261,5 @@ public class StatorWriter extends ObjectU implements IStringable, ITechStator {
       dc.appendVarWithSpace("type", type);
    }
    //#enddebug
-   
-   
-   public void writeInt(int v) {
-      writer.writeInt(v);
-   }
-
-   /**
-    * Called when a {@link IStatorable} asks its {@link IStatorable} children to writeselves.
-    * 
-    * The Parent knows which type of {@link StatorWriter} to use.
-    * Preferred method to use.. it also to deal with null and to see whether that object
-    * reference has already been written to this {@link StatorWriter}.
-    * <br>
-    * You should not use directly {@link IStatorable#stateWriteTo(StatorWriter)}
-    * 
-    * <p>
-    * Inverse of {@link StatorReader#readerToStatorable(IStatorable)}
-    * </p>
-    * @param statorable
-    */
-   public void writerToStatorable(IStatorable statorable) {
-      BADataOS dataWriter = getWriter();
-      if (statorable == null) {
-         dataWriter.writeInt(MAGIC_WORD_OBJECT_NULL);
-      } else {
-         int index = writtenObjects.findObjectRef(statorable);
-         if (index == -1) {
-            getWriter().writeInt(MAGIC_WORD_OBJECT);
-
-            //create a new one
-            int objectID = writtenObjects.nextempty;
-            writtenObjects.add(statorable);
-            getWriter().writeInt(objectID);
-            ICtx ctxOwner = statorable.getCtxOwner();
-            int ctxID = ctxOwner.getCtxID();
-            getWriter().writeInt(ctxID);
-            int classID = statorable.getStatorableClassID();
-            //sanity check if factory supports that class
-            IStatorFactory statorFactory = ctxOwner.getStatorFactory();
-            if (statorFactory == null) {
-               throw new IllegalArgumentException("No Factory for " + statorable.getClass().getName() + " Ctx:" + ctxOwner.getClass().getName());
-            }
-            if (!statorFactory.isSupported(statorable)) {
-               throw new IllegalArgumentException("Bad getCtxOwner for " + statorable.getClass().getName() + " != " + statorFactory.getClass().getName());
-            }
-
-            getWriter().writeInt(classID);
-            //now ask the statorable to write its object and children
-            statorable.stateWriteTo(this);
-         } else {
-            //write object id
-            getWriter().writeInt(MAGIC_WORD_OBJECT_POINTER);
-            getWriter().writeInt(index);
-         }
-      }
-   }
-
-   public void writeStartIndex(int len) {
-      writer.writeInt(len);
-   }
-
-
 
 }

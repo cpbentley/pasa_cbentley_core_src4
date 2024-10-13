@@ -135,15 +135,23 @@ public class ConfigUSettable implements IConfigU {
    public void toString(Dctx dc) {
       dc.root(this, ConfigUSettable.class, 136);
       toStringPrivate(dc);
-      dc.appendVarWithSpace("isEraseSettings", isEraseSettings);
-      dc.appendVarWithSpace("isEraseSettingsAll", isEraseSettingsAll);
-      dc.appendVarWithSpace("isStatorRead", isStatorRead);
-      dc.appendVarWithSpace("isStatorWrite", isStatorWrite);
-      dc.appendVarWithSpace("isForceExceptions", isForceExceptions);
-      dc.appendVarWithSpace("isHardcoded", isHardcoded);
-      dc.appendVarWithSpace("isIgnoreSettings", isIgnoreSettings);
-      dc.appendVarWithSpace("isIgnoreSettingsAll", isIgnoreSettingsAll);
-      dc.appendVarWithSpace("toStringIsUsingClassLinks", toStringIsUsingClassLinks);
+      dc.appendVarWithNewLine("encoding", encoding);
+      dc.appendVarWithNewLine("isEraseSettings", isEraseSettings);
+      dc.appendVarWithNewLine("isEraseSettingsAll", isEraseSettingsAll);
+      dc.appendVarWithNewLine("isForceExceptions", isForceExceptions);
+
+      dc.appendVarWithNewLine("isStatorRead", isStatorRead);
+      dc.appendVarWithNewLine("isStatorWrite", isStatorWrite);
+
+      dc.appendVarWithNewLine("isIgnoreSettings", isIgnoreSettings);
+      dc.appendVarWithNewLine("isIgnoreSettingsAll", isIgnoreSettingsAll);
+
+      dc.appendVarWithNewLine("isHardcoded", isHardcoded);
+
+      dc.appendVarWithNewLine("toStringBytesOn1Line", toStringBytesOn1Line);
+      dc.appendVarWithNewLine("toStringIsUsingClassLinks", toStringIsUsingClassLinks);
+
+      dc.appendClassNameWithNewLine("logConfigurator", logConfigurator);
    }
 
    public String toString1Line() {

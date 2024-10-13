@@ -6,17 +6,17 @@ package pasa.cbentley.core.src4.ctx;
 
 import java.util.Enumeration;
 
-import pasa.cbentley.core.src4.io.BADataIS;
-import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.IStatorOwner;
 import pasa.cbentley.core.src4.stator.ITechStator;
 import pasa.cbentley.core.src4.stator.Stator;
+import pasa.cbentley.core.src4.stator.StatorOwnerContainer;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.core.src4.structs.IntToObjects;
+import pasa.cbentley.core.src4.structs.ObjectToObjects;
 import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
@@ -44,6 +44,10 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  */
 public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
 
+   private static final int STATE_1_STATOR_OWNER_ID = 0xFEFEFEFE;
+
+   private static final int STATE_2_OTHER_ID        = 0xFFFFFFFF;
+
    /**
     * Number of static known ids.
     * <br>
@@ -52,19 +56,11 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
     */
    public static final int STATIC_DEFINED = 10;
 
-   private byte[]       dataCtx;
-
-   private int          dataCtxOffset;
-
    /**
     * Loading 
     */
-   private IntToObjects dataOffsets;
+   private IntToObjects    dataOffsets;
 
-   /**
-    * The first stator
-    */
-   private Stator       firstStator;
 
    /**
     * 
@@ -80,6 +76,7 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
     */
    private IntToObjects    intos;
 
+
    public CtxManager(UCtx uc) {
       super(uc);
       intos = new IntToObjects(uc);
@@ -87,9 +84,10 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
       dataOffsets = new IntToObjects(uc);
    }
 
+   /**
+    * 
+    */
    public void deleteStartData() {
-      firstStator = null;
-      dataCtx = null;
       dataOffsets.clear();
    }
 
@@ -136,20 +134,20 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
       return id.getIntsClonedTrimmed();
    }
 
+   /**
+    * 
+    * @param ctx
+    * @return
+    */
    public Stator getStatorInitFor(ICtx ctx) {
-      if (firstStator == null) {
-         return null;
+      int ctxID = ctx.getCtxID();
+      StatorOwnerContainer ar = (StatorOwnerContainer) dataOffsets.findIntObject(ctxID);
+      if (ar != null) {
+         Stator stator = ar.activateReader();
+         return stator;
       } else {
-         int ctxID = ctx.getCtxID();
-         int[] ar = (int[]) dataOffsets.findIntObject(ctxID);
-         if (ar != null) {
-            firstStator.setActiveReaderWith(dataCtx, ar[0], ar[1]);
-            return firstStator;
-         } else {
-            return null;
-         }
+         return null;
       }
-
    }
 
    private void rangeOverlap(int modID, int staticID, int first, int last, int firstV, int lastV) {
@@ -263,74 +261,70 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
 
    public void stateOwnerRead(Stator stator) {
       //#debug
-      toDLog().pStator("firstStator " + ((firstStator == null) ? " is null " : " is NOT NULL"), null, CtxManager.class, "stateOwnerRead@263");
+      toDLog().pStator("Reading...", null, CtxManager.class, "stateOwnerRead@270", LVL_05_FINE, false);
 
-      if (firstStator == null) {
-         firstStator = stator;
-      }
       StatorReader statorReaderCtx = stator.getReader(ITechStator.TYPE_3_CTX);
-      //check if we any data for us
-      if (statorReaderCtx != null) {
-         //read 
-         dataCtx = statorReaderCtx.getReaderByte();
-         dataCtxOffset = statorReaderCtx.getReaderByteOffset();
 
-         BADataIS dis = statorReaderCtx.getReader();
-         int numCtx = dis.readInt();
-         for (int i = 0; i < numCtx; i++) {
-            int ctxID = dis.readInt();
-            int ctrlInt = dis.readInt();
-            if (ctrlInt == 1) {
-               int posCtx = statorReaderCtx.getReaderByteOffset();
-               //reads into temporary st
-               stator.setActiveReaderWith(dis);
-               int len = dis.readInt();
-               dataOffsets.add(ctxID, new int[] { posCtx, len });
-               StatorReader active = stator.getActiveReader();
-               ICtx ctx = getCtx(ctxID);
-               if (ctx != null) {
-                  ((IStatorOwner) ctx).stateOwnerRead(stator);
+      if (statorReaderCtx == null) {
+         //#debug
+         toDLog().pStator("Null StatorReader for Ctx. Data is corrupted", stator, CtxManager.class, "stateOwnerRead@130", LVL_04_FINER, true);
+         return;
+      }
+      //we store ctx settings
 
-               } else {
-                  //not loaded yet, will load data later
-               }
+      int numCtx = statorReaderCtx.dataReadInt();
+      for (int i = 0; i < numCtx; i++) {
+         int ctxID = statorReaderCtx.dataReadInt();
+         int ctrlInt = statorReaderCtx.dataReadInt();
+         if (ctrlInt == STATE_1_STATOR_OWNER_ID) {
+            ICtx ctx = getCtx(ctxID);
+            IStatorOwner statorOwner;
+            if (ctx == null) {
+               statorOwner = new StatorOwnerContainer(uc);
+               //set it to the key ctxid so when the code ctx is created, it finds its data
+
+               dataOffsets.add(ctxID, statorOwner);
+            } else {
+               statorOwner = (IStatorOwner) ctx;
             }
+            statorReaderCtx.dataReadStatorOwnerMono(statorOwner);
+         } else {
+            //other nothing to do
          }
       }
    }
 
    public void stateOwnerWrite(Stator stator) {
+      //#debug
+      toDLog().pStator("Writing...", stator, CtxManager.class, "stateOwnerWrite@304", LVL_04_FINER, true);
+
       StatorWriter stateWriterCtx = stator.getWriter(ITechStator.TYPE_3_CTX);
-      BADataOS dos = stateWriterCtx.getWriter();
 
       //write the number
       int size = intos.nextempty;
-      int writeCount = dos.size();
-      dos.writeInt(size);
+      stateWriterCtx.countBytesStart();
+      stateWriterCtx.dataWriteInt(size);
       for (int i = 0; i < size; i++) {
          ICtx ctx = (ICtx) intos.objects[i];
          int ctxID = intos.ints[i];
-         dos.writeInt(ctxID);
+         stateWriterCtx.dataWriteInt(ctxID);
 
          if (ctx instanceof IStatorOwner) {
-            dos.writeInt(1);
-            //temporarily write
-            stator.setActiveWriteTemp();
-            StatorWriter active = stator.getActiveWriter();
-            //stator flag that we need to compartimalize here
-            ((IStatorOwner) ctx).stateOwnerWrite(stator);
-            int sizeBeforeWrite = dos.size();
-            stator.getActiveWriter().serializeData(dos);
-            int len1 = active.getBytesWritten();
-            int sizeAfterWrite = dos.size();
-            int len = sizeAfterWrite - sizeBeforeWrite;
-            dos.writeInt(len);
+            //#debug
+            toDLog().pStator("IStatorOwner ctxID=" + ctxID, null, CtxManager.class, "stateOwnerWrite@304", LVL_03_FINEST, true);
+            IStatorOwner statorOwner = (IStatorOwner) ctx;
+            stateWriterCtx.dataWriteInt(STATE_1_STATOR_OWNER_ID);
+            //we want to write as a independant entity
+            //because when reading, we store the data waiting for the context to come online
+            stateWriterCtx.dataWriteStatorOwnerMono(statorOwner);
          } else {
-            dos.writeInt(0);
+            //#debug
+            toDLog().pStator("Not an IStatorOwner id=" + ctxID, null, CtxManager.class, "stateOwnerWrite@348", LVL_03_FINEST, true);
+
+            stateWriterCtx.dataWriteInt(STATE_2_OTHER_ID);
          }
       }
-      int writeCountB = dos.size();
-      int bytesWritten = writeCountB - writeCount;
+      int bytesWritten = stateWriterCtx.countBytesEnd();
       //#debug
       toDLog().pStator("-->" + bytesWritten + " bytes were written to StatorWriter", null, CtxManager.class, "stateOwnerWrite@323");
 
@@ -422,6 +416,12 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
       return false;
    }
 
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, CtxManager.class, 407);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
    public boolean toString1Line(Dctx dc, Object o) {
       Enumeration e = intos.getEnumeration();
       while (e.hasMoreElements()) {
@@ -439,11 +439,37 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
       return false;
    }
 
-   
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, CtxManager.class, 407);
-      toStringPrivate(dc);
-      super.toString1Line(dc.sup1Line());
+   public String toStringConfigs() {
+      Dctx c = new Dctx(uc, "\n\t");
+      toStringConfigs(c);
+      return c.toString();
+   }
+
+   /**
+    * Collects all configurations mapping to {@link ICtx}
+    * @param dc
+    */
+   public void toStringConfigs(Dctx dc) {
+      ObjectToObjects oto = new ObjectToObjects(uc, true);
+      Enumeration enu = intos.getEnumeration();
+      while (enu.hasMoreElements()) {
+         Object o = enu.nextElement();
+         if (o instanceof ICtx) {
+            ICtx module = (ICtx) o;
+            IConfig config = module.getConfig();
+            oto.add(config, module);
+         }
+      }
+
+      enu = oto.getEnumerationKeys();
+      int count = 0;
+      while (enu.hasMoreElements()) {
+         IConfig config = (IConfig) enu.nextElement();
+         Object[] values = oto.getValues(config);
+         dc.appendVarWithNewLine("|--->Configuration #", ++count);
+         dc.nlLvl(config);
+         dc.nlLvlArray1Line(values, "Contexts configured with this config");
+      }
    }
 
    public String toStringCtxID(int ctxID) {

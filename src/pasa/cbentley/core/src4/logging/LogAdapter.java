@@ -373,5 +373,20 @@ public class LogAdapter implements IDLog {
 
    }
 
+   public void pConfig(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public int levelIncrement() {
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
+   public int levelDecrement() {
+      // TODO Auto-generated method stub
+      return 0;
+   }
+
    //#enddebug
 }

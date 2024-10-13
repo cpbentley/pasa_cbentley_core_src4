@@ -1238,6 +1238,9 @@ public class BitUtils {
    }
 
    public void toStringBytes(Dctx sb, byte[] ar, int offset, int len, int cols) {
+      if(cols <= 0) {
+         cols = 10;
+      }
       int count = 0;
       for (int i = offset; i < offset + len; i++) {
          byte v = ar[i];
