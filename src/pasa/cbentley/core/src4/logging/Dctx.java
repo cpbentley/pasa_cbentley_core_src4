@@ -9,10 +9,11 @@ import java.util.Vector;
 
 import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.ICtx;
-import pasa.cbentley.core.src4.ctx.IToStringFlags;
+import pasa.cbentley.core.src4.ctx.IToStringFlagsUC;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.CounterInt;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
+import pasa.cbentley.core.src4.interfaces.IToStringFlags;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.utils.ArrayUtils;
@@ -37,7 +38,7 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * @author Charles Bentley
  *
  */
-public class Dctx implements IToStringFlags {
+public class Dctx implements IToStringFlagsUC {
    //#mdebug
 
    /**
@@ -62,6 +63,9 @@ public class Dctx implements IToStringFlags {
 
    private int            flags;
 
+   /**
+    * Maps {@link ICtx} to their ToString flags
+    */
    private IntToObjects   flagsData;
 
    private boolean        isClassLinks;
@@ -125,6 +129,16 @@ public class Dctx implements IToStringFlags {
    }
 
    /**
+    * When {@link Dctx} methods have a choice betwen 1line and full
+    */
+   public static final int FLAG_1_EXPAND     = 1 << 0;
+
+   /**
+    * 
+    */
+   public static final int FLAG_02_COLLAPSED = 1 << 1;
+
+   /**
     * Creates a {@link Dctx} with parent
     * 
     * @param uc
@@ -144,6 +158,8 @@ public class Dctx implements IToStringFlags {
       this.numTabs = parent.numTabs;
       //must be a reference t
       this.numLines = parent.numLines;
+
+      this.flags = parent.flags; // ??
 
       this.nulls = new IntToStrings(uc);
       this.processedObjectsMulti = parent.processedObjectsMulti;
@@ -281,6 +297,17 @@ public class Dctx implements IToStringFlags {
       append(".java:");
       append(line);
       append(")");
+   }
+
+   public void appendClassNameWithNewLine(String s, Object cl) {
+      nl();
+      sb.append(s);
+      sb.append('=');
+      if (cl == null) {
+         sb.append("null");
+      } else {
+         sb.append(getClassSimpleName(cl.getClass()));
+      }
    }
 
    public void appendColorRGB(int colorRGB) {
@@ -450,6 +477,13 @@ public class Dctx implements IToStringFlags {
       sb.append(String.valueOf(v));
    }
 
+   public void appendVarWithNewLine(String s, Class cl) {
+      nl();
+      sb.append(s);
+      sb.append('=');
+      sb.append(getClassSimpleName(cl));
+   }
+
    public void appendVarWithNewLine(String s, int v) {
       nl();
       sb.append(s);
@@ -479,24 +513,6 @@ public class Dctx implements IToStringFlags {
       sb.append(s);
       sb.append('=');
       sb.append(String.valueOf(v));
-   }
-
-   public void appendVarWithNewLine(String s, Class cl) {
-      nl();
-      sb.append(s);
-      sb.append('=');
-      sb.append(getClassSimpleName(cl));
-   }
-   
-   public void appendClassNameWithNewLine(String s, Object cl) {
-      nl();
-      sb.append(s);
-      sb.append('=');
-      if(cl == null) {
-         sb.append("null");
-      } else {
-         sb.append(getClassSimpleName(cl.getClass()));
-      }
    }
 
    public void appendVarWithSpace(String s, Class cl) {
@@ -778,26 +794,49 @@ public class Dctx implements IToStringFlags {
    }
 
    /**
-    * Flag from a marked prefixed interface {@link IToStringFlags}
+    * Returns the {@link IToStringFlags} flag value. 
     * 
-    * If {@link ICtx} has not registered flags values with
+    * <p>
+    * Common flags for {@link UCtx} are
+    * <li> {@link IToStringFlagsUC#FLAG_UC_04_BIG_DATA}
+    * <li> {@link IToStringFlagsUC#FLAG_02_COLLAPSED}
+    * </p>
+    * <br>
+    * <p>
+    * There are 2 ways to set those flags
+    * <li> Directly on the {@link Dctx} with {@link Dctx#setFlagToString(ICtx, int, boolean)}.
+    * <li> On the {@link ICtx} with {@link ICtx#toStringSetToStringFlag(int, boolean)}
+    * </p>
+    * <br>
+    * <p>
+    * See {@link Dctx#setFlagToString(ICtx, int, boolean)} for setting the flag.
+    * </p>
     * 
-    * {@link Dctx#setFlagData(ICtx, int, boolean)}, method calls the global method
-    * 
-    * {@link ICtx#toStringHasToStringFlag(int)} which can be set externall with
-    * 
-    * {@link ACtx#toStringSetToStringFlag(int, boolean)}
-    * @param ctx
-    * @param flag
+    * @param ctx {@link ICtx}
+    * @param flag {@link IToStringFlags}
     * @return
     */
-   public boolean hasFlagData(ICtx ctx, int flag) {
+   public boolean hasFlagToString(ICtx ctx, int flag) {
       int index = flagsData.findObjectRef(ctx);
       if (index == -1) {
          return ctx.toStringHasToStringFlag(flag);
       } else {
          return flagsData.hasIntFlag(index, flag);
       }
+   }
+
+   /**
+    * Shortcut for {@link IToStringFlagsUC} and {@link UCtx} reference. 
+    * List of flags
+    * <li> {@link IToStringFlagsUC#FLAG_UC_01_SUCCINT}
+    * <li> {@link IToStringFlagsUC#FLAG_UC_02_CACHE_PRINT}
+    * <li> {@link IToStringFlagsUC#FLAG_UC_04_BIG_DATA}
+    * <li> {@link IToStringFlagsUC#FLAG_UC_06_SHOW_NULLS}
+    * @param flag
+    * @return
+    */
+   public boolean hasFlagToStringUC(int flag) {
+      return hasFlagToString(uc, flag);
    }
 
    public boolean isCompact() {
@@ -1153,7 +1192,7 @@ public class Dctx implements IToStringFlags {
                dc.setTitleSuffix(suffix);
                this.lineForCollapsed = lineNum;
             }
-            dc.setFlag(FLAG_DATA_07_COLLAPSED, true);
+            dc.setFlag(FLAG_02_COLLAPSED, true);
             is.toString1Line(dc);
          } else {
             is.toString(dc);
@@ -1800,6 +1839,12 @@ public class Dctx implements IToStringFlags {
       this.root1Line(o, str, cl);
    }
 
+   public void root1Line(Object o, Class title, Class cl, String line) {
+      String str = getClassSimpleName(title);
+      String classLink = getClassSimpleName(cl);
+      this.root1Line(o, str, classLink, line);
+   }
+
    public void root1Line(Object o, Class title, Class cl, int line) {
       String str = getClassSimpleName(title);
       String classLink = getClassSimpleName(cl);
@@ -1807,8 +1852,12 @@ public class Dctx implements IToStringFlags {
    }
 
    public void root1Line(Object o, Class cl, int line) {
+      root1Line(o, cl, String.valueOf(line));
+   }
+
+   public void root1Line(Object o, Class cl, String line) {
       String str = getClassSimpleName(cl);
-      root1Line(o, str, str, String.valueOf(line));
+      root1Line(o, str, str, line);
    }
 
    public void root1Line(Object o, String str) {
@@ -1819,9 +1868,17 @@ public class Dctx implements IToStringFlags {
       this.root1Line(o, str, cl, "40");
    }
 
+   public void root1Line(Object o, String str, Class cl, int line) {
+      this.root1Line(o, str, cl, String.valueOf(line));
+   }
+
+   public void root1Line(Object o, String str, Class cl, String line) {
+      this.root1Line(o, str, getClassSimpleName(cl), line);
+   }
+
    public void root1Line(Object o, String str, String classSimpleName, String line) {
-      if (hasFlag(FLAG_DATA_07_COLLAPSED)) {
-         this.setFlag(FLAG_DATA_07_COLLAPSED, false);
+      if (hasFlag(FLAG_02_COLLAPSED)) {
+         this.setFlag(FLAG_02_COLLAPSED, false);
          root1LineCollapsed(o, str, lineForCollapsed);
       } else {
          if (isClassLinks && classSimpleName != null) {
@@ -1841,10 +1898,6 @@ public class Dctx implements IToStringFlags {
             doTitleSuffix();
          }
       }
-   }
-
-   public void root1Line(Object o, String str, Class cl, String line) {
-      this.root1Line(o, str, getClassSimpleName(cl), line);
    }
 
    public void root1LineCollapsed(Object o, String str, int line) {
@@ -1984,12 +2037,17 @@ public class Dctx implements IToStringFlags {
    }
 
    /**
-    * Sets
-    * @param ctx
-    * @param flag
+    * Sets specific {@link IToStringFlags} for the {@link ICtx}.
+    * 
+    * Those flags will override the initial configuration that was set in {@link ILogConfiguratorCtx}.
+    * 
+    * See {@link Dctx#hasFlagToString(ICtx, int)} for reading the flags.
+    * 
+    * @param ctx {@link ICtx}
+    * @param flag {@link IToStringFlags}
     * @param b
     */
-   public void setFlagData(ICtx ctx, int flag, boolean b) {
+   public void setFlagToString(ICtx ctx, int flag, boolean b) {
       int index = flagsData.findObjectRef(ctx);
       if (index == -1) {
          //not even there

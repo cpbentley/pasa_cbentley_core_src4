@@ -388,5 +388,75 @@ public class LogAdapter implements IDLog {
       return 0;
    }
 
+   public void pCmd(String msg, Object str, LogParameters params) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pCmd(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pNull(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pDraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pData(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pEvent(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pModel(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pAlways(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pCreate(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pBridge(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pInit(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pStator(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public void pSimul(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+      
+   }
+
    //#enddebug
 }

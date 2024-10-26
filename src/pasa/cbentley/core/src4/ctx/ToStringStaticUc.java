@@ -7,6 +7,7 @@ package pasa.cbentley.core.src4.ctx;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.ITechThread;
 import pasa.cbentley.core.src4.interfaces.ITechTransform;
+import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.logging.ITechTags;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 import pasa.cbentley.core.src4.thread.ITechRunnable;
@@ -33,6 +34,31 @@ public class ToStringStaticUc extends ToStringStaticBase {
             return "MirrorRot90";
          default:
             return "ToStringTrans Unknown" + key;
+      }
+   }
+
+   public static String toStringLogLevel(int lvl) {
+      switch (lvl) {
+         case ITechLvl.LVL_02_FINE_EXTRA:
+            return "FINE_EXTRA";
+         case ITechLvl.LVL_03_FINEST:
+            return "FINEST";
+         case ITechLvl.LVL_04_FINER:
+            return "FINER";
+         case ITechLvl.LVL_05_FINE:
+            return "FINE";
+         case ITechLvl.LVL_07_CONFIG:
+            return "CONFIG";
+         case ITechLvl.LVL_08_INFO:
+            return "INFO";
+         case ITechLvl.LVL_09_WARNING:
+            return "WARNING";
+         case ITechLvl.LVL_10_SEVERE:
+            return "SEVERE";
+         case ITechLvl.LVL_11_EXIT:
+            return "EXIT";
+         default:
+            return "ToStringLogLvl Unknown" + lvl;
       }
    }
 
@@ -126,7 +152,7 @@ public class ToStringStaticUc extends ToStringStaticBase {
             return "UnknownState" + state;
       }
    }
-   
+
    public static String toStringDebugTag(int tag) {
       switch (tag) {
          case ITechTags.FLAG_01_PRINT_ALWAYS:

@@ -4,6 +4,7 @@
  */
 package pasa.cbentley.core.src4.logging;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
@@ -18,7 +19,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class DLogEntryOfConfig implements ITechLvl {
+public class DLogEntryOfConfig extends ObjectU implements ITechLvl {
 
    private IDLogConfig   config;
 
@@ -29,10 +30,9 @@ public class DLogEntryOfConfig implements ITechLvl {
 
    private DLogEntry entry;
 
-   private UCtx      uc;
 
    public DLogEntryOfConfig(UCtx uc, IDLogConfig config, DLogEntry entry) {
-      this.uc = uc;
+      super(uc);
       this.config = config;
       this.entry = entry;
    }
@@ -50,19 +50,42 @@ public class DLogEntryOfConfig implements ITechLvl {
    }
 
    public boolean isAccepted() {
-      return BitUtils.hasFlag(formatFlags, ITechConfig.FORMAT_FLAG_01_ACCEPTED);
+      return BitUtils.hasFlag(formatFlags, ITechDLogConfig.FORMAT_FLAG_01_ACCEPTED);
    }
 
    public boolean isOneLineConfig() {
-      return BitUtils.hasFlag(formatFlags, ITechConfig.FORMAT_FLAG_02_1LINE);
+      return BitUtils.hasFlag(formatFlags, ITechDLogConfig.FORMAT_FLAG_02_1LINE);
    }
 
    public boolean isStackConfig() {
-      return BitUtils.hasFlag(formatFlags, ITechConfig.FORMAT_FLAG_03_STACK);
+      return BitUtils.hasFlag(formatFlags, ITechDLogConfig.FORMAT_FLAG_03_STACK);
    }
 
    public void setConfigResFlag(int flag, boolean v) {
       formatFlags = BitUtils.setFlag(formatFlags, flag, v);
    }
 
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, DLogEntryOfConfig.class, toStringGetLine(70));
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      
+      dc.nlLvl(entry, "entry");
+      dc.nlLvl(config, "config");
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, DLogEntryOfConfig.class, toStringGetLine(70));
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      
+   }
+   //#enddebug
+   
+
+   
 }

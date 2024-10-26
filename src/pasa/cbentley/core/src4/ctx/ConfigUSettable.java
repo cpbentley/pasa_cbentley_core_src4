@@ -37,6 +37,8 @@ public class ConfigUSettable implements IConfigU {
 
    protected UCtx           uc;
 
+   protected String         name;
+
    public ConfigUSettable() {
       encoding = "UTF-8";
       toStringBytesOn1Line = 20;
@@ -45,6 +47,14 @@ public class ConfigUSettable implements IConfigU {
 
    public String getDefaultEncoding() {
       return encoding;
+   }
+
+   public String getUCtxName() {
+      return name;
+   }
+
+   public void setNameUCtx(String name) {
+      this.name = name;
    }
 
    public boolean isEraseSettings() {
@@ -167,7 +177,7 @@ public class ConfigUSettable implements IConfigU {
       return toStringBytesOn1Line;
    }
 
-   public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {
+   public ILogConfigurator toStringGetLogConfigurator() {
       if (logConfigurator == null) {
          logConfigurator = new LogConfiguratorAllFinest();
       }

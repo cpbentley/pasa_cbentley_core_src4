@@ -10,24 +10,25 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  * Interface to configure the logger
  * 
  * <li>{@link UCtx#toDLog()}
- * <li> {@link IDLog#getDefault()}
+ * <li>{@link IDLog#getDefault()}
  * <li> I
  * 
  * 
  * @author Charles Bentley
  *
  */
-public interface IDLogConfig extends IStringable, ITechConfig {
-
+public interface IDLogConfig extends IStringable, ITechDLogConfig {
 
    /**
-    * Compute {@link ITechConfig} flags of the {@link DLogEntry}.
+    * Compute {@link DLogEntryOfConfig} of the {@link DLogEntry}.
+    * 
     * 
     * It will use its config and any dev flags {@link ITechDev} of the {@link DLogEntry}
-    * @param type
-    * @return
+    * 
+    * @param logEntry {@link DLogEntry}
+    * @return {@link DLogEntryOfConfig}
     */
-   public DLogEntryOfConfig getEntryConfig(DLogEntry type);
+   public DLogEntryOfConfig getEntryConfig(DLogEntry logEntry);
 
    /**
     * 
@@ -36,12 +37,20 @@ public interface IDLogConfig extends IStringable, ITechConfig {
    public String getStackTraceBreak();
 
    /**
-    * <li> {@link ITechConfig#FORMAT_FLAG_04_THREAD}
+    * <li> {@link ITechDLogConfig#FORMAT_FLAG_04_THREAD}
     * @param flag
     * @return
     */
    public boolean hasFlagFormat(int flag);
 
+   /**
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_01_BLOCK_ALL_PRINT}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_07_THREAD_DATA}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_09_TREAT_STRINGABLE_CLASS}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_10_OWNER_NAME_UC}
+    * @param flag
+    * @return
+    */
    public boolean hasFlagMaster(int flag);
 
    public boolean hasFlagTag(int flag);
@@ -51,6 +60,7 @@ public interface IDLogConfig extends IStringable, ITechConfig {
    public boolean isClassNegative(Class c);
 
    public int getLevel();
+
    /**
     * 
     */
@@ -92,28 +102,13 @@ public interface IDLogConfig extends IStringable, ITechConfig {
    public void setClassPositives(Class c, boolean v);
 
    /**
-    * Set Config flags for formatting
-    * 
-    * <li> {@link ITechConfig#FORMAT_FLAG_01_ACCEPTED}
-    * <li> {@link ITechConfig#FORMAT_FLAG_02_1LINE}
-    * <li> {@link ITechConfig#FORMAT_FLAG_03_STACK}
-    * <li> {@link ITechConfig#FORMAT_FLAG_04_THREAD}
-    * <li> {@link ITechConfig#FORMAT_FLAG_05_TIMESTAMP}
-    * <li> {@link ITechConfig#FORMAT_FLAG_06_BIG}
-    * <li> {@link ITechConfig#FORMAT_FLAG_07_LEVEL}
-    * @param flag
-    * @param b
-    */
-   public void setFlagFormat(int flag, boolean b);
-
-   /**
     * Config flags
-    * <li> {@link ITechConfig#MASTER_FLAG_01_BLOCK_ALL_PRINT}
-    * <li> {@link ITechConfig#MASTER_FLAG_02_OPEN_ALL_PRINT}
-    * <li> {@link ITechConfig#MASTER_FLAG_03_ONLY_POSITIVES}
-    * <li> {@link ITechConfig#MASTER_FLAG_04_IGNORE_CLASSES}
-    * <li> {@link ITechConfig#MASTER_FLAG_05_IGNORE_FLAGS}
-    * <li> {@link ITechConfig#MASTER_FLAG_06_CLASS_INSTANCES}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_01_BLOCK_ALL_PRINT}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_02_OPEN_ALL_PRINT}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_03_ONLY_POSITIVES}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_04_IGNORE_CLASSES}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_05_IGNORE_FLAGS}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_06_CLASS_INSTANCES}
     * @param flag
     * @param v
     */
@@ -137,7 +132,7 @@ public interface IDLogConfig extends IStringable, ITechConfig {
    public void setFlagTag(int[] flags, boolean v);
 
    /**
-    * When true, sets the Tag as a negative. The tag is then ignored if {@link ITechConfig#MASTER_FLAG_08_OPEN_ALL_BUT_FALSE}
+    * When true, sets the Tag as a negative. The tag is then ignored if {@link ITechDLogConfig#MASTER_FLAG_08_OPEN_ALL_BUT_FALSE}
     * is set.
     * @param flag
     * @param v

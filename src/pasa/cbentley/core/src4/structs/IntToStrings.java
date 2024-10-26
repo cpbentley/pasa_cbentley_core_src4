@@ -6,6 +6,7 @@ package pasa.cbentley.core.src4.structs;
 
 import java.io.Serializable;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -31,7 +32,7 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * @author Charles Bentley
  *
  */
-public class IntToStrings implements IStringable, Serializable {
+public class IntToStrings extends ObjectU implements IStringable, Serializable {
 
    /**
     * 
@@ -49,29 +50,40 @@ public class IntToStrings implements IStringable, Serializable {
 
    public String[]           strings;
 
-   protected UCtx            uc;
-
    public IntToStrings(UCtx uc) {
       this(uc, 0);
    }
 
    public IntToStrings(UCtx uc, int size) {
-      if (uc == null) {
-         throw new NullPointerException();
-      }
-      this.uc = uc;
+      super(uc);
       ints = new int[size];
       strings = new String[size];
       imgs = new String[size];
    }
 
    public IntToStrings(UCtx uc, String[] str) {
-      if (uc == null) {
-         throw new NullPointerException();
-      }
-      this.uc = uc;
+      super(uc);
       strings = str;
       ints = new int[str.length];
+      nextempty = str.length;
+   }
+
+   /**
+    * Arrays are not copied
+    * @param uc
+    * @param str
+    * @param ints
+    */
+   public IntToStrings(UCtx uc, String[] str, int[] ints) {
+      super(uc);
+      if (str == null || ints == null) {
+         throw new NullPointerException();
+      }
+      if (str.length != ints.length) {
+         throw new IllegalArgumentException();
+      }
+      this.strings = str;
+      this.ints = ints;
       nextempty = str.length;
    }
 
@@ -462,12 +474,10 @@ public class IntToStrings implements IStringable, Serializable {
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "IntToString");
+      dc.root(this, IntToStrings.class, 481);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
       dc.appendVarWithSpace("size", getSize());
       for (int i = 0; i < nextempty; i++) {
          dc.nl();
@@ -477,12 +487,10 @@ public class IntToStrings implements IStringable, Serializable {
       }
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "IntToString");
+      dc.root1Line(this, IntToStrings.class, 481);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
       dc.appendVarWithSpace("size", getSize());
       //show max 10 of them on the line
       int num = Math.min(nextempty, 10);
@@ -491,12 +499,11 @@ public class IntToStrings implements IStringable, Serializable {
          dc.append('\t');
          dc.append(strings[i]);
       }
+   }
+
+   private void toStringPrivate(Dctx dc) {
 
    }
    //#enddebug
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
 
 }

@@ -30,8 +30,6 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       }
    }
 
-
-
    /**
     * This is used for quick debugging without having to change configuration of the logger.
     * <br>
@@ -64,15 +62,19 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    public void pBridge(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_19_BRIDGE, ITechTags.FLAG_19_PRINT_BRIDGE, lvl, oneLine);
    }
+
    public void pBridge1(String msg, Object str, Class c, String method) {
       pBridge(msg, getStringable(str), c, method, getLevelDefault(), true);
    }
+
    public void pBusiness(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_12_BUSINESS, ITechTags.FLAG_12_PRINT_BUSINESS, lvl, oneLine);
    }
+
    public void pBusiness(String msg, Object str, Class c, String method, int lvl, int flags) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_12_BUSINESS, ITechTags.FLAG_12_PRINT_BUSINESS, lvl, flags);
    }
+
    public void pBusiness1(String msg, Object str, Class c, String method) {
       pCmd(msg, getStringable(str), c, method, getLevelDefault(), true);
    }
@@ -85,6 +87,14 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_11_CMD, ITechTags.FLAG_11_PRINT_COMMANDS, lvl, oneLine);
    }
 
+   public void pCmd(String msg, Object str, LogParameters params) {
+      pCmd(msg, getStringable(str), params.cl, params.method, getLevelDefault(), false);
+   }
+
+   public void pCmd(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pCmd(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
    public void pCmd1(String msg, Object str, Class c, String method) {
       pCmd(msg, getStringable(str), c, method, getLevelDefault(), true);
    }
@@ -93,6 +103,10 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_26_CONFIG, ITechTags.FLAG_26_PRINT_CONFIG, lvl, oneLine);
    }
 
+   public void pSimul(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_27_SIMULATION, ITechTags.FLAG_27_PRINT_SIMULATION, lvl, oneLine);
+   }
+   
    public void pCreate(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_25_CREATE, ITechTags.FLAG_25_PRINT_CREATE, lvl, oneLine);
    }
@@ -340,4 +354,55 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
 
    }
    //#enddebug
+
+   public void pAlways(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pAlways(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pBridge(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pBridge(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pCreate(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pCreate(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+   public void pSimul(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pCreate(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pData(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pData(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pDraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pDraw(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pEvent(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pEvent(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pFlow(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pInit(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pInit(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pModel(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pModel(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pNull(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pNull(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pAnim(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pAnim(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pStator(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pStator(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
 }

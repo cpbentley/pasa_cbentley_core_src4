@@ -22,7 +22,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  * @author Charles Bentley
  *
  */
-public interface ILogConfigurator extends ITechTags,ITechLvl, ITechConfig {
+public interface ILogConfigurator extends ITechTags,ITechLvl, ITechDLogConfig {
 
    //#mdebug
    public void apply(IDLogConfig log);

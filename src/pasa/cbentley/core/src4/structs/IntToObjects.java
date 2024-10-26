@@ -82,6 +82,28 @@ public class IntToObjects extends ObjectU implements IStringable {
       nextempty = os.length;
       ints = new int[os.length];
    }
+   
+   /**
+    * Arrays are not copied
+    * @param uc
+    * @param str
+    * @param ints
+    */
+   public IntToObjects(UCtx uc, String[] objects, int[] ints) {
+      super(uc);
+      if (uc == null) {
+         throw new NullPointerException();
+      }
+      if (objects == null || ints == null) {
+         throw new NullPointerException();
+      }
+      if (objects.length != ints.length) {
+         throw new IllegalArgumentException();
+      }
+      this.objects = objects;
+      this.ints = ints;
+      nextempty = objects.length;
+   }
 
    public void add(int i, int o) {
       this.add(new Integer(o), i);

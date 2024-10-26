@@ -57,7 +57,8 @@ public interface IStatorable extends IStringable {
    public void stateWriteTo(StatorWriter state);
 
    /**
-    * Called to write object parameter first.
+    * Called to write object parameter first so that the StatorFactory reads the parameters to 
+    * call the constructor. Then the method {@link IStatorable#stateReadFrom(StatorReader)} is called.
     * 
     * @param state
     */

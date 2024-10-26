@@ -232,6 +232,10 @@ public class BusEvent extends ObjectU implements IStringable, ITechThread {
       this.busOwner.putOnBus(this, threadType);
    }
 
+   public void setSource(Object source) {
+      
+   }
+   
    public void setParamO1(Object paramO1) {
       this.paramO1 = paramO1;
    }

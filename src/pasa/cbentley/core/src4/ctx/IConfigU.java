@@ -54,15 +54,15 @@ public interface IConfigU extends IConfig {
     */
    public boolean isIgnoreSettingsAll();
 
+   public String getUCtxName();
 
    //#mdebug
    /**
     * A non null {@link ILogConfigurator}.
     * Create a default one if necessary
-    * @param uc
     * @return
     */
-   public ILogConfigurator toStringGetLogConfigurator(UCtx uc);
+   public ILogConfigurator toStringGetLogConfigurator();
 
    /**
     * is {@link Dctx} using class links instead of #
@@ -78,7 +78,7 @@ public interface IConfigU extends IConfig {
    public void toStringSetDebugUCtx(UCtx uc);
 
    /**
-    * Sets the {@link ILogConfigurator} to be retrieved with {@link IConfigU#toStringGetLogConfigurator(UCtx)}
+    * Sets the {@link ILogConfigurator} to be retrieved with {@link IConfigU#toStringGetLogConfigurator()}
     * @param logConfigurator
     * @return
     */

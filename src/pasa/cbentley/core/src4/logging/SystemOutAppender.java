@@ -55,7 +55,7 @@ public class SystemOutAppender extends BaseAppender {
       StringBBuilder sb = new StringBBuilder(uc, 500);
 
       int count = sb.getCount();
-      if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_08_OWNER_NAME)) {
+      if (logEntryc.hasFormatFlag(ITechDLogConfig.FORMAT_FLAG_08_OWNER_NAME)) {
          sb.append(entry.getNameOwner());
          sb.append('\t');
       }
@@ -67,10 +67,10 @@ public class SystemOutAppender extends BaseAppender {
       //first enter message. format is hard coded
       String tagString = entry.getTagString();
       sb.append(tagString);
-      if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_07_LEVEL)) {
+      if (logEntryc.hasFormatFlag(ITechDLogConfig.FORMAT_FLAG_07_LEVEL)) {
          sb.append(" " + entry.getLevel() + " ");
       }
-      if (logEntryc.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
+      if (logEntryc.hasFormatFlag(ITechDLogConfig.FORMAT_FLAG_04_THREAD)) {
          sb.append(" [" + entry.getThreadName() + "]");
       }
       int extraSpaces = sb.getCount() - count;

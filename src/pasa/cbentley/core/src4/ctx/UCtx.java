@@ -16,6 +16,7 @@ import pasa.cbentley.core.src4.helpers.UserLogJournal;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.interfaces.C;
 import pasa.cbentley.core.src4.interfaces.IHost;
+import pasa.cbentley.core.src4.interfaces.ILineGetter;
 import pasa.cbentley.core.src4.interfaces.IStrComparator;
 import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.core.src4.io.BAByteIS;
@@ -32,6 +33,7 @@ import pasa.cbentley.core.src4.logging.ILogEntryAppender;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.logging.IUserLog;
+import pasa.cbentley.core.src4.logging.LogParameters;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 import pasa.cbentley.core.src4.logging.UserLogSystemOut;
 import pasa.cbentley.core.src4.memory.IMemory;
@@ -127,7 +129,7 @@ import pasa.cbentley.core.src4.utils.URLUtils;
  * <ul>
  * <li> {@link IConfig} and possibly a default Java implementation of it.
  * <li>IEvents prefixed interfaces such as {@link IEventsCore} are located in ctx package.
- * <li>{@link IToStringFlags} prefixed interfaces used to dynamically configure a {@link Dctx} (Debug Context)
+ * <li>{@link IToStringFlagsUC} prefixed interfaces used to dynamically configure a {@link Dctx} (Debug Context)
  * <li>{@link ToStringStaticUc} for debugging integer constant object of the code context
  * <li> The <code>.ctx</code> contains an IEvents interface and IStrings and any interface defining
  * 
@@ -270,7 +272,7 @@ public class UCtx implements ICtx, IEventsCore {
 
    private String           name;
 
-   private Random           random = null;
+   private Random           random;
 
    private int              registrationID;
 
@@ -313,6 +315,11 @@ public class UCtx implements ICtx, IEventsCore {
       this(config, null);
    }
 
+   /**
+    * 
+    * @param config
+    * @param name maybe null, in which case configU name is used
+    */
    public UCtx(IConfigU config, String name) {
       if (config == null) {
          config = new ConfigUDef();
@@ -321,7 +328,11 @@ public class UCtx implements ICtx, IEventsCore {
       //#debug
       config.toStringSetDebugUCtx(this);
 
-      this.name = name;
+      if (name == null) {
+         this.name = config.getUCtxName();
+      } else {
+         this.name = name;
+      }
       this.config = config;
       ctxManager = new CtxManager(this);
       aInit();
@@ -348,7 +359,9 @@ public class UCtx implements ICtx, IEventsCore {
       }
       this.dlog = dlog;
 
-      toStringLogConfigurator = config.toStringGetLogConfigurator(this);
+      //no linegetter in the constructor. no time to set
+
+      toStringLogConfigurator = config.toStringGetLogConfigurator();
       //TODO there might be different appenders with different configurations
       //Files etc etc Here we deal with default appender
       ILogEntryAppender logAppender = dlog.getDefault();
@@ -357,9 +370,9 @@ public class UCtx implements ICtx, IEventsCore {
 
       //String message = "Very First Log Message; Using LogConfigurator:" + toStringLogConfigurator.getClass().getName();
       String message = "Very First Log Message; Using (" + stru.getNameClass(toStringLogConfigurator.getClass()) + ".java:20)";
-      dlog.pAlways(message, null, UCtx.class, "[" + +this.hashCode() + "]");
+      dlog.pAlways(message, null, UCtx.class, "name=" + name + " hashcode=" + +this.hashCode() + " ");
       dlog.pAlways("configOfAppender", configOfAppender, UCtx.class, "constructor@360");
-      dlog.pConfig("IConfigU", config, UCtx.class, "constructor@361", ITechLvl.LVL_05_FINE, false);
+      dlog.pConfig("IConfigU", config, UCtx.class, "constructor@365", ITechLvl.LVL_05_FINE, false);
       //#enddebug
 
       //this is not for debug purposes. its the application log for the application user.
@@ -380,7 +393,7 @@ public class UCtx implements ICtx, IEventsCore {
       ctxManager.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringDIDs.A_DID_OFFSET_A_UC, IToStringDIDs.A_DID_OFFSET_Z_UC);
       didManager = new DIDManager(this);
       config.toStringSetDebugUCtx(this);
-      toDLog().pCreate("", this, UCtx.class, "Created@382", LVL_05_FINE, true);
+      toDLog().pCreate("", this, UCtx.class, "Created@386", LVL_05_FINE, true);
       //#enddebug
    }
 
@@ -871,6 +884,25 @@ public class UCtx implements ICtx, IEventsCore {
       return toStringFlags;
    }
 
+   public String toStringGetLine(int value) {
+      if (toStringLineGetter == null) {
+         return String.valueOf(value);
+      } else {
+         return toStringLineGetter.getLine(value);
+      }
+   }
+
+   public LogParameters toStringGetLine(Class cl, String method, int value) {
+      if (toStringLineGetter == null) {
+         LogParameters lp = new LogParameters();
+         lp.cl = cl;
+         lp.method = method + "@" + value;
+         return lp;
+      } else {
+         return toStringLineGetter.getLine(cl, method, value);
+      }
+   }
+
    public UCtx toStringGetUCtx() {
       return this;
    }
@@ -918,8 +950,16 @@ public class UCtx implements ICtx, IEventsCore {
       }
    }
 
+   //#debug
+   private ILineGetter toStringLineGetter;
+
+   public void toStringSetLineNumberGetter(ILineGetter lineGetter) {
+      this.toStringLineGetter = lineGetter;
+   }
+
    /**
-    * Debug flag for this context
+    * Sets a ToString flag for {@link UCtx} defined in {@link IToStringFlagsUC}
+    * 
     * @param flag
     * @param v
     */

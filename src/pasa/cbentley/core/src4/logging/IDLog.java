@@ -24,13 +24,19 @@ import pasa.cbentley.core.src4.ctx.UCtx;
  * <b>Dev flags</b>
  * Flags that the dev can manually set for a quick debug override of the config.
  * 
- * Dev flags are only overriden by the master config flags of {@link ITechConfig}
+ * Dev flags are only overriden by the master config flags of {@link ITechDLogConfig}
  * 
  * @author Charles Bentley
  *
  * @see ITechTags
  */
 public interface IDLog extends IStringable {
+
+   /**
+    * Number of printed statements
+    * @return
+    */
+   public long getCount();
 
    //#mdebug
    /**
@@ -45,9 +51,17 @@ public interface IDLog extends IStringable {
     */
    public ILogEntryAppender getDefault();
 
+   public boolean getTag(int tag);
+
+   public int levelDecrement();
+
+   public int levelIncrement();
+
    public void pAlways(String msg, Object str, Class c, String method);
 
    public void pAlways(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pAlways(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
 
    public void pAnim(String msg, Object str, Class c, String method);
 
@@ -56,6 +70,8 @@ public interface IDLog extends IStringable {
    public void pBridge(String msg, Object str, Class c, String method);
 
    public void pBridge(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pBridge(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
 
    public void pBridge1(String msg, Object str, Class c, String method);
 
@@ -67,46 +83,37 @@ public interface IDLog extends IStringable {
 
    public void pCmd(String msg, Object str, Class c, String method);
 
-   public void pData(String msg, Object str, Class c, String method);
-
    public void pCmd(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pCmd(String msg, Object str, LogParameters params);
+
+   public void pCmd(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
+   public void pCmd1(String msg, Object str, Class c, String method);
+
+   public void pConfig(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pCreate(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pCreate(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
+   public void pData(String msg, Object str, Class c, String method);
 
    public void pData(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
    public void pData(String msg, Object str, Class c, String method, int lvl, boolean oneLine, Exception e);
 
+   public void pData(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
    public void pDraw(String msg, Object str, Class c, String method);
 
    public void pDraw(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pStator(String msg, Object str, Class c, String method);
-
-   public void pStator(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
-
-   public void pConfig(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+   public void pDraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
 
    public void pEvent(String msg, Object str, Class c, String method);
 
    public void pEvent(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
-
-   /**
-    * 
-    * @param msg
-    * @param str
-    * @param c
-    * @param method
-    * @param lvl
-    * @param oneLine
-    */
-   public void pSoundEvent(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
-
-   public boolean getTag(int tag);
-
-   public int levelIncrement();
-
-   public int levelDecrement();
-
-   public boolean toggleTag(int tag);
 
    /**
     * Flag override the 1st level config
@@ -118,6 +125,8 @@ public interface IDLog extends IStringable {
     * @param flags
     */
    public void pEvent(String msg, Object str, Class c, String method, int lvl, int flags);
+
+   public void pEvent(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
 
    public void pEvent1(String msg, Object str, Class c, String method);
 
@@ -146,8 +155,14 @@ public interface IDLog extends IStringable {
 
    public void pFlow(String msg, Object str, Class c, String method);
 
+   public void pFlow(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pFlow(String msg, Object str, Class c, String method, int lvl, int flags);
+
+   public void pFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
    /**
-    * We know its big chunk of data. Only printed if {@link ITechConfig}
+    * We know its big chunk of data. Only printed if {@link ITechDLogConfig}
     * @param msg
     * @param str
     * @param c
@@ -155,21 +170,17 @@ public interface IDLog extends IStringable {
     */
    public void pFlowBig(String msg, Object str, Class c, String method);
 
-   public void pFlow(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
-
-   public void pFlow(String msg, Object str, Class c, String method, int lvl, int flags);
-
    public void pInit(String msg, Object str, Class c, String method);
-
-   public void pInitBig(String msg, Object str, Class c, String method);
 
    public void pInit(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pCreate(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
-
    public void pInit(String msg, Object str, Class c, String method, int lvl, int flags);
 
+   public void pInit(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
    public void pInit1(String msg, Object str, Class c, String method);
+
+   public void pInitBig(String msg, Object str, Class c, String method);
 
    public void pMemory(String msg, Object str, Class c, String method);
 
@@ -177,15 +188,19 @@ public interface IDLog extends IStringable {
 
    public void pMemoryWarn(String msg, Object str, Class c, String method);
 
-   public void pModel1(String msg, Object str, Class c, String method);
-
    public void pModel(String msg, Object str, Class c, String method);
 
    public void pModel(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pNull(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+   public void pModel(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
+   public void pModel1(String msg, Object str, Class c, String method);
 
    public void pNull(String msg, Object str, Class c, String method);
+
+   public void pNull(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pNull(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
 
    public void pSound(String msg, Object str, Class c, String method);
 
@@ -193,9 +208,28 @@ public interface IDLog extends IStringable {
 
    public void pSound1(String msg, Object str, Class c, String method);
 
+   /**
+    * 
+    * @param msg
+    * @param str
+    * @param c
+    * @param method
+    * @param lvl
+    * @param oneLine
+    */
+   public void pSoundEvent(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
    public void pState(String msg, Object str, Class c, String method);
 
    public void pState(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pStator(String msg, Object str, Class c, String method);
+
+   public void pStator(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
+
+   public void pStator(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+   
+   public void pSimul(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
 
    public void pTest(String msg, Object str, Class c, String method);
 
@@ -211,13 +245,7 @@ public interface IDLog extends IStringable {
 
    public void pWork(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
-   public void pCmd1(String msg, Object str, Class c, String method);
-
-   /**
-    * Number of printed statements
-    * @return
-    */
-   public long getCount();
+   public boolean toggleTag(int tag);
 
    //#enddebug
 }

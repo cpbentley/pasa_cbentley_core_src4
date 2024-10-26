@@ -46,7 +46,7 @@ public class ApiManager extends ObjectU implements ILifeListener {
                   ACtx ctx = serviceCtx.context;
                   Class c = Class.forName(className);
                   //#debug
-                  toDLog().pBridge1("Init " + className + " for ID=" + id, this, ApiManager.class, "getAPIService");
+                  toDLog().pBridge1("Init for " + className + " for ID=" + id, this, ApiManager.class, "getAPIService@50");
                   //api services such a GamePAD JInput
                   IAPIService apiService = (IAPIService) c.newInstance();
                   apiService.setCtx(ctx);

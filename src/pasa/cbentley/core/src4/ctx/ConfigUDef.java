@@ -23,6 +23,10 @@ public class ConfigUDef implements IConfigU {
    public ConfigUDef() {
    }
 
+   public String getUCtxName() {
+      return null;
+   }
+
    public String getDefaultEncoding() {
       return "UTF-8";
    }
@@ -82,7 +86,7 @@ public class ConfigUDef implements IConfigU {
       return 20;
    }
 
-   public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {
+   public ILogConfigurator toStringGetLogConfigurator() {
       if (logConfigurator == null) {
          logConfigurator = new LogConfiguratorAllFinest();
       }

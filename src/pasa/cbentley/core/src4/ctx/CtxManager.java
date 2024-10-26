@@ -8,6 +8,7 @@ import java.util.Enumeration;
 
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.core.src4.logging.StringableWrapper;
 import pasa.cbentley.core.src4.stator.IStatorOwner;
 import pasa.cbentley.core.src4.stator.ITechStator;
 import pasa.cbentley.core.src4.stator.Stator;
@@ -151,9 +152,25 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
    }
 
    private void rangeOverlap(int modID, int staticID, int first, int last, int firstV, int lastV) {
-      String msg = "Overlap staticid=" + staticID + " Incoming [" + first + "," + last + "] with [" + firstV + "," + lastV + "] of moduleid=" + modID;
+      ICtx ctx = getCtx(modID);
+      Dctx dc = new Dctx(uc,"\n");
+      dc.appendVar("Overlap staticid",staticID);
+      dc.append(" Incoming [");
+      dc.append(first);
+      dc.append(",");
+      dc.append(last);
+      dc.append("] with [");
+      dc.append(firstV);
+      dc.append(",");
+      dc.append(lastV);
+      dc.append("] of moduleid=");
+      dc.append(modID);
+      dc.append(ctx.toString1Line());
+      
+      String msg = dc.toString();
+      StringableWrapper stringable = new StringableWrapper(uc, toStringStaticIDRange(staticID));
       //#debug
-      toDLog().pData(msg, this, CtxManager.class, "rangeOverlap");
+      toDLog().pAlways(msg, stringable, CtxManager.class, "rangeOverlap@171");
       throw new RuntimeException(msg);
    }
 
@@ -439,6 +456,30 @@ public class CtxManager extends ObjectU implements IStringable, IStatorOwner {
       return false;
    }
 
+   public String toStringStaticIDRange(int staticID) {
+      Dctx dc = new Dctx(uc, "\n\t");
+      dc.setLineNumbers(false);
+      dc.append("Static ID Ranges for ");
+      dc.appendBracketedWithSpace(toStringStaticID(staticID));
+      dc.appendBracketedWithSpace(""+staticID);
+      
+      int[] r = ids.getIntsRef();
+      int size = ids.getSize();
+      //start at 1 because IntBuffer has first element as length
+      for (int i = 1; i < size; i += 4) {
+         int ctxID = r[i];
+         int sID = r[i + 1];
+         int sidFirst = r[i + 2];
+         int sidLast = r[i + 3];
+         if(staticID == sID) {
+            dc.nl();
+            dc.appendVar("CtxID", ctxID);
+            dc.appendBracketedWithSpace(toStringCtxID(ctxID));
+            dc.append(" [" + sidFirst + "," + sidLast + "]");
+         }
+      }
+      return dc.toString();
+   }
    public String toStringConfigs() {
       Dctx c = new Dctx(uc, "\n\t");
       toStringConfigs(c);

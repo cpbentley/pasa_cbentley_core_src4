@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import pasa.cbentley.core.src4.ctx.ObjectU;
+import pasa.cbentley.core.src4.ctx.ToStringStaticUc;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.CounterInt;
 import pasa.cbentley.core.src4.utils.BitUtils;
@@ -29,7 +30,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITechConfig {
+public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITechDLogConfig {
 
    private Hashtable all                 = new Hashtable();
 
@@ -92,16 +93,25 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       //first check if accepted
       DLogEntryOfConfig entryOfConf = new DLogEntryOfConfig(uc, this, type);
       int flags = 0;
-      entryOfConf.setConfigResFlag(FORMAT_FLAG_01_ACCEPTED, isAccepted(type));
+      boolean isAccepted = isAccepted(type);
+      
+      entryOfConf.setConfigResFlag(FORMAT_FLAG_01_ACCEPTED, isAccepted);
 
-      if (this.hasFlagFormat(FORMAT_FLAG_04_THREAD)) {
-         entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
-      }
-      if (this.hasFlagFormat(FORMAT_FLAG_07_LEVEL)) {
+      if (this.hasFlagMaster(MASTER_FLAG_12_LEVEL)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_07_LEVEL, true);
       }
+      if (this.hasFlagMaster(MASTER_FLAG_07_THREAD_DATA)) {
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
+      }
+      if (this.hasFlagMaster(MASTER_FLAG_10_OWNER_NAME_UC)) {
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_08_OWNER_NAME, true);
+      }
+      //Dev flags override master flags and are processed last
+      if (type.hasDevFlag(DEV_4_THREAD)) {
+         entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
+      }
       //dev flags override the config?
-      if (type.hasDevFlag(DEV_2_1LINE)) {
+      if (type.hasDevFlag(DEV_2_ONELINE)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_02_1LINE, true);
       }
       if (type.hasDevFlag(DEV_3_STACK)) {
@@ -110,18 +120,7 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       if (type.hasDevFlag(DEV_6_BIG)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_06_BIG, true);
       }
-
-      if (hasFlagMaster(MASTER_FLAG_07_THREAD_DATA)) {
-         entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
-      }
-      if (hasFlagMaster(MASTER_FLAG_10_OWNER_NAME_UC)) {
-         entryOfConf.setConfigResFlag(FORMAT_FLAG_08_OWNER_NAME, true);
-      }
-      //Dev override master flag
-      if (type.hasDevFlag(DEV_4_THREAD)) {
-         entryOfConf.setConfigResFlag(FORMAT_FLAG_04_THREAD, true);
-      }
-
+      
       return entryOfConf;
    }
 
@@ -155,18 +154,21 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       return false;
    }
 
+   /**
+    * Flags set with {@link DLogConfig#setFlagFormat(int, boolean)}
+    */
    public boolean hasFlagFormat(int flag) {
       return BitUtils.hasFlag(flagsFormat, flag);
    }
 
    /**
     * Sets
-    * <li> {@link ITechConfig#MASTER_FLAG_01_BLOCK_ALL_PRINT}
-    * <li> {@link ITechConfig#MASTER_FLAG_02_OPEN_ALL_PRINT}
-    * <li> {@link ITechConfig#MASTER_FLAG_03_ONLY_POSITIVES}
-    * <li> {@link ITechConfig#MASTER_FLAG_04_IGNORE_CLASSES}
-    * <li> {@link ITechConfig#MASTER_FLAG_05_IGNORE_FLAGS}
-    * <li> {@link ITechConfig#MASTER_FLAG_06_CLASS_INSTANCES}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_01_BLOCK_ALL_PRINT}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_02_OPEN_ALL_PRINT}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_03_ONLY_POSITIVES}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_04_IGNORE_CLASSES}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_05_IGNORE_FLAGS}
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_06_CLASS_INSTANCES}
     * @param flag
     * @param b
     */
@@ -244,7 +246,8 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       if (type.getLevel() < logLevel) {
          return false;
       }
-      boolean isAcceptedFlag = isAcceptedFlags(type.getTagID());
+      int tagID = type.getTagID();
+      boolean isAcceptedFlag = isAcceptedFlags(tagID);
       if (isAcceptedFlag) {
 
          boolean isClassAccepted = isClassAccepted(type.getClassL());
@@ -304,7 +307,7 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
     * true if class is null.
     * 
     * <li> By default all classes are accepted except negative classes
-    * <li> {@link ITechConfig#MASTER_FLAG_03_ONLY_POSITIVES} hides classes not explicitely positive
+    * <li> {@link ITechDLogConfig#MASTER_FLAG_03_ONLY_POSITIVES} hides classes not explicitely positive
     * @param c
     * @return
     */
@@ -531,14 +534,15 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, DLogConfig.class, "@line490");
+      dc.root(this, DLogConfig.class, 534);
 
-      dc.appendVarWithSpace("logLevel", logLevel);
+      dc.appendVarWithNewLine("logLevel", logLevel);
+      dc.appendWithSpace(ToStringStaticUc.toStringLogLevel(logLevel));
       dc.appendVarWithSpace("threshold", threshold);
       dc.appendVarWithSpace("stackPrefix", stackPrefix);
 
       dc.nl();
-      dc.appendWithSpace("Master Trues  = ");
+      dc.append("Master Trues  = ");
       toStringFlagMasterTrue(MASTER_FLAG_01_BLOCK_ALL_PRINT, STRING_M_01_BLOCK_ALL_PRINT, dc);
       toStringFlagMasterTrue(MASTER_FLAG_02_OPEN_ALL_PRINT, STRING_M_02_OPEN_ALL_PRINT, dc);
       toStringFlagMasterTrue(MASTER_FLAG_03_ONLY_POSITIVES, STRING_M_03_ONLY_POSITIVES, dc);
@@ -552,7 +556,7 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       toStringFlagMasterTrue(MASTER_FLAG_11_IGNORES_BIGS, STRING_M_11_IGNORE_BIGS, dc);
 
       dc.nl();
-      dc.appendWithSpace("Format Trues  = ");
+      dc.append("Format Trues  = ");
       toStringFlagFormatTrue(FORMAT_FLAG_01_ACCEPTED, STRING_F_01_ACCEPTED, dc);
       toStringFlagFormatTrue(FORMAT_FLAG_02_1LINE, STRING_F_02_1LINE, dc);
       toStringFlagFormatTrue(FORMAT_FLAG_03_STACK, STRING_F_03_STACK, dc);

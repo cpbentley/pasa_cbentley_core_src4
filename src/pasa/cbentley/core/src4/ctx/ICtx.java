@@ -5,7 +5,9 @@
 package pasa.cbentley.core.src4.ctx;
 
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
+import pasa.cbentley.core.src4.interfaces.IToStringFlags;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.ILogConfiguratorCtx;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.IStatorFactory;
 
@@ -71,6 +73,7 @@ public interface ICtx extends IStringable {
     * @return
     */
    public IStatorFactory getStatorFactory();
+
    /**
     * For the given {@link IStaticIDs} type (e.g {@link IStaticIDs#SID_STRINGS},
     * 
@@ -104,6 +107,7 @@ public interface ICtx extends IStringable {
    public boolean toString(Dctx dc, Object o);
 
    public boolean toString1Line(Dctx dc, Object o);
+
    /**
     * Finds a toString match for the instance of Object.
     * If none is found inside the ctx, the {@link Dctx}
@@ -118,8 +122,18 @@ public interface ICtx extends IStringable {
 
    public String toStringEventID(int pid, int eid);
 
+   /**
+    * Returns true of {@link IToStringFlags} is set for this {@link ICtx}.
+    * 
+    * @param flag
+    * @return
+    */
    public boolean toStringHasToStringFlag(int flag);
 
+   /**
+    * Returns all the {@link IToStringFlags} for this {@link ICtx}.
+    * @return
+    */
    public int toStringGetToStringFlags();
 
    /**
@@ -131,12 +145,26 @@ public interface ICtx extends IStringable {
 
    public String toStringStaticID(int pid);
 
+   /**
+    * Sets the {@link IToStringFlags} for this {@link ICtx}.
+    * 
+    * <p>
+    * Usually this will be done inside the {@link ILogConfiguratorCtx#configureCtx(ACtx)} method.
+    * </p>
+    * @param flag
+    * @param v
+    */
    public void toStringSetToStringFlag(int flag, boolean v);
 
    /**
-    * Called when a flag was set on {@link Dctx}.
-    * Enables ctx to set other flags linked to this flag.. but invisible 
-    * to the caller of this method
+    * Called when a {@link IToStringFlags} flag was set on {@link Dctx} with {@link Dctx#setFlagToString(ICtx, int, boolean)}.
+    * 
+    * <p>
+    * Enables ctx to set other flags linked to this flag.. but invisible to the caller of this method
+    * </p>
+    * 
+    * The flag comes from ?
+    * 
     * @param flag
     * @param b
     * @param dctx

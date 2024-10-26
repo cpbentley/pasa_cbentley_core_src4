@@ -8,6 +8,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.ILogConfigurator;
 import pasa.cbentley.core.src4.logging.LogConfiguratorAllFinest;
+import pasa.cbentley.core.src4.logging.LogParameters;
 
 /**
  * Base core implemention class for {@link IConfig}
@@ -24,15 +25,18 @@ public abstract class ConfigAbstract implements IConfig {
 
    protected boolean        isIgnoreSettings;
 
+   private ILogConfigurator logConfigurator;
+
+   /**
+    * Set using {@link ConfigAbstract#toStringSetDebugUCtx(UCtx)}
+    */
    protected UCtx           uc;
 
-   private ILogConfigurator logConfigurator;
+   public ConfigAbstract() {
+   }
 
    public ConfigAbstract(UCtx uc) {
       this.uc = uc;
-   }
-
-   public ConfigAbstract() {
    }
 
    /**
@@ -52,7 +56,6 @@ public abstract class ConfigAbstract implements IConfig {
    public boolean isHardcoded() {
       return false;
    }
-
 
    /**
     * Ignores the saved settings
@@ -88,7 +91,7 @@ public abstract class ConfigAbstract implements IConfig {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ConfigAbstract.class, 91);
+      dc.root(this, ConfigAbstract.class, toStringGetLine(95));
       toStringPrivate(dc);
       dc.appendVarWithNewLine("hashcode", this.hashCode());
       dc.appendVarWithNewLine("isEraseSettings", isEraseSettings);
@@ -101,17 +104,33 @@ public abstract class ConfigAbstract implements IConfig {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, ConfigAbstract.class, 126);
+      dc.root1Line(this, ConfigAbstract.class, toStringGetLine(107));
       toStringPrivate(dc);
       dc.appendVarWithSpace("isEraseSettings", isEraseSettings);
       dc.appendVarWithSpace("isIgnoreSettings", isIgnoreSettings);
    }
 
-   public ILogConfigurator toStringGetLogConfigurator(UCtx uc) {
+   public LogParameters toStringGetLine(Class cl, String method, int value) {
+      return toStringGetUCtx().toStringGetLine(cl, method, value);
+   }
+
+   public String toStringGetLine(int value) {
+      return toStringGetUCtx().toStringGetLine(value);
+   }
+
+   public ILogConfigurator toStringGetLogConfigurator() {
       if (logConfigurator == null) {
          logConfigurator = new LogConfiguratorAllFinest();
       }
       return logConfigurator;
+   }
+
+   public UCtx toStringGetUCtx() {
+      return uc;
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
    }
 
    public void toStringSetDebugUCtx(UCtx uc) {
@@ -121,14 +140,6 @@ public abstract class ConfigAbstract implements IConfig {
 
    public void toStringSetLogConfigurator(ILogConfigurator logConfigurator) {
       this.logConfigurator = logConfigurator;
-   }
-
-   public UCtx toStringGetUCtx() {
-      return uc;
-   }
-
-   private void toStringPrivate(Dctx dc) {
-    
    }
 
    //#enddebug

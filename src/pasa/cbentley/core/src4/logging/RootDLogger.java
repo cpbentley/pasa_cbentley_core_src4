@@ -138,7 +138,7 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
    protected void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, boolean oneLine) {
       int devFlags = 0;
       if (oneLine) {
-         devFlags = ITechConfig.FORMAT_FLAG_02_1LINE;
+         devFlags = ITechDLogConfig.FORMAT_FLAG_02_1LINE;
       }
       this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, devFlags);
    }
@@ -149,7 +149,7 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
       count++;
       ILogEntryAppender[] appenders = getAppenders();
       for (int i = 0; i < appenders.length; i++) {
-         DLogEntry entry = new DLogEntry();
+         DLogEntry entry = new DLogEntry(uc);
          entry.setNameOwner(name);
          entry.setCount(count);
          entry.setMethod(method);

@@ -9,6 +9,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.ILogConfigurator;
 import pasa.cbentley.core.src4.logging.ILogConfiguratorCtx;
+import pasa.cbentley.core.src4.logging.LogParameters;
 import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
@@ -86,22 +87,25 @@ public abstract class ACtx implements ICtx {
    public ACtx(IConfig config, UCtx uc, CtxManager cm) {
       this.config = config;
 
-     
       this.uc = uc;
       this.cm = cm;
 
       id = cm.registerCtx(this);
 
       //#mdebug
+      if (config != null) {
+         config.toStringSetDebugUCtx(uc);
+      }
+
       ILogConfigurator logConfig = uc.toStringGetLogConfigurator();
       if (logConfig instanceof ILogConfiguratorCtx) {
          ((ILogConfiguratorCtx) logConfig).configureCtx(this);
       }
       //#enddebug
-      
+
       //#mdebug
       String str = uc.getStrU().getNameObjectClass(this);
-      toDLog().pConfig("for (" + str+ ").java", config, ACtx.class, "ACtx@103", LVL_03_FINEST, false);
+      toDLog().pConfig("for (" + str + ").java", config, ACtx.class, "ACtx@103", LVL_03_FINEST, false);
       //#enddebug
 
    }
@@ -217,7 +221,7 @@ public abstract class ACtx implements ICtx {
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, ACtx.class, 200);
+      dc.root(this, ACtx.class, toStringGetLine(220));
       toStringPrivate(dc);
       dc.appendVarWithSpace("toStringFlags", toStringFlags);
       dc.nlLvlArrayBytes("data", data);
@@ -244,8 +248,16 @@ public abstract class ACtx implements ICtx {
       return Dctx.toString1Line(this);
    }
 
+   public String toStringGetLine(int value) {
+      return toStringGetUCtx().toStringGetLine(value);
+   }
+
+   public LogParameters toStringGetLine(Class cl, String method, int value) {
+      return toStringGetUCtx().toStringGetLine(cl, method, value);
+   }
+
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, ACtx.class, 248);
+      dc.root1Line(this, ACtx.class, toStringGetLine(250));
       toStringPrivate(dc);
    }
 
@@ -305,6 +317,10 @@ public abstract class ACtx implements ICtx {
       return null;
    }
 
+   /**
+    * Called during {@link ACtx} init from {@link IConfig}
+    * @param flags
+    */
    public void toStringSetToStringFlag(int flags) {
       toStringFlags = flags;
    }

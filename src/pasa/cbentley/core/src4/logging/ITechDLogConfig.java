@@ -7,7 +7,7 @@ package pasa.cbentley.core.src4.logging;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.interfaces.ITech;
 
-public interface ITechConfig extends ITech {
+public interface ITechDLogConfig extends ITech {
 
    /**
     * ?
@@ -46,6 +46,10 @@ public interface ITechConfig extends ITech {
     * Shows in front before line number
     * 
     * usefull when several different {@link UCtx} writing to System.out
+    * 
+    * <p>
+    * Master Set with {@link ITechDLogConfig#MASTER_FLAG_10_OWNER_NAME_UC}
+    * </p>
     */
    public static final int    FORMAT_FLAG_08_OWNER_NAME             = 1 << 7;
 
@@ -106,6 +110,14 @@ public interface ITechConfig extends ITech {
     * 
     */
    public static final int    MASTER_FLAG_07_THREAD_DATA            = 1 << 6;
+
+   /**
+    * Show lvl on all entries
+    */
+   public static final int    MASTER_FLAG_12_LEVEL                  = 1 << 11;
+
+   public static final int    MASTER_FLAG_13_TIMESTAMP              = 1 << 12;
+
 
    /**
     * Assume all tags are true, will reject only flags that are explicitly false

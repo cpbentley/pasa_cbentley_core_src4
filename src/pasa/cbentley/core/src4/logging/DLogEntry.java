@@ -4,13 +4,17 @@
  */
 package pasa.cbentley.core.src4.logging;
 
+import pasa.cbentley.core.src4.ctx.ObjectU;
+import pasa.cbentley.core.src4.ctx.ToStringStaticUc;
+import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
- * Represents a log statement
+ * Represents a log statement written in the code.
+ * 
+ * It is filled by the {@link BaseDLogger} with relevant data.
  * 
  * The {@link IStringable} is a reference to the object. As such it cannot be serialized
- *
  * <li> message
  * <li> {@link IStringable}
  * <li> Class
@@ -23,7 +27,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class DLogEntry implements ITechLvl {
+public class DLogEntry extends ObjectU implements ITechLvl {
 
    private Class       classL;
 
@@ -69,7 +73,8 @@ public class DLogEntry implements ITechLvl {
     */
    private long        timeStamp;
 
-   public DLogEntry() {
+   public DLogEntry(UCtx uc) {
+      super(uc);
       lvl = LVL_05_FINE;
    }
 
@@ -80,10 +85,10 @@ public class DLogEntry implements ITechLvl {
    public DLogEntryOfConfig computeDLogEntryOfConfig(IDLogConfig config) {
       DLogEntryOfConfig ec = config.getEntryConfig(this);
       //check if this log entry should record the thread name
-      if (threadName == null && ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_04_THREAD)) {
+      if (threadName == null && ec.hasFormatFlag(ITechDLogConfig.FORMAT_FLAG_04_THREAD)) {
          fillThreadName();
       }
-      if (timeStamp == 0 && ec.hasFormatFlag(ITechConfig.FORMAT_FLAG_05_TIMESTAMP)) {
+      if (timeStamp == 0 && ec.hasFormatFlag(ITechDLogConfig.FORMAT_FLAG_05_TIMESTAMP)) {
          timeStamp = System.currentTimeMillis();
       }
       return ec;
@@ -256,5 +261,33 @@ public class DLogEntry implements ITechLvl {
    public void setThrowable(Throwable throwable) {
       this.throwable = throwable;
    }
+   
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, DLogEntry.class, toStringGetLine(265));
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      
+      
+      dc.appendVarWithSpace("lvl", ToStringStaticUc.toStringLogLevel(lvl));
+      dc.appendVarWithSpace("owner", name);
+      
+      
+      dc.appendVarWithNewLine("threadName", threadName);
+      dc.appendVarWithNewLine("msg", msg);
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, DLogEntry.class, toStringGetLine(265));
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("tagString", tagString);
+   }
+   //#enddebug
+   
+
 
 }
