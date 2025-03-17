@@ -7,7 +7,6 @@ package pasa.cbentley.core.src4.logging;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IToStringFlagsUC;
 import pasa.cbentley.core.src4.ctx.UCtx;
@@ -40,6 +39,16 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  */
 public class Dctx implements IToStringFlagsUC {
    //#mdebug
+
+   /**
+    * 
+    */
+   public static final int FLAG_02_COLLAPSED = 1 << 1;
+
+   /**
+    * When {@link Dctx} methods have a choice betwen 1line and full
+    */
+   public static final int FLAG_1_EXPAND     = 1 << 0;
 
    /**
     * Static method for debugging. Supposedly to be inlined but since its debug code, it will be removed in production.
@@ -127,16 +136,6 @@ public class Dctx implements IToStringFlagsUC {
    public Dctx(UCtx uc) {
       this(uc, "\n");
    }
-
-   /**
-    * When {@link Dctx} methods have a choice betwen 1line and full
-    */
-   public static final int FLAG_1_EXPAND     = 1 << 0;
-
-   /**
-    * 
-    */
-   public static final int FLAG_02_COLLAPSED = 1 << 1;
 
    /**
     * Creates a {@link Dctx} with parent
@@ -1641,6 +1640,15 @@ public class Dctx implements IToStringFlagsUC {
       }
    }
 
+   public void nlLvlSuccint(IStringable o, String title) {
+      if (this.hasFlagToStringUC(IToStringFlagsUC.FLAG_UC_01_SUCCINT)) {
+         this.appendVarWithNewLine("COLLAPSE TO ONE LINE SUCCINT FLAG", true);
+         this.nlLvl1Line(o, title);
+      } else {
+         this.nlLvl(o, title);
+      }
+   }
+
    /**
     * Only prints title if {@link IStringable} is null
     * @param is
@@ -1839,16 +1847,16 @@ public class Dctx implements IToStringFlagsUC {
       this.root1Line(o, str, cl);
    }
 
-   public void root1Line(Object o, Class title, Class cl, String line) {
-      String str = getClassSimpleName(title);
-      String classLink = getClassSimpleName(cl);
-      this.root1Line(o, str, classLink, line);
-   }
-
    public void root1Line(Object o, Class title, Class cl, int line) {
       String str = getClassSimpleName(title);
       String classLink = getClassSimpleName(cl);
       this.root1Line(o, str, classLink, String.valueOf(line));
+   }
+
+   public void root1Line(Object o, Class title, Class cl, String line) {
+      String str = getClassSimpleName(title);
+      String classLink = getClassSimpleName(cl);
+      this.root1Line(o, str, classLink, line);
    }
 
    public void root1Line(Object o, Class cl, int line) {

@@ -157,6 +157,22 @@ public interface IDLog extends IStringable {
 
    public void pFlow(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
+   public void pSetADraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
+   public void pSetAFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
+   public void pSetFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
+   public void pSet(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
+   public void pInitADraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
+
+   public void o5FlowEvent(String msg, Object str, LogParameters params);
+
+   public void o4FlowEvent(String msg, Object str, LogParameters params);
+
+   public void o3FlowEvent(String msg, Object str, LogParameters params);
+
    public void pFlow(String msg, Object str, Class c, String method, int lvl, int flags);
 
    public void pFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
@@ -228,7 +244,7 @@ public interface IDLog extends IStringable {
    public void pStator(String msg, Object str, Class c, String method, int lvl, boolean oneLine);
 
    public void pStator(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
-   
+
    public void pSimul(String msg, Object str, LogParameters params, int lvl, boolean oneLine);
 
    public void pTest(String msg, Object str, Class c, String method);

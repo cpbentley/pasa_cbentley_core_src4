@@ -6,6 +6,7 @@ package pasa.cbentley.core.src4.logging;
 
 import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
  * @author Charles Bentley
@@ -133,14 +134,23 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
     * @param c
     * @param method
     * @param tagString
-    * @param tagID
+    * @param tagFlags
     */
-   protected void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, boolean oneLine) {
+   protected void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagFlags, int lvl, boolean oneLine) {
       int devFlags = 0;
       if (oneLine) {
          devFlags = ITechDLogConfig.FORMAT_FLAG_02_1LINE;
       }
-      this.ptPrint(msg, stringable, c, method, tagString, tagID, lvl, devFlags);
+      this.ptPrint(msg, stringable, c, method, tagString, tagFlags, lvl, devFlags);
+   }
+
+   protected void ptPrintAnd(String msg, IStringable stringable, Class c, String method, String tagString, int tagFlags, int lvl, boolean oneLine) {
+      int devFlags = 0;
+      if (oneLine) {
+         devFlags = ITechDLogConfig.FORMAT_FLAG_02_1LINE;
+      }
+      devFlags |= ITechDev.DEV_7_AND_TAGS;
+      this.ptPrint(msg, stringable, c, method, tagString, tagFlags, lvl, devFlags);
    }
 
    protected synchronized void ptPrint(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl, int flags) {
@@ -159,13 +169,27 @@ public abstract class RootDLogger extends ObjectU implements IDLog {
             entry.setClassStringable(stringable.getClass());
          }
          entry.setMsg(msg);
-         entry.setTagString(tagString);
+
          entry.setTagID(tagID);
+         if (tagString == null) {
+            //get it from the tagID
+            tagString = getTagStringFromIDs(tagID);
+         }
+         entry.setTagString(tagString);
          entry.setStringable(stringable);
          entry.setDevFlags(flags);
          entry.setLevel(lvl);
          appenders[i].processLogEntry(entry);
       }
+   }
+
+   private String getTagStringFromIDs(int tagID) {
+      if (BitUtils.hasFlag(tagID, ITechTags.FLAG_07_PRINT_EVENT)) {
+         return ITechTags.STRING_07_EVENT;
+      } else if (BitUtils.hasFlag(tagID, ITechTags.FLAG_09_PRINT_FLOW)) {
+         return ITechTags.STRING_09_FLOW;
+      }
+      return "MixIDNotProgrammed" + tagID;
    }
 
    protected void ptPrintBig(String msg, IStringable stringable, Class c, String method, String tagString, int tagID, int lvl) {

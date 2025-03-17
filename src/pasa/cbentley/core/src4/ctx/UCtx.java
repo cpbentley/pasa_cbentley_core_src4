@@ -29,6 +29,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IDLogConfig;
 import pasa.cbentley.core.src4.logging.ILogConfigurator;
+import pasa.cbentley.core.src4.logging.ILogConfiguratorCtx;
 import pasa.cbentley.core.src4.logging.ILogEntryAppender;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.logging.ITechLvl;
@@ -368,6 +369,13 @@ public class UCtx implements ICtx, IEventsCore {
       IDLogConfig configOfAppender = logAppender.getConfig();
       toStringLogConfigurator.apply(configOfAppender); //apply config
 
+      //TODO
+      //what is applied first ? IConfig flags or this ? 
+      //IConfig flags are first unless Config explicitely overrides LogConfigurator
+      if(toStringLogConfigurator instanceof ILogConfiguratorCtx) {
+         ((ILogConfiguratorCtx)toStringLogConfigurator).configureUCtx(this);
+      }
+      
       //String message = "Very First Log Message; Using LogConfigurator:" + toStringLogConfigurator.getClass().getName();
       String message = "Very First Log Message; Using (" + stru.getNameClass(toStringLogConfigurator.getClass()) + ".java:20)";
       dlog.pAlways(message, null, UCtx.class, "name=" + name + " hashcode=" + +this.hashCode() + " ");

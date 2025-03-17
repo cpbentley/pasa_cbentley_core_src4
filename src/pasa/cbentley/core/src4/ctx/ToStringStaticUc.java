@@ -209,6 +209,10 @@ public class ToStringStaticUc extends ToStringStaticBase {
             return ITechTags.STRING_27_SIMULATION;
          case ITechTags.FLAG_28_PRINT_LOOP:
             return ITechTags.STRING_28_LOOP;
+         case ITechTags.FLAG_29_PRINT_SET:
+            return ITechTags.STRING_29_SET;
+         case ITechTags.FLAG_30_PRINT_GET:
+            return ITechTags.STRING_30_GET;
          default:
             return "Unknown " + tag;
       }

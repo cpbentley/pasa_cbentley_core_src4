@@ -409,6 +409,23 @@ public class BitUtils {
       return byteSize;
    }
 
+   /**
+    * True if both values have at least one bits in common with a 1 value
+    * @param root
+    * @param flags
+    * @return
+    */
+   public static boolean hasMatchAtLeastOneFlag(int root, int flags) {
+      //
+      return (root & flags) != 0;
+   }
+   
+   /**
+    * 
+    * @param root
+    * @param flag
+    * @return
+    */
    public static boolean hasFlag(int root, int flag) {
       return (root & flag) == flag;
    }

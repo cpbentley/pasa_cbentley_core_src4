@@ -375,7 +375,7 @@ public class LogAdapter implements IDLog {
 
    public void pConfig(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public int levelIncrement() {
@@ -390,72 +390,112 @@ public class LogAdapter implements IDLog {
 
    public void pCmd(String msg, Object str, LogParameters params) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pCmd(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pNull(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pDraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pData(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pEvent(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pModel(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pAlways(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pCreate(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pBridge(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pInit(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pStator(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
    }
 
    public void pSimul(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       // TODO Auto-generated method stub
-      
+
+   }
+
+   public void o5FlowEvent(String msg, Object str, LogParameters params) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void o4FlowEvent(String msg, Object str, LogParameters params) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void o3FlowEvent(String msg, Object str, LogParameters params) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void pSetADraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void pInitADraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void pSetAFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void pSetFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+
+   }
+
+   public void pSet(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      // TODO Auto-generated method stub
+
    }
 
    //#enddebug

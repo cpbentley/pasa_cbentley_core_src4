@@ -16,6 +16,13 @@ public interface ITechTags extends ITech {
 
    public static final int    FLAG_01_PRINT_ALWAYS     = 1 << 0;
 
+   /**
+    * Message that should not occur, generating a NPE if not catching
+    */
+   public static final int    FLAG_02_PRINT_NULL       = 1 << 1;
+
+   public static final int    FLAG_03_                 = 1 << 2;
+
    public static final int    FLAG_04_PRINT_STATOR     = 1 << 3;
 
    public static final int    FLAG_05_PRINT_UI         = 1 << 4;
@@ -66,14 +73,21 @@ public interface ITechTags extends ITech {
 
    public static final int    FLAG_28_PRINT_LOOP       = 1 << 27;
 
-   /**
-    * Message that should not occur, generating a NPE if not catching
-    */
-   public static final int    FLAG_02_PRINT_NULL       = 1 << 1;
+   public static final int    FLAG_29_PRINT_SET        = 1 << 28;
+
+   public static final int    FLAG_30_PRINT_GET        = 1 << 29;
+
+   public static final int    FLAG_31_                 = 1 << 30;
+
+   public static final int    FLAG_32_                 = 1 << 31;
 
    public static final int    FLAG_ALL                 = -1;
 
    public static final String STRING_01_ALWAYS         = "Always";
+
+   public static final String STRING_02_NULL           = "Null";
+
+   public static final String STRING_03_               = "";
 
    public static final String STRING_04_STATOR         = "Stator";
 
@@ -125,6 +139,14 @@ public interface ITechTags extends ITech {
 
    public static final String STRING_28_LOOP           = "Loop";
 
-   public static final String STRING_02_NULL           = "Null";
+   public static final String STRING_29_SET            = "Set";
+
+   public static final String STRING_30_GET            = "Get";
+
+   public static final String STRING_31_               = "";
+
+   public static final String STRING_32_               = "";
+
+   public static final String STRING_XX_FLOWEVENT      = "FlowEvent";
 
 }

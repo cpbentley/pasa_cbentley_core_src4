@@ -106,7 +106,7 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    public void pSimul(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_27_SIMULATION, ITechTags.FLAG_27_PRINT_SIMULATION, lvl, oneLine);
    }
-   
+
    public void pCreate(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_25_CREATE, ITechTags.FLAG_25_PRINT_CREATE, lvl, oneLine);
    }
@@ -201,6 +201,12 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
       pFlow(msg, getStringable(str), c, method, getLevelDefault(), false);
    }
 
+   public void pGet(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_30_GET, ITechTags.FLAG_30_PRINT_GET, lvl, oneLine);
+   }
+   public void pSet(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_29_SET, ITechTags.FLAG_29_PRINT_SET, lvl, oneLine);
+   }
    public void pFlow(String msg, Object str, Class c, String method, int lvl, boolean oneLine) {
       super.ptPrint(msg, getStringable(str), c, method, ITechTags.STRING_09_FLOW, ITechTags.FLAG_09_PRINT_FLOW, lvl, oneLine);
    }
@@ -366,12 +372,41 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
    public void pCreate(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       pCreate(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
    }
+
    public void pSimul(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       pCreate(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
    }
 
    public void pData(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       pData(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pFlowEvent(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), params.cl, params.method, null, ITechTags.FLAG_09_PRINT_FLOW | ITechTags.FLAG_07_PRINT_EVENT, lvl, oneLine);
+   }
+
+   public void pSetADraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      super.ptPrintAnd(msg, getStringable(str), params.cl, params.method, null, ITechTags.FLAG_29_PRINT_SET | ITechTags.FLAG_24_PRINT_DRAW, lvl, oneLine);
+   }
+
+   public void pInitADraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      super.ptPrintAnd(msg, getStringable(str), params.cl, params.method, null, ITechTags.FLAG_20_PRINT_INIT | ITechTags.FLAG_24_PRINT_DRAW, lvl, oneLine);
+   }
+
+   public void o5SetADraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), params.cl, params.method, null, ITechTags.FLAG_29_PRINT_SET | ITechTags.FLAG_24_PRINT_DRAW, ITechLvl.LVL_05_FINE, true);
+   }
+
+   public void o5FlowEvent(String msg, Object str, LogParameters params) {
+      pFlowEvent(msg, str, params, LVL_05_FINE, true);
+   }
+
+   public void o4FlowEvent(String msg, Object str, LogParameters params) {
+      pFlowEvent(msg, str, params, LVL_04_FINER, true);
+   }
+
+   public void o3FlowEvent(String msg, Object str, LogParameters params) {
+      pFlowEvent(msg, str, params, LVL_03_FINEST, true);
    }
 
    public void pDraw(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
@@ -404,5 +439,21 @@ public class BaseDLogger extends RootDLogger implements IDLog, ITechTags {
 
    public void pStator(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
       pStator(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
+   }
+
+   public void pSetAFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      super.ptPrintAnd(msg, getStringable(str), params.cl, params.method, null, ITechTags.FLAG_29_PRINT_SET | ITechTags.FLAG_09_PRINT_FLOW, lvl, oneLine);
+            
+   }
+   public void pSetAInit(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      super.ptPrintAnd(msg, getStringable(str), params.cl, params.method, null, ITechTags.FLAG_29_PRINT_SET | ITechTags.FLAG_20_PRINT_INIT, lvl, oneLine);
+            
+   }
+   public void pSetFlow(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      super.ptPrint(msg, getStringable(str), params.cl, params.method, null, ITechTags.FLAG_29_PRINT_SET | ITechTags.FLAG_09_PRINT_FLOW, lvl, oneLine);
+   }
+
+   public void pSet(String msg, Object str, LogParameters params, int lvl, boolean oneLine) {
+      pSet(msg, getStringable(str), params.cl, params.method, lvl, oneLine);
    }
 }

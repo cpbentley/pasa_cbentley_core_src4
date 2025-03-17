@@ -32,7 +32,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  */
 public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITechDLogConfig {
 
-   private Hashtable all                 = new Hashtable();
+   private Hashtable all                   = new Hashtable();
 
    protected int     cmdflags;
 
@@ -47,11 +47,11 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
 
    private int       flagsTagNeg;
 
-   private String flagToStringSeparator = "-";
+   private String    flagToStringSeparator = "-";
 
-   private Hashtable fullPositives       = new Hashtable();
+   private Hashtable fullPositives         = new Hashtable();
 
-   private int       logLevel            = ITechLvl.LVL_05_FINE;
+   private int       logLevel              = ITechLvl.LVL_05_FINE;
 
    /**
     * Class object that are required to be ignored.
@@ -59,20 +59,20 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
     * No hashset
     * Implement our own?
     */
-   private Hashtable negatives           = new Hashtable();
+   private Hashtable negatives             = new Hashtable();
 
-   private Hashtable positives1LineClass = new Hashtable();
+   private Hashtable positives1LineClass   = new Hashtable();
 
-   private Hashtable positives1LineInt   = new Hashtable();
+   private Hashtable positives1LineInt     = new Hashtable();
 
    /**
     * 
     */
-   private Hashtable positivesClasses    = new Hashtable();
+   private Hashtable positivesClasses      = new Hashtable();
 
-   private Hashtable positivesTraceClass = new Hashtable();
+   private Hashtable positivesTraceClass   = new Hashtable();
 
-   private Hashtable positivesTraceTags  = new Hashtable();
+   private Hashtable positivesTraceTags    = new Hashtable();
 
    private String    stackPrefix;
 
@@ -94,7 +94,7 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       DLogEntryOfConfig entryOfConf = new DLogEntryOfConfig(uc, this, type);
       int flags = 0;
       boolean isAccepted = isAccepted(type);
-      
+
       entryOfConf.setConfigResFlag(FORMAT_FLAG_01_ACCEPTED, isAccepted);
 
       if (this.hasFlagMaster(MASTER_FLAG_12_LEVEL)) {
@@ -120,7 +120,7 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       if (type.hasDevFlag(DEV_6_BIG)) {
          entryOfConf.setConfigResFlag(FORMAT_FLAG_06_BIG, true);
       }
-      
+
       return entryOfConf;
    }
 
@@ -191,6 +191,10 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       return BitUtils.hasFlag(flagsTag, flag);
    }
 
+   public boolean hasMatchAtLeastOneFlag(int flags) {
+      return BitUtils.hasMatchAtLeastOneFlag(flagsTag, flags);
+   }
+
    /**
     * <li> {@link ITechTags#FLAG_01_PRINT_ALWAYS}
     * <li> {@link ITechTags#FLAG_05_PRINT_UI}
@@ -236,26 +240,26 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       return false;
    }
 
-   public boolean isAccepted(DLogEntry type) {
-      boolean isClassFullDebug = isClassFullPositive(type.getClassL());
+   public boolean isAccepted(DLogEntry logEntry) {
+      boolean isClassFullDebug = isClassFullPositive(logEntry.getClassL());
       if (isClassFullDebug) {
          return true;
       }
 
       //fail fast
-      if (type.getLevel() < logLevel) {
+      if (logEntry.getLevel() < logLevel) {
          return false;
       }
-      int tagID = type.getTagID();
-      boolean isAcceptedFlag = isAcceptedFlags(tagID);
+
+      boolean isAcceptedFlag = isAcceptedTags(logEntry);
       if (isAcceptedFlag) {
 
-         boolean isClassAccepted = isClassAccepted(type.getClassL());
+         boolean isClassAccepted = isClassAccepted(logEntry.getClassL());
          if (isClassAccepted) {
             return true;
          }
          if (hasFlagMaster(MASTER_FLAG_09_TREAT_STRINGABLE_CLASS)) {
-            boolean isClassStringableAccepted = isClassAccepted(type.getClassStringable());
+            boolean isClassStringableAccepted = isClassAccepted(logEntry.getClassStringable());
             if (isClassStringableAccepted) {
                return true;
             }
@@ -274,7 +278,7 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       return true;
    }
 
-   public boolean isAcceptedFlags(int flagTag) {
+   public boolean isAcceptedTags(DLogEntry logEntry) {
       if (hasFlagMaster(MASTER_FLAG_02_OPEN_ALL_PRINT)) {
          return true;
       }
@@ -284,6 +288,7 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       if (hasFlagMaster(MASTER_FLAG_05_IGNORE_FLAGS)) {
          return true;
       } else {
+         int flagTag = logEntry.getTagID();
          if (flagTag == FLAG_01_PRINT_ALWAYS) {
             return true;
          }
@@ -296,9 +301,16 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
                return true;
             }
          } else {
-            //only accept if tag is set to true
-            boolean hasFlagTag = hasFlagTag(flagTag);
-            return hasFlagTag;
+            //double tags ?
+            //only accept if tag flag is set to true
+            //OR or AND
+            if (logEntry.hasDevFlag(ITechDev.DEV_7_AND_TAGS)) {
+               boolean hasFlagTag = hasMatchAtLeastOneFlag(flagTag);
+               return hasFlagTag;
+            } else {
+               boolean hasFlagTag = hasMatchAtLeastOneFlag(flagTag);
+               return hasFlagTag;
+            }
          }
       }
    }
@@ -595,6 +607,8 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       toStringFlagTagTrue(FLAG_26_PRINT_CONFIG, STRING_26_CONFIG, dc);
       toStringFlagTagTrue(FLAG_27_PRINT_SIMULATION, STRING_27_SIMULATION, dc);
       toStringFlagTagTrue(FLAG_28_PRINT_LOOP, STRING_28_LOOP, dc);
+      toStringFlagTagTrue(FLAG_29_PRINT_SET, STRING_29_SET, dc);
+      toStringFlagTagTrue(FLAG_30_PRINT_GET, STRING_30_GET, dc);
 
       dc.nl();
       dc.append("TagNegs Trues = ");
@@ -625,6 +639,8 @@ public class DLogConfig extends ObjectU implements IDLogConfig, ITechTags, ITech
       toStringFlagTagNegTrue(FLAG_26_PRINT_CONFIG, STRING_26_CONFIG, dc);
       toStringFlagTagNegTrue(FLAG_27_PRINT_SIMULATION, STRING_27_SIMULATION, dc);
       toStringFlagTagNegTrue(FLAG_28_PRINT_LOOP, STRING_28_LOOP, dc);
+      toStringFlagTagNegTrue(FLAG_29_PRINT_SET, STRING_29_SET, dc);
+      toStringFlagTagNegTrue(FLAG_30_PRINT_GET, STRING_30_GET, dc);
 
       toStringHashClass(dc, "Negative Classes", negatives);
       toStringHashClass(dc, "Positive Classes", positivesClasses);
